@@ -11,9 +11,8 @@ export const Consultations = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { data, addMessage, setQueueStatus, pendingSyncCount, flushSync } = useAppData();
-  const [mode, setMode] = useState<'patient' | 'doctor'>('patient');
-  const [message, setMessage] = useState('');
-  const [isFlushing, setIsFlushing] = useState(false);
+  if (!user) return null;
+  const isDoctor = user.role === 'doctor';
   const consultationId = 'live_consultation_1';
 
   const messages = useMemo(
@@ -22,13 +21,13 @@ export const Consultations = () => {
   );
 
   const queueItems = useMemo(
-    () => data.queue.filter((q) => q.status === 'waiting' || q.status === 'ongoing'),
-    [data.queue],
+    () => data.queue.filter((q) => q.doctorId === user.id && (q.status === 'waiting' || q.status === 'ongoing')),
+    [data.queue, user],
   );
 
   const sendMessage = () => {
     if (!user || !message.trim()) return;
-    addMessage({ consultationId, senderId: user.id, text: message.trim() });
+    addMessage({ consultationId, senderId: user.id, text: message });
     setMessage('');
   };
 
@@ -36,31 +35,15 @@ export const Consultations = () => {
     <div className="space-y-6 w-full">
       <div className="rounded-2xl border bg-card p-4">
         <h2 className="text-2xl font-bold">Consultation Workspace</h2>
-        <p className="text-sm text-muted-foreground mt-1">Video call + queue operations + in-consult chat and attachments.</p>
-        <div className="flex gap-3 mt-4">
-          <button
-            type="button"
-            onClick={() => setMode('patient')}
-            className={`px-4 py-2 rounded-lg border transition ${
-              mode === 'patient' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200'
-            }`}
-          >
-            Patient View
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('doctor')}
-            className={`px-4 py-2 rounded-lg border transition ${
-              mode === 'doctor' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200'
-            }`}
-          >
-            Doctor View
-          </button>
-        </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          {isDoctor
+            ? 'Incoming patient calls appear below. Accept to start the video consult.'
+            : 'Search for a doctor and start your video consultation.'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-5">
-        <div>{mode === 'patient' ? <DoctorConsultation language={language} /> : <DoctorDashboard language={language} />}</div>
+        <div>{isDoctor ? <DoctorDashboard language={language} user={user} /> : <DoctorConsultation language={language} user={user} />}</div>
 
         <div className="space-y-4">
           <RoomOnboarding

@@ -15,12 +15,14 @@ import { useTranslation } from "./translations";
 import { VitalsDashboard } from "./vitals-dashboard";
 import { PrescriptionBuilder } from "./prescription-builder";
 import { WebRTCService } from "../services/webrtc-service";
+import { SessionUser } from "../types/app";
 
 interface DoctorDashboardProps {
   language: string;
+  user: SessionUser;
 }
 
-export function DoctorDashboard({ language }: DoctorDashboardProps) {
+export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   const t = useTranslation(language);
 
   // Existing dashboard state
@@ -52,10 +54,10 @@ export function DoctorDashboard({ language }: DoctorDashboardProps) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Sample doctor info - IMPORTANT: This must match what patient is calling
+  // The logged-in doctor drives identity — no hardcoded doctor_1 fallback
   const currentDoctor = {
-    id: 'doctor_1', // This creates the ID that patient calls
-    name: 'Dr. Priya Sharma',
+    id: user.id, // e.g. 'doctor_1'
+    name: user.name,
     specialty: 'General Medicine'
   };
 

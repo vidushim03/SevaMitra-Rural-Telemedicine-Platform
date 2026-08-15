@@ -7,12 +7,14 @@ import { Separator } from "./ui/separator";
 import { Video, VideoOff, Mic, MicOff, Phone, PhoneOff, Calendar, Clock, Star, User, Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "./translations";
 import { WebRTCService } from "../services/webrtc-service";
+import { SessionUser } from "../types/app";
 
 interface DoctorConsultationProps {
   language: string;
+  user: SessionUser;
 }
 
-export function DoctorConsultation({ language }: DoctorConsultationProps) {
+export function DoctorConsultation({ language, user }: DoctorConsultationProps) {
   const [isInCall, setIsInCall] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -27,10 +29,10 @@ export function DoctorConsultation({ language }: DoctorConsultationProps) {
 
   const t = useTranslation(language);
 
-  // Sample patient info - replace with actual data
+  // The logged-in patient drives identity — no more hardcoded "John Doe"
   const currentPatient = {
-    id: 'patient_123',
-    name: 'John Doe',
+    id: user.id,
+    name: user.name,
     age: 30,
     condition: 'General consultation'
   };
@@ -69,7 +71,7 @@ export function DoctorConsultation({ language }: DoctorConsultationProps) {
   ];
 
   useEffect(() => {
-    // Register as patient
+    // Register the real patient so the doctor's signaling server sees them
     webrtcService.register(currentPatient.id, 'patient', {
       name: currentPatient.name,
       age: currentPatient.age,
@@ -147,7 +149,7 @@ export function DoctorConsultation({ language }: DoctorConsultationProps) {
     console.log('Starting consultation with doctor:', doctorId);
     setCallStatus('calling');
 
-    // Call the doctor
+    // Call the real seeded doctor account (doctor_1, doctor_2, ...)
     webrtcService.callDoctor(
       `doctor_${doctorId}`,
       currentPatient.id,
