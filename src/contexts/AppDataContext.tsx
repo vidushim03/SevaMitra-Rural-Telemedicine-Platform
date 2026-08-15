@@ -1,7 +1,9 @@
 ﻿import React, { createContext, useContext, useMemo, useState } from 'react';
 import { AppDataState, Appointment, ChatMessage, MedicalRecord, Payment, Prescription, QueueItem, SessionUser } from '../types/app';
+import { SyncQueue, SyncOperation } from '../services/sync-queue';
 
 const STORAGE_KEY = 'sevamitra.data.v1';
+const syncQueue = new SyncQueue();
 
 const seedUsers: SessionUser[] = [
   { id: 'patient_demo', name: 'Rohan Verma', role: 'patient', email: 'rohan@demo.com' },
@@ -76,6 +78,8 @@ interface AppDataContextValue {
   data: AppDataState;
   doctors: SessionUser[];
   patients: SessionUser[];
+  pendingSyncCount: number;
+  flushSync: () => Promise<number>;
   addAppointment: (payload: Omit<Appointment, 'id' | 'status'>) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   addRecord: (payload: Omit<MedicalRecord, 'id' | 'date'>) => void;
@@ -99,10 +103,22 @@ function loadState(): AppDataState {
 
 export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppDataState>(() => loadState());
+  const [pendingSyncCount, setPendingSyncCount] = useState(() => syncQueue.getPendingCount());
 
   const persist = (next: AppDataState) => {
     setData(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const sync = (op: Omit<SyncOperation, 'createdAt'>) => {
+    syncQueue.enqueue({ ...op, createdAt: new Date().toISOString() });
+    setPendingSyncCount(syncQueue.getPendingCount());
+  };
+
+  const flushSync = async () => {
+    const synced = await syncQueue.flush();
+    setPendingSyncCount(syncQueue.getPendingCount());
+    return synced;
   };
 
   const value = useMemo<AppDataContextValue>(() => {
@@ -113,6 +129,8 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       data,
       doctors,
       patients,
+      pendingSyncCount,
+      flushSync,
       addAppointment: (payload) => {
         const id = `apt_${Date.now()}`;
         const appointment: Appointment = { ...payload, id, status: 'scheduled' };
@@ -129,12 +147,15 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           appointments: [appointment, ...data.appointments],
           queue: [queueItem, ...data.queue],
         });
+        sync({ type: 'appointment.created', payload: appointment });
+        sync({ type: 'queue.updated', id: queueItem.id, status: queueItem.status });
       },
       updateAppointmentStatus: (id, status) => {
         persist({
           ...data,
           appointments: data.appointments.map((a) => (a.id === id ? { ...a, status } : a)),
         });
+        sync({ type: 'appointment.updated', id, status });
       },
       addRecord: (payload) => {
         const rec: MedicalRecord = {
@@ -143,6 +164,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           date: new Date().toISOString(),
         };
         persist({ ...data, records: [rec, ...data.records] });
+        sync({ type: 'record.created', payload: rec });
       },
       addPrescription: (payload) => {
         const rx: Prescription = {
@@ -151,6 +173,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           date: new Date().toISOString(),
         };
         persist({ ...data, prescriptions: [rx, ...data.prescriptions] });
+        sync({ type: 'prescription.created', payload: rx });
       },
       addPayment: (payload) => {
         const payment: Payment = {
@@ -159,18 +182,21 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           date: new Date().toISOString(),
         };
         persist({ ...data, payments: [payment, ...data.payments] });
+        sync({ type: 'payment.created', payload: payment });
       },
       markPayment: (id, status) => {
         persist({
           ...data,
           payments: data.payments.map((p) => (p.id === id ? { ...p, status } : p)),
         });
+        sync({ type: 'payment.updated', id, status });
       },
       setQueueStatus: (id, status) => {
         persist({
           ...data,
           queue: data.queue.map((q) => (q.id === id ? { ...q, status } : q)),
         });
+        sync({ type: 'queue.updated', id, status });
       },
       addMessage: (payload) => {
         const msg: ChatMessage = {
@@ -179,6 +205,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
         };
         persist({ ...data, chats: [...data.chats, msg] });
+        sync({ type: 'message.created', payload: msg });
       },
     };
   }, [data]);

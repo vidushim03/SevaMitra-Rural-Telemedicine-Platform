@@ -2,15 +2,18 @@
 import { useLanguage } from '../contexts/LanguageContext';
 import { DoctorConsultation } from '../components/doctor-consultation';
 import { DoctorDashboard } from '../components/doctor-dashboard';
+import { RoomOnboarding } from '../components/room-onboarding';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppData } from '../contexts/AppDataContext';
+import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 
 export const Consultations = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
-  const { data, addMessage, setQueueStatus } = useAppData();
+  const { data, addMessage, setQueueStatus, pendingSyncCount, flushSync } = useAppData();
   const [mode, setMode] = useState<'patient' | 'doctor'>('patient');
   const [message, setMessage] = useState('');
+  const [isFlushing, setIsFlushing] = useState(false);
   const consultationId = 'live_consultation_1';
 
   const messages = useMemo(
@@ -60,6 +63,45 @@ export const Consultations = () => {
         <div>{mode === 'patient' ? <DoctorConsultation language={language} /> : <DoctorDashboard language={language} />}</div>
 
         <div className="space-y-4">
+          <RoomOnboarding
+            language={language}
+            userId={user?.id || 'guest'}
+            userName={user?.name || 'Guest'}
+            role={user?.role === 'doctor' ? 'doctor' : 'patient'}
+          />
+
+          <div className="rounded-2xl border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Offline Sync</h3>
+              {pendingSyncCount === 0 ? (
+                <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                  <Wifi size={14} /> Synced
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs text-amber-600 font-medium">
+                  <WifiOff size={14} /> {pendingSyncCount} pending
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Changes made offline are queued on this device and flushed automatically when the connection returns.
+            </p>
+            {pendingSyncCount > 0 && (
+              <button
+                onClick={async () => {
+                  setIsFlushing(true);
+                  await flushSync();
+                  setIsFlushing(false);
+                }}
+                disabled={isFlushing}
+                className="mt-3 flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-3 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+              >
+                <RefreshCw size={14} className={isFlushing ? 'animate-spin' : ''} />
+                {isFlushing ? 'Syncing...' : 'Sync Now'}
+              </button>
+            )}
+          </div>
+
           <div className="rounded-2xl border bg-card p-4">
             <h3 className="font-semibold">Waiting Queue</h3>
             <div className="space-y-2 mt-3">

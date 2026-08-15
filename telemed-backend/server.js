@@ -5,6 +5,27 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
+
+// Stores operations flushed from clients' offline sync queues
+const syncedOperations = [];
+
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', pendingOps: syncedOperations.length });
+});
+
+app.post('/api/sync', (req, res) => {
+    const operations = Array.isArray(req.body?.operations) ? req.body.operations : [];
+    if (operations.length === 0) {
+        return res.status(400).json({ error: 'No operations provided' });
+    }
+    syncedOperations.push(...operations.map((op) => ({
+        ...op,
+        receivedAt: new Date().toISOString()
+    })));
+    console.log(`Sync received ${operations.length} operation(s); total ${syncedOperations.length}`);
+    res.json({ accepted: operations.length });
+});
 
 const server = http.createServer(app);
 const io = socketIo(server, {

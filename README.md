@@ -1,23 +1,158 @@
+# SevaMitra — Telemedicine Access for Rural Healthcare in Nabha
 
-  # Multilingual Telemedicine App
+SevaMitra is a low-bandwidth, offline-capable telemedicine platform built for rural communities where
+medical infrastructure is thin and connectivity is unreliable. It connects patients, doctors, health
+workers, and pharmacies through video consultations, a symptom triage assistant, electronic medical
+records, and medicine delivery — in English, Hindi, and Punjabi.
 
-  This is a code bundle for Multilingual Telemedicine App. The original project is available at https://www.figma.com/design/GuxS3RpvKgvkVMbZDedFEO/Multilingual-Telemedicine-App.
+This project was built as a response to the **Smart India Hackathon 2025 problem statement
+SIH25018 ("Telemedicine Access for Rural Healthcare in Nabha", Government of Punjab)**: rural Nabha
+faces a shortage of qualified doctors, poor internet connectivity, and low digital literacy. The
+platform's core design decisions — offline sync, QR-based onboarding, multilingual UI, low-bandwidth
+video — all trace back to that problem statement.
 
-  ## Running the code
+---
 
-  1. Install frontend deps:
-  `npm i`
+## The problem
 
-  2. Start signaling backend (terminal 1):
-  `cd telemed-backend && npm i && npm start`
+Nabha and surrounding villages face a compound healthcare gap:
 
-  3. Start frontend (terminal 2):
-  `npm run dev`
+- **Doctor shortage** — a few specialists serve a large rural population; travel to a town clinic is
+  costly and time-consuming.
+- **Poor connectivity** — rural 2G/3G networks drop frequently; patients cannot rely on always-on
+  internet.
+- **Language barrier** — the primary care network serves Hindi and Punjabi speakers; health
+  information must not assume English.
+- **Low digital literacy** — onboarding must be as simple as showing a QR code or entering a short
+  room code, not filling registration forms on a PC.
 
-  Defaults:
-  - Frontend: `http://localhost:3000` (strict)
-  - Signaling server: `http://localhost:4001`
+## The users
 
-  Optional override:
-  - Set `VITE_SIGNALING_SERVER_URL` to point frontend to a different signaling backend URL.
-  
+| Role | Needs |
+|------|-------|
+| **Patient** (rural, Hindi/Punjabi) | Speak to a doctor without travelling; do it on a phone with flaky internet |
+| **Doctor** (urban or sub-centre) | See patients remotely, review records, issue prescriptions, track queue |
+| **Health worker / ASHA** | Help patients onboard and join consultations; work with low connectivity |
+| **Pharmacist** | See prescriptions, manage stock, alert patients when a medicine is unavailable nearby |
+
+## The workflow
+
+```
+Symptom check / complaint → Room code or QR onboarding → Video consultation
+        → Electronic medical record + prescription → Pharmacy stock lookup & delivery
+```
+
+1. A patient describes symptoms using the **triage assistant**, which suggests a specialist and an
+   urgency level (low / medium / high / emergency).
+2. A doctor shares a **QR code or 6-character room code**; the patient scans or types it to join the
+   live consultation — no accounts or app-store signup required.
+3. During the call the doctor updates vitals, writes notes, and issues a **prescription**.
+4. The prescription drives the **pharmacy tracker**: nearby pharmacies, stock levels, and opening
+   hours, so the patient knows where the medicine is available.
+
+## Design constraints (from SIH25018)
+
+- **Low bandwidth** — video works on degraded networks; the call can fall back to audio-only.
+- **Offline first** — appointments, records, messages, and prescription updates made offline are
+  queued on the device and **flushed automatically when connectivity returns**.
+- **Phone-only** — the UI is a responsive mobile-first web app; no desktop workflows assumed.
+- **Multilingual** — full English / Hindi / Punjabi interface.
+- **QR / room-code onboarding** — a patient with low digital literacy joins via a scan or a short code.
+
+## What's inside
+
+### Features
+- **Live video/audio consultations** with WebRTC (`RTCPeerConnection` + STUN) and a Socket.IO
+  signaling server for offer/answer/ICE exchange.
+- **Symptom triage assistant** — rule-based specialist + urgency recommendation in three languages.
+- **Offline sync queue** — every data mutation (appointment, record, prescription, payment, message)
+  is persisted locally and enqueued; a `SyncQueue` flushes the batch to the backend on reconnect.
+- **QR / room-code onboarding** — doctors create a consultation room (QR + code), patients join by
+  scanning or typing the code.
+- **EMR + prescription builder** — vitals, diagnosis, notes, and structured prescriptions.
+- **Pharmacy tracker** — nearby pharmacy lookup with stock levels, opening hours, and distance sort.
+- **Admin view** — platform health: users, appointments, payment success, queue depth, sync status.
+
+### Architecture
+
+```
+┌─────────────────────────────┐        ┌────────────────────────────────────┐
+│  React SPA (Vite + TS)      │        │  telemed-backend (Node + Express)  │
+│  ─────────────────────      │  WS    │  ────────────────────────────────   │
+│  WebRTC service             │───────▶│  Socket.IO signaling (offer/answer/ │
+│  SyncQueue (offline queue)  │  HTTP   │  ICE, call lifecycle)              │
+│  Room onboarding (QR/code)  │───────▶│  POST /api/sync (offline flush)    │
+│  Triage, EMR, pharmacy, i18n│        │  GET  /api/health                  │
+└─────────────────────────────┘        └────────────────────────────────────┘
+        │ localStorage (offline persistence + sync queue)
+        ▼
+   device-local data that survives disconnects
+```
+
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Socket.IO client, WebRTC, shadcn/ui.
+- **Backend:** Node.js, Express, Socket.IO.
+- **Persistence:** localStorage-backed offline queue (`src/services/sync-queue.ts`) with automatic
+  flush on the `online` event.
+
+## Running locally
+
+```bash
+# 1. Backend (terminal 1)
+cd telemed-backend && npm i && npm start   # http://localhost:4001
+
+# 2. Frontend (terminal 2)
+npm i && npm run dev                        # http://localhost:3000
+```
+
+- The frontend auto-detects the signaling server at `http://<host>:4001`.
+- Override with `VITE_SIGNALING_SERVER_URL` for a deployed backend.
+
+## Impact (targets)
+
+For a rural block like Nabha, a platform like this is expected to move the needle on:
+
+- **Travel cost** — patients no longer travel 20–40 km for a consultation that a video call covers.
+- **Consult wait time** — queue management gives visibility into when a doctor is free.
+- **Specialist access** — a patient can reach a specialist who would otherwise be out of reach.
+- **Language access** — triage, records, and instructions available in the patient's own language.
+
+> These are targets from the problem framing; the analytics tooling in this repo
+> (`analysis/` notebook + admin dashboard) is built to measure consultation volume, symptom mix, and
+> pharmacy stock risk once the platform sees real traffic.
+
+## Why this design
+
+The interesting engineering problems here are the ones the problem statement *requires*:
+
+1. **Offline sync is the hard part.** Everything else is CRUD; surviving a dropped 2G connection while
+   a doctor is mid-consultation is the actual systems problem. The queue keeps the device authoritative
+   while offline and reconciles on reconnect.
+2. **QR onboarding is a UX constraint, not a gimmick.** Rural users with low digital literacy can't
+   register with email + password on a phone. A scan or a 6-character code is the shortest path to a
+   live consultation.
+3. **Multilingual is not translation, it's infrastructure.** The triage rules, pharmacy lookup, and
+   records are all language-aware from the start.
+
+## Project structure
+
+```
+├── src/
+│   ├── components/            # UI: consultations, triage, pharmacy, EMR, onboarding, i18n
+│   │   └── ui/                # shadcn/ui primitives
+│   ├── contexts/              # auth, language, app-data (with sync queue wiring)
+│   ├── services/
+│   │   ├── webrtc-service.ts  # WebRTC + Socket.IO signaling client
+│   │   ├── sync-queue.ts      # offline→online operation queue
+│   │   ├── room-service.ts    # QR/room-code creation & joining
+│   │   └── ai-symptom-service.ts  # rule-based triage + urgency
+│   ├── pages/                 # router pages (dashboard, admin, etc.)
+│   └── types/                 # shared domain types
+├── telemed-backend/           # Express + Socket.IO signaling + /api/sync
+├── analysis/                  # EDA notebook + synthetic consultation dataset
+└── ARCHITECTURE.md            # deeper system write-up
+```
+
+---
+
+*Built as a healthcare platform portfolio project grounded in SIH2025 PS SIH25018. See
+`ARCHITECTURE.md` for the systems write-up and `analysis/` for the data/analytics work.*
