@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { SyncQueue, SyncOperation } from "./sync-queue";
+import { SyncQueue, SyncOperation, QueuedOperation } from "./sync-queue";
 
 const KEY = "sevamitra.test.queue";
 
@@ -43,8 +43,9 @@ describe("SyncQueue", () => {
     expect(synced).toBe(2);
     expect(queue.getPendingCount()).toBe(0);
     expect(transport).toHaveBeenCalledTimes(1);
-    const sent = transport.mock.calls[0][0] as SyncOperation[];
+    const sent = transport.mock.calls[0][0] as QueuedOperation[];
     expect(sent).toHaveLength(2);
+    expect(sent.every((item) => typeof item.id === 'string' && item.id.length > 0)).toBe(true);
   });
 
   it("keeps operations and increments attempts when transport fails", async () => {

@@ -10,6 +10,28 @@ app.use(express.json());
 // Stores operations flushed from clients' offline sync queues
 const syncedOperations = [];
 
+// Idempotency registry: de-duplicates retried sync posts. An operation that was
+// acknowledged but whose response was lost is retried by the client with the same
+// stable `id`; we keep a bounded set of seen ids so the retry is a no-op instead
+// of double-applying. In-memory by design (see ARCHITECTURE.md) - use Redis or a
+// DB table in production.
+const seenOpIds = new Map();
+const MAX_SEEN_IDS = 10000;
+
+function isDuplicate(op) {
+    if (!op || !op.id) return false;
+    return seenOpIds.has(op.id);
+}
+
+function rememberOp(op) {
+    if (!op || !op.id) return;
+    if (!seenOpIds.has(op.id) && seenOpIds.size >= MAX_SEEN_IDS) {
+        const oldestKey = seenOpIds.keys().next().value;
+        seenOpIds.delete(oldestKey);
+    }
+    seenOpIds.set(op.id, Date.now());
+}
+
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', pendingOps: syncedOperations.length });
 });
@@ -19,12 +41,24 @@ app.post('/api/sync', (req, res) => {
     if (operations.length === 0) {
         return res.status(400).json({ error: 'No operations provided' });
     }
-    syncedOperations.push(...operations.map((op) => ({
-        ...op,
-        receivedAt: new Date().toISOString()
-    })));
-    console.log(`Sync received ${operations.length} operation(s); total ${syncedOperations.length}`);
-    res.json({ accepted: operations.length });
+
+    let accepted = 0;
+    let skippedDuplicates = 0;
+    for (const op of operations) {
+        if (isDuplicate(op)) {
+            skippedDuplicates += 1;
+            continue;
+        }
+        rememberOp(op);
+        syncedOperations.push({
+            ...op,
+            receivedAt: new Date().toISOString()
+        });
+        accepted += 1;
+    }
+
+    console.log(`Sync received ${operations.length} operation(s) (${skippedDuplicates} duplicate); total ${syncedOperations.length}`);
+    res.json({ accepted, skipped: skippedDuplicates });
 });
 
 const server = http.createServer(app);
@@ -38,6 +72,36 @@ const io = socketIo(server, {
 // Store active calls and user sessions
 const activeCalls = new Map();
 const userSessions = new Map();
+
+// Auto-expire calls that were never answered, so a ringing call cannot linger
+// in the in-memory map forever after a participant drops.
+const RING_TIMEOUT_MS = 60 * 1000;
+const ringTimeouts = new Map();
+
+function expireRingingCall(callId) {
+    const call = activeCalls.get(callId);
+    if (!call || call.status !== 'ringing') return;
+    console.log(`Call ${callId} expired (not answered)`);
+    const doctor = userSessions.get(call.doctorId);
+    const patient = userSessions.get(call.patientId);
+    if (patient) io.to(patient.socketId).emit('call-rejected');
+    if (doctor) io.to(doctor.socketId).emit('call-ended');
+    activeCalls.delete(callId);
+    ringTimeouts.delete(callId);
+}
+
+function cleanupCallParticipant(userId) {
+    for (const [callId, call] of activeCalls) {
+        if (call.doctorId !== userId && call.patientId !== userId) continue;
+        const otherId = call.doctorId === userId ? call.patientId : call.doctorId;
+        const other = userSessions.get(otherId);
+        if (other) io.to(other.socketId).emit('call-ended');
+        activeCalls.delete(callId);
+        const t = ringTimeouts.get(callId);
+        if (t) clearTimeout(t);
+        ringTimeouts.delete(callId);
+    }
+}
 
 console.log('Starting signaling server...');
 
@@ -73,6 +137,7 @@ io.on('connection', (socket) => {
                 status: 'ringing',
                 createdAt: new Date()
             });
+            ringTimeouts.set(callId, setTimeout(() => expireRingingCall(callId), RING_TIMEOUT_MS));
 
             console.log('Notifying doctor of incoming call');
             // Notify doctor of incoming call
@@ -96,6 +161,9 @@ io.on('connection', (socket) => {
         const call = activeCalls.get(callId);
         if (call) {
             call.status = 'accepted';
+            const t = ringTimeouts.get(callId);
+            if (t) clearTimeout(t);
+            ringTimeouts.delete(callId);
             const patient = userSessions.get(call.patientId);
 
             if (patient) {
@@ -114,6 +182,9 @@ io.on('connection', (socket) => {
                 io.to(patient.socketId).emit('call-rejected');
             }
             activeCalls.delete(callId);
+            const t = ringTimeouts.get(callId);
+            if (t) clearTimeout(t);
+            ringTimeouts.delete(callId);
         }
     });
 
@@ -171,12 +242,16 @@ io.on('connection', (socket) => {
             if (patient) io.to(patient.socketId).emit('call-ended');
 
             activeCalls.delete(callId);
+            const t = ringTimeouts.get(callId);
+            if (t) clearTimeout(t);
+            ringTimeouts.delete(callId);
         }
     });
 
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
         if (socket.userId) {
+            cleanupCallParticipant(socket.userId);
             userSessions.delete(socket.userId);
         }
     });
@@ -198,3 +273,18 @@ server.listen(PORT, '0.0.0.0', () => {  // '0.0.0.0' is crucial!
         }
     }
 });
+
+// Graceful shutdown: stop accepting new work and drain in-flight state so a
+// Ctrl+C restart behaves predictably. Call state and the idempotency registry
+// are intentionally in-memory - a restart resets ringing calls (by design) and
+// the de-dupe window; clients replay unsynced ops from their local queue on the
+// next flush.
+function shutdown() {
+    console.log('Shutting down gracefully...');
+    for (const t of ringTimeouts.values()) clearTimeout(t);
+    io.close(() => {
+        server.close(() => process.exit(0));
+    });
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

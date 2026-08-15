@@ -43,11 +43,28 @@ export class WebRTCService {
   }
 
   private createPeerConnection(): RTCPeerConnection {
+    const iceServers: RTCIceServer[] = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+    ];
+
+    const turnUrl = import.meta.env.VITE_TURN_URL;
+    const turnUser = import.meta.env.VITE_TURN_USERNAME;
+    const turnCredential = import.meta.env.VITE_TURN_PASSWORD;
+
+    if (turnUrl) {
+      const server: RTCIceServer = { urls: turnUrl };
+      if (turnUser && turnCredential) {
+        server.username = turnUser;
+        server.credential = turnCredential;
+      }
+      iceServers.push(server);
+    }
+
     return new RTCPeerConnection({
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ],
+      iceServers,
+      iceCandidatePoolSize: 10,
+      iceTransportPolicy: 'all',
     });
   }
 

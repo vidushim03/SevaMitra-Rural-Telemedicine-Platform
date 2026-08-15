@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Language = 'en' | 'es' | 'hi' | 'fr';
+type Language = 'en' | 'hi' | 'pa';
 
 interface Translations {
   [key: string]: Record<string, string>;
@@ -17,16 +17,6 @@ const translations: Translations = {
     patients_treated: 'Patients Treated',
     hello: 'Hello',
   },
-  es: {
-    welcome: 'Bienvenido a la Telemedicina SevaMitra',
-    dashboard: 'Tablero',
-    appointments: 'Citas',
-    consultations: 'Consultas',
-    book_now: 'Reservar',
-    active_doctors: 'Doctores Activos',
-    patients_treated: 'Pacientes Tratados',
-    hello: 'Hola',
-  },
   hi: {
     welcome: 'सेवामित्र टेलीमेडिसिन में आपका स्वागत है',
     dashboard: 'डैशबोर्ड',
@@ -37,15 +27,15 @@ const translations: Translations = {
     patients_treated: 'उपचारित रोगी',
     hello: 'नमस्ते',
   },
-  fr: {
-    welcome: 'Bienvenue sur SevaMitra Télémédecine',
-    dashboard: 'Tableau de Bord',
-    appointments: 'Rendez-vous',
-    consultations: 'Consultations',
-    book_now: 'Réserver',
-    active_doctors: 'Médecins Actifs',
-    patients_treated: 'Patients Traités',
-    hello: 'Bonjour',
+  pa: {
+    welcome: 'ਸੇਵਾਮਿੱਤਰ ਟੈਲੀਮੈਡੀਸਨ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ',
+    dashboard: 'ਡੈਸ਼ਬੋਰਡ',
+    appointments: 'ਮੁਲਾਕਾਤਾਂ',
+    consultations: 'ਸਲਾਹ',
+    book_now: 'ਹੁਣ ਬੁੱਕ ਕਰੋ',
+    active_doctors: 'ਸਰਗਰਮ ਡਾਕਟਰ',
+    patients_treated: 'ਇਲਾਜ ਕੀਤੇ ਮਰੀਜ਼',
+    hello: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ',
   }
 };
 

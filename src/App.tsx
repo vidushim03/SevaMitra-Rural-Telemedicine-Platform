@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { BrowserRouter as Router, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
-import { Activity, Calendar, CreditCard, FileText, Globe, Moon, Shield, Stethoscope, Sun, Video } from 'lucide-react';
+import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppDataProvider } from './contexts/AppDataContext';
@@ -13,6 +13,10 @@ import { PrescriptionsPage } from './pages/Prescriptions';
 import { PaymentsPage } from './pages/Payments';
 import { AdminPage } from './pages/Admin';
 import { LoginPage } from './pages/Login';
+import { SymptomsPage } from './pages/Symptoms';
+import { PharmacyPage } from './pages/Pharmacy';
+import { MedicinesPage } from './pages/Medicines';
+import { VitalsPage } from './pages/Vitals';
 
 const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
@@ -29,7 +33,7 @@ const ThemeToggle = () => {
 const LanguageToggle = () => {
   const { language, setLanguage } = useLanguage();
   const toggleLanguage = () => {
-    const langs: ('en' | 'es' | 'hi' | 'fr')[] = ['en', 'es', 'hi', 'fr'];
+    const langs: ('en' | 'hi' | 'pa')[] = ['en', 'hi', 'pa'];
     const nextIdx = (langs.indexOf(language) + 1) % langs.length;
     setLanguage(langs[nextIdx]);
   };
@@ -51,9 +55,13 @@ function ProtectedApp() {
 
   const links = [
     { to: '/', label: t('dashboard'), icon: Activity },
-    { to: '/appointments', label: 'Appointments', icon: Calendar },
+    { to: '/symptoms', label: 'Symptom Checker', icon: Stethoscope },
     { to: '/consultations', label: 'Consultations', icon: Video },
+    { to: '/appointments', label: 'Appointments', icon: Calendar },
     { to: '/records', label: 'Records', icon: FileText },
+    { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
+    { to: '/medicines', label: 'Medicines', icon: Pill },
+    { to: '/vitals', label: 'Vitals', icon: HeartPulse },
     { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
     { to: '/payments', label: 'Payments', icon: CreditCard },
     ...(user.role === 'admin' ? [{ to: '/admin', label: 'Admin', icon: Shield }] : []),
@@ -88,9 +96,13 @@ function ProtectedApp() {
         <div className="animate-in">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/symptoms" element={<SymptomsPage />} />
             <Route path="/appointments" element={<Appointments />} />
             <Route path="/consultations" element={<Consultations />} />
             <Route path="/records" element={<RecordsPage />} />
+            <Route path="/pharmacy" element={<PharmacyPage />} />
+            <Route path="/medicines" element={<MedicinesPage />} />
+            <Route path="/vitals" element={<VitalsPage />} />
             <Route path="/prescriptions" element={<PrescriptionsPage />} />
             <Route path="/payments" element={<PaymentsPage />} />
             <Route path="/admin" element={<AdminPage />} />

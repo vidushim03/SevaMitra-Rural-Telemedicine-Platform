@@ -31,10 +31,10 @@ export class SyncQueue {
 
   public onPendingChange?: (pending: number) => void;
   public onSynced?: (count: number) => void;
-  public transport: (operations: SyncOperation[]) => Promise<boolean>;
+  public transport: (operations: QueuedOperation[]) => Promise<boolean>;
 
   constructor(
-    transport?: (operations: SyncOperation[]) => Promise<boolean>,
+    transport?: (operations: QueuedOperation[]) => Promise<boolean>,
     storageKey: string = STORAGE_KEY,
     options: { autoFlush?: boolean } = {},
   ) {
@@ -44,7 +44,9 @@ export class SyncQueue {
         const res = await fetch(`${this.signalingBase()}/api/sync`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ operations }),
+          body: JSON.stringify({
+            operations: operations.map(({ id, op }) => ({ id, ...op })),
+          }),
         });
         return res.ok;
       });
@@ -124,8 +126,7 @@ export class SyncQueue {
     this.flushing = true;
     try {
       const batch = this.queue.slice(0, 50);
-      const ops = batch.map((b) => b.op);
-      const ok = await this.transport(ops);
+      const ok = await this.transport(batch);
 
       if (ok) {
         const acked = new Set(batch.map((b) => b.id));

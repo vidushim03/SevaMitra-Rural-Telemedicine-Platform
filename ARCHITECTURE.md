@@ -36,7 +36,8 @@ exchanges the *metadata* needed to establish the P2P connection.
 ## 1. WebRTC media path
 
 - `src/services/webrtc-service.ts` wraps `RTCPeerConnection` with two STUN servers
-  (`stun.l.google.com`, `stun1.l.google.com`).
+(`stun.l.google.com`, `stun1.l.google.com`) plus an optional TURN relay supplied via
+`VITE_TURN_URL`/`VITE_TURN_USERNAME`/`VITE_TURN_PASSWORD` for strict-NAT fallback.
 - Media flows **peer-to-peer**; the signaling server only relays `webrtc-offer`, `webrtc-answer`,
   and `ice-candidate` messages between the two socket clients in the same call.
 - `telemed-backend/server.js` routes signaling by looking up the **other party** of the call
@@ -100,7 +101,7 @@ consultation, and works entirely offline at the device level.
 
 | Route / event | Behavior |
 |---------------|----------|
-| `POST /api/sync` | Accepts a batch of offline operations, buffers them, returns `{ accepted }`. |
+| `POST /api/sync` | Accepts a batch of offline operations; de-dupes by `op.id` (LRU-bounded), returns `{ accepted, skipped }`. |
 | `GET /api/health` | Reports status + pending operation count (used by tests). |
 | `register` | Binds a user id → socket id + availability. |
 | `initiate-call` / `accept-call` / `reject-call` | Call lifecycle; relays to the relevant peer. |
@@ -140,9 +141,15 @@ Run: `npm test`.
 
 ## Known limitations
 
-- The sync queue flushes to a single endpoint; there is no per-operation idempotency key yet, so a
-  repeated POST could duplicate an operation. Adding an `op.id` dedupe check on the server is the
-  natural next step.
-- Signaling server holds call state in memory; a server restart drops active-call state (clients
-  reconnect via Socket.IO auto-reconnect, but a ringing call would be lost).
-- STUN-only ICE: in strict NAT environments without a TURN relay, some P2P calls may fail to connect.
+- **TURN is configurable, not bundled.** The client reads `VITE_TURN_URL` (+ optional
+  `VITE_TURN_USERNAME`/`VITE_TURN_PASSWORD`); with no TURN configured it falls back to STUN-only and
+  some calls behind strict symmetric NAT will fail. A production deployment must supply a TURN relay
+  (self-hosted coturn or a managed provider).
+- **Idempotency registry is in-memory and bounded.** `POST /api/sync` de-dupes by `op.id` with an
+  LRU-bounded set (10k entries), so a retried batch whose response was lost is a no-op instead of a
+  double-apply. After a server restart the dedupe window resets; a client that re-flushes a truly old
+  batch could in principle replay it. Production would use a durable store (Redis or a DB table).
+- **Call state is in-memory.** A server restart drops ringing/active call state. The server clears
+  ring timeouts on restart and expires unanswered calls after 60s, and clients reconnect via
+  Socket.IO auto-reconnect — but a call in flight at the exact moment of restart is lost and must be
+  re-initiated.
