@@ -82,13 +82,11 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
     const socket = webrtcService.getSocket();
 
     socket.on('call-initiated', ({ callId }) => {
-      console.log('Call initiated, waiting for doctor response');
       setCurrentCallId(callId);
       setCallStatus('ringing');
     });
 
     socket.on('call-accepted', async ({ callId }) => {
-      console.log('Doctor accepted the call');
       setCallStatus('connected');
       setIsInCall(true);
 
@@ -102,13 +100,11 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
         // Initiate WebRTC call
         await webrtcService.initiateCall(callId);
       } catch (error) {
-        console.error('Failed to start call:', error);
         alert('Failed to access camera/microphone. Please check permissions.');
       }
     });
 
     socket.on('call-rejected', () => {
-      console.log('Doctor rejected the call');
       alert('Doctor is currently unavailable. Please try again later.');
       setCallStatus('idle');
       setCurrentCallId(null);
@@ -121,7 +117,6 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
 
     // Handle remote stream
     webrtcService.onRemoteStream = (stream) => {
-      console.log('Received remote stream from doctor');
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
       }
@@ -129,13 +124,17 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
 
     // Handle call ended
     webrtcService.onCallEnded = () => {
-      console.log('Call ended');
       endCall();
     };
 
     // Handle connection state changes
     webrtcService.onConnectionStateChange = (state) => {
       setConnectionQuality(state === 'connected' ? 'good' : 'poor');
+    };
+
+    // Handle call ended
+    webrtcService.onCallEnded = () => {
+      endCall();
     };
 
     return () => {
@@ -146,10 +145,10 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   const startConsultation = async (doctorId: number) => {
     if (callStatus !== 'idle') return;
 
-    console.log('Starting consultation with doctor:', doctorId);
     setCallStatus('calling');
 
-    // Call the real seeded doctor account (doctor_1, doctor_2, ...)
+    // Ring the real seeded doctor account (doctor_1, doctor_2, ...) using the
+    // logged-in patient's identity
     webrtcService.callDoctor(
       `doctor_${doctorId}`,
       currentPatient.id,
@@ -162,7 +161,6 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   };
 
   const endCall = () => {
-    console.log('Ending call from patient side');
     webrtcService.endCall();
     setIsInCall(false);
     setCallStatus('idle');

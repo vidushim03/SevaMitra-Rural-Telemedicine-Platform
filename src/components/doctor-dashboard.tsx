@@ -16,6 +16,7 @@ import { VitalsDashboard } from "./vitals-dashboard";
 import { PrescriptionBuilder } from "./prescription-builder";
 import { WebRTCService } from "../services/webrtc-service";
 import { SessionUser } from "../types/app";
+import { useAppData } from "../contexts/AppDataContext";
 
 interface DoctorDashboardProps {
   language: string;
@@ -43,10 +44,8 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   // WebRTC service and video refs
   const [webrtcService] = useState(() => {
     try {
-      console.log('🔧 Creating WebRTC service for doctor...');
       return new WebRTCService();
     } catch (err) {
-      console.error('❌ Failed to create WebRTC service:', err);
       setError('Failed to initialize video call service');
       return null;
     }
@@ -62,194 +61,102 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   };
 
   // Dashboard data
+  const myQueue = data.queue.filter((q) => q.doctorId === user.id);
+  const waiting = myQueue.filter((q) => q.status === 'waiting' || q.status === 'ongoing').length;
+  const myRecords = data.records.filter((r) => r.doctorId === user.id);
   const todaysStats = {
-    totalPatients: 12,
-    waiting: 3,
+    totalPatients: myQueue.length,
+    waiting,
     avgConsultationTime: 15,
     satisfaction: 4.8
   };
 
-  const todaysPatients = [
-    {
-      id: 1,
-      name: "Rajesh Kumar",
-      age: 45,
-      gender: 'M',
-      appointmentTime: "09:00 AM",
-      condition: "Diabetes Follow-up",
-      symptoms: "Blood sugar monitoring",
-      lastVisit: "2 weeks ago",
-      waitTime: 0,
-      status: "completed"
-    },
-    {
-      id: 2,
-      name: "Priya Singh",
-      age: 32,
-      gender: 'F',
-      appointmentTime: "10:30 AM",
-      condition: "Hypertension",
-      symptoms: "High BP, headaches",
-      lastVisit: "1 month ago",
-      waitTime: 15,
-      status: "waiting"
-    },
-    {
-      id: 3,
-      name: "Amit Sharma",
-      age: 28,
-      gender: 'M',
-      appointmentTime: "11:00 AM",
-      condition: "General Checkup",
-      symptoms: "Annual health screening",
-      lastVisit: null,
-      waitTime: 45,
-      status: "waiting"
-    },
-    {
-      id: 4,
-      name: "Anjali Devi",
-      age: 58,
-      gender: 'F',
-      appointmentTime: "11:30 AM",
-      condition: "Arthritis Management",
-      symptoms: "Joint pain, stiffness",
-      lastVisit: "3 months ago",
-      waitTime: 0,
-      status: "completed"
-    },
-    {
-      id: 5,
-      name: "Sanjay Gupta",
-      age: 62,
-      gender: 'M',
-      appointmentTime: "12:00 PM",
-      condition: "Cardiac Review",
-      symptoms: "Chest discomfort, fatigue",
-      lastVisit: "1 week ago",
-      waitTime: 10,
-      status: "waiting"
-    }
-  ];
+  // Build the doctor's today list from the real queue + appointments
+  const todaysPatients = myQueue
+    .map((q) => {
+      const apt = data.appointments.find((a) => a.id === q.appointmentId);
+      const rec = data.records.find((r) => r.patientId === q.patientId);
+      const patientName = data.users.find((u) => u.id === q.patientId)?.name || q.patientId;
+      return {
+        id: q.id,
+        name: patientName,
+        age: 30,
+        gender: 'M',
+        appointmentTime: apt ? `${apt.date} ${apt.time}` : new Date(q.joinedAt).toLocaleTimeString(),
+        condition: apt?.reason || 'General consultation',
+        symptoms: rec?.diagnosis || 'No notes',
+        lastVisit: rec ? new Date(rec.date).toLocaleDateString() : null,
+        waitTime: 0,
+        status: (q.status === 'ongoing' ? 'ongoing' : q.status === 'finished' ? 'completed' : 'waiting') as 'waiting' | 'ongoing' | 'completed',
+      };
+    })
+    .sort((a, b) => (a.status === 'waiting' ? -1 : 1));
 
-  const consultationCalls = [
-    {
-      id: 1,
-      patientName: "Rajesh Kumar",
-      status: "completed",
-      duration: 18
-    },
-    {
-      id: 2,
-      patientName: "Priya Singh",
-      status: "ongoing",
-      duration: 12
-    }
-  ];
+  const consultationCalls = myQueue
+    .filter((q) => q.status === 'ongoing')
+    .map((q, i) => ({
+      id: i + 1,
+      patientName: data.users.find((u) => u.id === q.patientId)?.name || q.patientId,
+      status: 'ongoing' as const,
+      duration: 0
+    }));
 
   // Video call setup
   useEffect(() => {
-    console.log('🏥 Doctor Dashboard mounting...');
-
     if (!webrtcService) {
-      console.error('❌ WebRTC service not available');
       setError('Video call service not available');
       return;
     }
 
-    try {
-      console.log('📝 Registering doctor:', currentDoctor.id);
+    // Register the real logged-in doctor so incoming calls route to them
+    webrtcService.register(currentDoctor.id, 'doctor', {
+      name: currentDoctor.name,
+      specialty: currentDoctor.specialty
+    });
 
-      // Register as doctor
-      webrtcService.register(currentDoctor.id, 'doctor', {
-        name: currentDoctor.name,
-        specialty: currentDoctor.specialty
-      });
+    // Setup event listeners
+    const socket = webrtcService.getSocket();
 
-      // Setup event listeners
-      const socket = webrtcService.getSocket();
+    socket.on('connect', () => {
+      setConnectionStatus('connected');
+      setError(null);
+    });
 
-      socket.on('connect', () => {
-        console.log('✅ Doctor connected to server:', socket.id);
-        setConnectionStatus('connected');
-        setError(null);
-      });
+    socket.on('connect_error', () => {
+      setConnectionStatus('disconnected');
+      setError('Failed to connect to server. Please refresh the page.');
+    });
 
-      socket.on('connect_error', (err) => {
-        console.error('🚫 Doctor connection error:', err);
-        setConnectionStatus('disconnected');
-        setError('Failed to connect to server. Please refresh the page.');
-      });
+    socket.on('disconnect', () => {
+      setConnectionStatus('disconnected');
+    });
 
-      socket.on('disconnect', () => {
-        console.log('❌ Doctor disconnected from server');
-        setConnectionStatus('disconnected');
-      });
+    socket.on('incoming-call', ({ callId, patientId, patientInfo }) => {
+      setIncomingCall({ callId, patientId, patientInfo });
+    });
 
-      // Listen for incoming calls - THIS IS THE KEY EVENT
-      socket.on('incoming-call', ({ callId, patientId, patientInfo }) => {
-        console.log('📞 INCOMING CALL RECEIVED:', { callId, patientId, patientInfo });
-        console.log('🔔 Setting incoming call state...');
-        setIncomingCall({ callId, patientId, patientInfo });
-      });
+    webrtcService.onRemoteStream = (stream) => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+      }
+    };
 
-      // Add more detailed logging for debugging
-      socket.on('call-initiated', (data) => {
-        console.log('📞 Call initiated event received:', data);
-      });
+    webrtcService.onCallEnded = () => {
+      endVideoCall();
+    };
 
-      socket.on('call-accepted', (data) => {
-        console.log('✅ Call accepted event:', data);
-      });
+    webrtcService.onConnectionStateChange = (state) => {
+      setConnectionQuality(state === 'connected' ? 'good' : 'poor');
+    };
 
-      socket.on('call-rejected', (data) => {
-        console.log('❌ Call rejected event:', data);
-      });
-
-      // Handle remote stream
-      webrtcService.onRemoteStream = (stream) => {
-        console.log('📹 Received remote stream from patient');
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = stream;
-        }
-      };
-
-      // Handle call ended
-      webrtcService.onCallEnded = () => {
-        console.log('📞 Call ended');
-        endVideoCall();
-      };
-
-      // Handle connection state changes
-      webrtcService.onConnectionStateChange = (state) => {
-        console.log('🔗 Connection state changed:', state);
-        setConnectionQuality(state === 'connected' ? 'good' : 'poor');
-      };
-
-      // Debug: Log all events
-      const originalEmit = socket.emit;
-      socket.emit = function (...args) {
-        console.log('📤 Doctor sending:', args[0], args.slice(1));
-        return originalEmit.apply(socket, args);
-      };
-
-      // Test connection after 2 seconds
-      setTimeout(() => {
-        if (socket.connected) {
-          console.log('✅ Doctor connection verified');
-        } else {
-          console.log('❌ Doctor not connected after timeout');
-          setError('Connection timeout. Please refresh the page.');
-        }
-      }, 3000);
-
-    } catch (err) {
-      console.error('❌ Error setting up doctor dashboard:', err);
-      setError('Error setting up video call. Please refresh the page.');
-    }
+    // Test connection after 2 seconds
+    setTimeout(() => {
+      if (!socket.connected) {
+        setError('Connection timeout. Please refresh the page.');
+      }
+    }, 3000);
 
     return () => {
-      console.log('🧹 Doctor dashboard cleanup');
       if (webrtcService) {
         webrtcService.disconnect();
       }
@@ -259,8 +166,6 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   // Video call functions
   const acceptCall = async () => {
     if (incomingCall && webrtcService) {
-      console.log('✅ Doctor accepting call from patient');
-
       try {
         // Start local stream
         const localStream = await webrtcService.startLocalStream(isVideoEnabled, isAudioEnabled);
@@ -274,10 +179,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         setIsInVideoCall(true);
         setCurrentPatient(incomingCall.patientInfo);
         setIncomingCall(null);
-
-        console.log('✅ Call accepted successfully');
       } catch (error) {
-        console.error('❌ Failed to accept call:', error);
         alert('Failed to access camera/microphone. Please check permissions.');
       }
     }
@@ -285,14 +187,12 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
 
   const rejectCall = () => {
     if (incomingCall && webrtcService) {
-      console.log('❌ Doctor rejecting call from patient');
       webrtcService.rejectCall(incomingCall.callId);
       setIncomingCall(null);
     }
   };
 
   const endVideoCall = () => {
-    console.log('🔚 Ending video call');
     if (webrtcService) {
       webrtcService.endCall();
     }
