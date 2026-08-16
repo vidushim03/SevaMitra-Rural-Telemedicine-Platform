@@ -1,0 +1,151 @@
+pharmacy,specialty,medicine,stock_checks,stock_shortages,availability_rate
+Nabha Chemists,general,Paracetamol,90,7,0.922
+Nabha Chemists,general,ORS,90,7,0.922
+Nabha Chemists,general,Antacid,90,7,0.922
+Nabha Chemists,general,Cetirizine,90,7,0.922
+Bhadson Medical Hall,general,Paracetamol,90,7,0.922
+Bhadson Medical Hall,general,ORS,90,7,0.922
+Bhadson Medical Hall,general,Antacid,90,7,0.922
+Bhadson Medical Hall,general,Cetirizine,90,7,0.922
+Amargarh Pharmacy,general,Paracetamol,90,7,0.922
+Amargarh Pharmacy,general,ORS,90,7,0.922
+Amargarh Pharmacy,general,Antacid,90,7,0.922
+Amargarh Pharmacy,general,Cetirizine,90,7,0.922
+Dhanaula Store,general,Paracetamol,90,7,0.922
+Dhanaula Store,general,ORS,90,7,0.922
+Dhanaula Store,general,Antacid,90,7,0.922
+Dhanaula Store,general,Cetirizine,90,7,0.922
+Kal Majra Clinic Store,general,Paracetamol,90,7,0.922
+Kal Majra Clinic Store,general,ORS,90,7,0.922
+Kal Majra Clinic Store,general,Antacid,90,7,0.922
+Kal Majra Clinic Store,general,Cetirizine,90,7,0.922
+SevaMitra Hub Pharmacy,general,Paracetamol,90,7,0.922
+SevaMitra Hub Pharmacy,general,ORS,90,7,0.922
+SevaMitra Hub Pharmacy,general,Antacid,90,7,0.922
+SevaMitra Hub Pharmacy,general,Cetirizine,90,7,0.922
+Nabha Chemists,cardiology,Amlodipine,90,19,0.789
+Nabha Chemists,cardiology,Aspirin,90,19,0.789
+Nabha Chemists,cardiology,Atorvastatin,90,19,0.789
+Bhadson Medical Hall,cardiology,Amlodipine,90,19,0.789
+Bhadson Medical Hall,cardiology,Aspirin,90,19,0.789
+Bhadson Medical Hall,cardiology,Atorvastatin,90,19,0.789
+Amargarh Pharmacy,cardiology,Amlodipine,90,19,0.789
+Amargarh Pharmacy,cardiology,Aspirin,90,19,0.789
+Amargarh Pharmacy,cardiology,Atorvastatin,90,19,0.789
+Dhanaula Store,cardiology,Amlodipine,90,19,0.789
+Dhanaula Store,cardiology,Aspirin,90,19,0.789
+Dhanaula Store,cardiology,Atorvastatin,90,19,0.789
+Kal Majra Clinic Store,cardiology,Amlodipine,90,19,0.789
+Kal Majra Clinic Store,cardiology,Aspirin,90,19,0.789
+Kal Majra Clinic Store,cardiology,Atorvastatin,90,19,0.789
+SevaMitra Hub Pharmacy,cardiology,Amlodipine,90,19,0.789
+SevaMitra Hub Pharmacy,cardiology,Aspirin,90,19,0.789
+SevaMitra Hub Pharmacy,cardiology,Atorvastatin,90,19,0.789
+Nabha Chemists,pediatrics,Pediatric syrup,90,12,0.867
+Nabha Chemists,pediatrics,ORS,90,12,0.867
+Nabha Chemists,pediatrics,Paracetamol syrup,90,12,0.867
+Bhadson Medical Hall,pediatrics,Pediatric syrup,90,12,0.867
+Bhadson Medical Hall,pediatrics,ORS,90,12,0.867
+Bhadson Medical Hall,pediatrics,Paracetamol syrup,90,12,0.867
+Amargarh Pharmacy,pediatrics,Pediatric syrup,90,12,0.867
+Amargarh Pharmacy,pediatrics,ORS,90,12,0.867
+Amargarh Pharmacy,pediatrics,Paracetamol syrup,90,12,0.867
+Dhanaula Store,pediatrics,Pediatric syrup,90,12,0.867
+Dhanaula Store,pediatrics,ORS,90,12,0.867
+Dhanaula Store,pediatrics,Paracetamol syrup,90,12,0.867
+Kal Majra Clinic Store,pediatrics,Pediatric syrup,90,12,0.867
+Kal Majra Clinic Store,pediatrics,ORS,90,12,0.867
+Kal Majra Clinic Store,pediatrics,Paracetamol syrup,90,12,0.867
+SevaMitra Hub Pharmacy,pediatrics,Pediatric syrup,90,12,0.867
+SevaMitra Hub Pharmacy,pediatrics,ORS,90,12,0.867
+SevaMitra Hub Pharmacy,pediatrics,Paracetamol syrup,90,12,0.867
+Nabha Chemists,neurology,Paracetamol,90,16,0.822
+Nabha Chemists,neurology,Propranolol,90,16,0.822
+Nabha Chemists,neurology,Sumatriptan,90,16,0.822
+Bhadson Medical Hall,neurology,Paracetamol,90,16,0.822
+Bhadson Medical Hall,neurology,Propranolol,90,16,0.822
+Bhadson Medical Hall,neurology,Sumatriptan,90,16,0.822
+Amargarh Pharmacy,neurology,Paracetamol,90,16,0.822
+Amargarh Pharmacy,neurology,Propranolol,90,16,0.822
+Amargarh Pharmacy,neurology,Sumatriptan,90,16,0.822
+Dhanaula Store,neurology,Paracetamol,90,16,0.822
+Dhanaula Store,neurology,Propranolol,90,16,0.822
+Dhanaula Store,neurology,Sumatriptan,90,16,0.822
+Kal Majra Clinic Store,neurology,Paracetamol,90,16,0.822
+Kal Majra Clinic Store,neurology,Propranolol,90,16,0.822
+Kal Majra Clinic Store,neurology,Sumatriptan,90,16,0.822
+SevaMitra Hub Pharmacy,neurology,Paracetamol,90,16,0.822
+SevaMitra Hub Pharmacy,neurology,Propranolol,90,16,0.822
+SevaMitra Hub Pharmacy,neurology,Sumatriptan,90,16,0.822
+Nabha Chemists,orthopedics,Diclofenac gel,90,9,0.9
+Nabha Chemists,orthopedics,Ibuprofen,90,9,0.9
+Nabha Chemists,orthopedics,Calcium,90,9,0.9
+Bhadson Medical Hall,orthopedics,Diclofenac gel,90,9,0.9
+Bhadson Medical Hall,orthopedics,Ibuprofen,90,9,0.9
+Bhadson Medical Hall,orthopedics,Calcium,90,9,0.9
+Amargarh Pharmacy,orthopedics,Diclofenac gel,90,9,0.9
+Amargarh Pharmacy,orthopedics,Ibuprofen,90,9,0.9
+Amargarh Pharmacy,orthopedics,Calcium,90,9,0.9
+Dhanaula Store,orthopedics,Diclofenac gel,90,9,0.9
+Dhanaula Store,orthopedics,Ibuprofen,90,9,0.9
+Dhanaula Store,orthopedics,Calcium,90,9,0.9
+Kal Majra Clinic Store,orthopedics,Diclofenac gel,90,9,0.9
+Kal Majra Clinic Store,orthopedics,Ibuprofen,90,9,0.9
+Kal Majra Clinic Store,orthopedics,Calcium,90,9,0.9
+SevaMitra Hub Pharmacy,orthopedics,Diclofenac gel,90,9,0.9
+SevaMitra Hub Pharmacy,orthopedics,Ibuprofen,90,9,0.9
+SevaMitra Hub Pharmacy,orthopedics,Calcium,90,9,0.9
+Nabha Chemists,dermatology,Clotrimazole cream,90,13,0.856
+Nabha Chemists,dermatology,Cetirizine,90,13,0.856
+Nabha Chemists,dermatology,Hydrocortisone cream,90,13,0.856
+Bhadson Medical Hall,dermatology,Clotrimazole cream,90,13,0.856
+Bhadson Medical Hall,dermatology,Cetirizine,90,13,0.856
+Bhadson Medical Hall,dermatology,Hydrocortisone cream,90,13,0.856
+Amargarh Pharmacy,dermatology,Clotrimazole cream,90,13,0.856
+Amargarh Pharmacy,dermatology,Cetirizine,90,13,0.856
+Amargarh Pharmacy,dermatology,Hydrocortisone cream,90,13,0.856
+Dhanaula Store,dermatology,Clotrimazole cream,90,13,0.856
+Dhanaula Store,dermatology,Cetirizine,90,13,0.856
+Dhanaula Store,dermatology,Hydrocortisone cream,90,13,0.856
+Kal Majra Clinic Store,dermatology,Clotrimazole cream,90,13,0.856
+Kal Majra Clinic Store,dermatology,Cetirizine,90,13,0.856
+Kal Majra Clinic Store,dermatology,Hydrocortisone cream,90,13,0.856
+SevaMitra Hub Pharmacy,dermatology,Clotrimazole cream,90,13,0.856
+SevaMitra Hub Pharmacy,dermatology,Cetirizine,90,13,0.856
+SevaMitra Hub Pharmacy,dermatology,Hydrocortisone cream,90,13,0.856
+Nabha Chemists,ent,Amoxicillin,90,10,0.889
+Nabha Chemists,ent,Cetirizine,90,10,0.889
+Nabha Chemists,ent,Saline drops,90,10,0.889
+Bhadson Medical Hall,ent,Amoxicillin,90,10,0.889
+Bhadson Medical Hall,ent,Cetirizine,90,10,0.889
+Bhadson Medical Hall,ent,Saline drops,90,10,0.889
+Amargarh Pharmacy,ent,Amoxicillin,90,10,0.889
+Amargarh Pharmacy,ent,Cetirizine,90,10,0.889
+Amargarh Pharmacy,ent,Saline drops,90,10,0.889
+Dhanaula Store,ent,Amoxicillin,90,10,0.889
+Dhanaula Store,ent,Cetirizine,90,10,0.889
+Dhanaula Store,ent,Saline drops,90,10,0.889
+Kal Majra Clinic Store,ent,Amoxicillin,90,10,0.889
+Kal Majra Clinic Store,ent,Cetirizine,90,10,0.889
+Kal Majra Clinic Store,ent,Saline drops,90,10,0.889
+SevaMitra Hub Pharmacy,ent,Amoxicillin,90,10,0.889
+SevaMitra Hub Pharmacy,ent,Cetirizine,90,10,0.889
+SevaMitra Hub Pharmacy,ent,Saline drops,90,10,0.889
+Nabha Chemists,psychiatry,Sertraline,90,25,0.722
+Nabha Chemists,psychiatry,Melatonin,90,25,0.722
+Nabha Chemists,psychiatry,SSRI low dose,90,25,0.722
+Bhadson Medical Hall,psychiatry,Sertraline,90,25,0.722
+Bhadson Medical Hall,psychiatry,Melatonin,90,25,0.722
+Bhadson Medical Hall,psychiatry,SSRI low dose,90,25,0.722
+Amargarh Pharmacy,psychiatry,Sertraline,90,25,0.722
+Amargarh Pharmacy,psychiatry,Melatonin,90,25,0.722
+Amargarh Pharmacy,psychiatry,SSRI low dose,90,25,0.722
+Dhanaula Store,psychiatry,Sertraline,90,25,0.722
+Dhanaula Store,psychiatry,Melatonin,90,25,0.722
+Dhanaula Store,psychiatry,SSRI low dose,90,25,0.722
+Kal Majra Clinic Store,psychiatry,Sertraline,90,25,0.722
+Kal Majra Clinic Store,psychiatry,Melatonin,90,25,0.722
+Kal Majra Clinic Store,psychiatry,SSRI low dose,90,25,0.722
+SevaMitra Hub Pharmacy,psychiatry,Sertraline,90,25,0.722
+SevaMitra Hub Pharmacy,psychiatry,Melatonin,90,25,0.722
+SevaMitra Hub Pharmacy,psychiatry,SSRI low dose,90,25,0.722

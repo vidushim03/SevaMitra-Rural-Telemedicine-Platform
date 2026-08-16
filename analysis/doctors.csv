@@ -1,0 +1,9 @@
+doctor_id,specialty,capacity_per_day
+doctor_1,general,5
+doctor_2,cardiology,2
+doctor_3,pediatrics,3
+doctor_4,neurology,2
+doctor_5,orthopedics,2
+doctor_6,dermatology,3
+doctor_7,ent,2
+doctor_8,psychiatry,2

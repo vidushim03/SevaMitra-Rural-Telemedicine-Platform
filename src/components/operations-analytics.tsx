@@ -1,0 +1,324 @@
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  Activity,
+  AlertTriangle,
+  CalendarClock,
+  Clock,
+  FlaskConical,
+  HeartPulse,
+  Languages,
+  MapPin,
+  Pill,
+  Stethoscope,
+  Users,
+  Zap,
+} from "lucide-react";
+import operationsData from "../lib/operations-analytics.json";
+
+interface OpsMeta {
+  title: string;
+  label: string;
+  generated: string;
+  source: string;
+  period: string;
+}
+interface FlowStage {
+  label: string;
+  [key: string]: string | number;
+}
+interface ChartDatum {
+  [key: string]: string | number;
+}
+interface OperationsPayload {
+  meta: OpsMeta;
+  kpis: Record<string, number>;
+  flow: Record<string, FlowStage>;
+  charts: Record<string, ChartDatum[]>;
+}
+
+const data = operationsData as OperationsPayload;
+
+const URGENCY_COLORS: Record<string, string> = {
+  Emergency: "#ef4444",
+  High: "#f59e0b",
+  Routine: "#10b981",
+};
+
+const ACCESS_COLORS: Record<string, string> = {
+  "Rural → Specialist": "#8b5cf6",
+  "Rural → General": "#3b82f6",
+  "Hub → Specialist": "#f59e0b",
+  "Hub → General": "#94a3b8",
+};
+
+function pct(v: number): string {
+  return `${(v * 100).toFixed(1)}%`;
+}
+
+export function OperationsAnalytics() {
+  const k = data.kpis;
+  const flow = data.flow;
+
+  const flowStages = [
+    {
+      key: "demand",
+      icon: <Users size={18} />,
+      items: [
+        { label: "Consults / day", value: `${flow.demand.consults_per_day}` },
+        { label: "Emergency / day", value: flow.demand.emergency_per_day },
+        { label: "Active villages", value: flow.demand.active_villages },
+        { label: "Rural share", value: pct(Number(flow.demand.rural_share)) },
+      ],
+    },
+    {
+      key: "capacity",
+      icon: <Stethoscope size={18} />,
+      items: [
+        { label: "Doctors", value: flow.capacity.doctors },
+        { label: "Avg utilization", value: pct(Number(flow.capacity.avg_utilization)) },
+        { label: "Peak hour", value: `${flow.capacity.peak_hour}:00` },
+        { label: "Peak share of day", value: `${flow.capacity.peak_share}%` },
+      ],
+    },
+    {
+      key: "outcomes",
+      icon: <HeartPulse size={18} />,
+      items: [
+        { label: "Completion", value: pct(Number(flow.outcomes.completion_rate)) },
+        { label: "Avg wait", value: `${flow.outcomes.avg_wait_min} min` },
+        { label: "Rx issued", value: pct(Number(flow.outcomes.rx_conversion)) },
+        { label: "Rating", value: flow.outcomes.avg_rating },
+      ],
+    },
+    {
+      key: "pharmacy",
+      icon: <Pill size={18} />,
+      items: [
+        { label: "Stock-out rate", value: pct(Number(flow.pharmacy.stock_out_rate)) },
+        { label: "Med availability", value: pct(Number(flow.pharmacy.medicine_availability)) },
+      ],
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Simulated-data banner */}
+      <div className="rounded-2xl border bg-card p-4 flex items-start gap-3">
+        <FlaskConical className="h-5 w-5 text-purple-500 mt-0.5 shrink-0" />
+        <div>
+          <p className="text-sm font-semibold">{data.meta.label}</p>
+          <p className="text-xs text-muted-foreground">
+            Generated {data.meta.generated} · {data.meta.period} · source: {data.meta.source}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            This dashboard renders the same aggregates computed in the{" "}
+            <code className="text-[11px]">analysis/</code> notebook and SQL queries, and will
+            measure the live platform once it sees real traffic. No production numbers are claimed.
+          </p>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <KpiCard icon={<CalendarClock size={20} />} label="Consultations / day" value={k.consults_per_day} sub={`${k.consults_per_week}/week across ${k.active_villages} villages`} />
+        <KpiCard icon={<Clock size={20} />} label="Avg wait time" value={`${k.avg_wait_min} min`} sub={`median ${k.median_wait_min} min on completed consults`} />
+        <KpiCard icon={<Activity size={20} />} label="Doctor utilization" value={pct(k.doctor_utilization)} sub={`${k.doctors} doctors in the panel`} />
+        <KpiCard icon={<Zap size={20} />} label="Appointment completion" value={pct(k.completion_rate)} sub={`no-show ${pct(k.no_show_rate)} · cancelled ${pct(k.cancellation_rate)}`} />
+      </div>
+
+      {/* Demand → Capacity → Outcomes → Pharmacy */}
+      <div>
+        <h3 className="font-semibold mb-3">Operational flow: patient demand → doctor capacity → consultation outcomes → pharmacy availability</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {flowStages.map((stage) => (
+            <div key={stage.key} className="rounded-2xl border bg-card p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                {stage.icon}
+                <p className="text-sm font-semibold">{stage.label}</p>
+              </div>
+              <div className="space-y-2">
+                {stage.items.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{item.label}</span>
+                    <span className="font-semibold">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <ChartCard title="Daily consultation volume (last 14 days)">
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={data.charts.demand_by_day}>
+              <defs>
+                <linearGradient id="gOpsDemand" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Area type="monotone" dataKey="consults" name="Consultations" stroke="#8b5cf6" fill="url(#gOpsDemand)" strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Demand by hour of day">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data.charts.demand_by_hour}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="hour" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="consults" name="Consultations" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Consultation wait-time distribution">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data.charts.wait_buckets}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="bucket" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" name="Consults" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Doctor utilization by specialty">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data.charts.utilization_by_specialty} layout="vertical" margin={{ left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
+              <YAxis type="category" dataKey="specialty" width={90} tick={{ fontSize: 11 }} />
+              <Tooltip formatter={(v) => [`${v}%`, "Utilization"]} />
+              <Bar dataKey="utilization" name="Utilization" fill="#10b981" radius={[0, 6, 6, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Urgency mix">
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={data.charts.urgency_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
+                {data.charts.urgency_mix.map((entry) => (
+                  <Cell key={String(entry.name)} fill={URGENCY_COLORS[String(entry.name)] ?? "#94a3b8"} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Patient language mix">
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={data.charts.language_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
+                {data.charts.language_mix.map((entry, i) => (
+                  <Cell key={String(entry.name)} fill={["#3b82f6", "#8b5cf6", "#f59e0b"][i % 3]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Top symptoms">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data.charts.symptom_mix} layout="vertical" margin={{ left: 30 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 10 }} />
+              <Tooltip />
+              <Bar dataKey="value" name="Cases" fill="#0ea5e9" radius={[0, 6, 6, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Pharmacy stock-out rate by specialty">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data.charts.stock_risk_by_specialty}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="specialty" tick={{ fontSize: 10 }} />
+              <YAxis unit="%" tick={{ fontSize: 11 }} />
+              <Tooltip formatter={(v) => [`${v}%`, "Stock-out rate"]} />
+              <Bar dataKey="rate" name="Stock-out rate" fill="#ef4444" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Specialist access: rural vs hub">
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={data.charts.access_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
+                {data.charts.access_mix.map((entry) => (
+                  <Cell key={String(entry.name)} fill={ACCESS_COLORS[String(entry.name)] ?? "#94a3b8"} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Takeaway strip */}
+      <div className="rounded-2xl border bg-card p-4 space-y-2">
+        <h3 className="font-semibold flex items-center gap-2">
+          <AlertTriangle size={16} className="text-amber-500" /> What the numbers say (simulated)
+        </h3>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
+          <li>Peak load at {flow.capacity.peak_hour}:00 — capacity should follow demand, and wait-time tail (21–60 min) is where experience degrades.</li>
+          <li>~{pct(Number(k.cancellation_rate) + Number(k.no_show_rate))} of appointments never happen — a target for health-worker reminder nudges.</li>
+          <li>Chronic-medicine stock risk clusters in psychiatry ({data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Psychiatry")?.rate}%) and cardiology ({data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Cardiology")?.rate}%) — prioritize stock alerts there.</li>
+          <li>Rural users reach specialists {pct(k.rural_specialist_share)} of the time — the platform's core access value prop.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string | number; sub?: string }) {
+  return (
+    <div className="rounded-2xl border bg-card p-4">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        {icon}
+        <p className="text-sm">{label}</p>
+      </div>
+      <p className="text-3xl font-bold mt-2">{value}</p>
+      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+    </div>
+  );
+}
+
+function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border bg-card p-4">
+      <h3 className="font-semibold mb-4">{title}</h3>
+      {children}
+    </div>
+  );
+}

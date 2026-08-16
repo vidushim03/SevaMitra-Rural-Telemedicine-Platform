@@ -11,6 +11,12 @@ faces a shortage of qualified doctors, poor internet connectivity, and low digit
 platform's core design decisions — offline sync, QR-based onboarding, multilingual UI, low-bandwidth
 video — all trace back to that problem statement.
 
+The repo also carries an **operations analytics** workstream: a reproducible simulated dataset, SQL
+KPI queries, an EDA notebook, and an in-app analytics dashboard that measure the platform the way it
+would measure itself in production (consultation volume, wait time, doctor utilization, pharmacy
+stock risk, language & specialist access). Everything is explicitly labeled **simulated** — no real
+impact numbers are claimed.
+
 ---
 
 ## The problem
@@ -72,6 +78,10 @@ Symptom check / complaint → Room code or QR onboarding → Video consultation
 - **EMR + prescription builder** — vitals, diagnosis, notes, and structured prescriptions.
 - **Pharmacy tracker** — nearby pharmacy lookup with stock levels, opening hours, and distance sort.
 - **Admin view** — platform health: users, appointments, payment success, queue depth, sync status.
+- **Operations analytics dashboard** (admin) — simulated-traffic KPIs in the demand → doctor
+  capacity → consultation outcomes → pharmacy availability chain: consults/day, wait time, doctor
+  utilization, completion/no-show/cancellation rates, language mix, symptom mix, pharmacy stock-out
+  rate, medicine availability, and rural vs specialist access.
 
 ### Architecture
 
@@ -120,6 +130,28 @@ For a rural block like Nabha, a platform like this is expected to move the needl
 > (`analysis/` notebook + admin dashboard) is built to measure consultation volume, symptom mix, and
 > pharmacy stock risk once the platform sees real traffic.
 
+## Analytics (operations)
+
+SevaMitra's analytics layer shows how the platform would be measured in production. It is a
+reproducible, seeded pipeline — Python generates a realistic synthetic operations dataset, SQL
+computes the KPIs, and the app renders the same aggregates in an admin dashboard.
+
+- **Dataset** (`analysis/generate_operations.py`) — 4,200 appointments across 12 villages and
+  8 specialties, each with wait time, outcome (completed/cancelled/no-show), language, urgency,
+  symptom, connectivity, and pharmacy stock events.
+- **SQL** (`analysis/schema.sql`, `analysis/analytics_queries.sql`) — 11 annotated KPI queries:
+  volume per day/week, avg wait time, doctor utilization, completion/no-show/cancellation rates,
+  language distribution, symptom distribution, pharmacy stock-out rate, medicine availability, and
+  rural vs specialist access.
+- **EDA** (`analysis/eda_consultations.ipynb`) — executed notebook with charts and a business
+  narrative.
+- **Dashboard** (`src/components/operations-analytics.tsx`) — admin view showing KPI cards, the
+  demand → capacity → outcomes → pharmacy flow, and charts; fed by
+  `src/lib/operations-analytics.json`.
+
+The dashboard labels every figure **simulated**. The SQL and notebook are the analytical proof;
+the dashboard is where the numbers are surfaced in the product.
+
 ## Why this design
 
 The interesting engineering problems here are the ones the problem statement *requires*:
@@ -145,14 +177,17 @@ The interesting engineering problems here are the ones the problem statement *re
 │   │   ├── sync-queue.ts      # offline→online operation queue
 │   │   ├── room-service.ts    # QR/room-code creation & joining
 │   │   └── ai-symptom-service.ts  # rule-based triage + urgency
+│   ├── lib/
+│   │   └── operations-analytics.json  # generated aggregates for the analytics dashboard
 │   ├── pages/                 # router pages (dashboard, admin, etc.)
 │   └── types/                 # shared domain types
 ├── telemed-backend/           # Express + Socket.IO signaling + /api/sync
-├── analysis/                  # EDA notebook + synthetic consultation dataset
+├── analysis/                  # operations analytics: generator, SQL, EDA notebook, CSVs
 └── ARCHITECTURE.md            # deeper system write-up
 ```
 
 ---
 
 *Built as a healthcare platform portfolio project grounded in SIH2025 PS SIH25018. See
-`ARCHITECTURE.md` for the systems write-up and `analysis/` for the data/analytics work.*
+`ARCHITECTURE.md` for the systems write-up and `analysis/` for the data/analytics work (simulated
+dataset, SQL KPIs, EDA, and the in-app operations dashboard).*

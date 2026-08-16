@@ -1,0 +1,361 @@
+{
+  "meta": {
+    "title": "SevaMitra Operations Analytics",
+    "label": "Simulated platform data (modeled on rural Nabha, SIH2025 PS SIH25018)",
+    "generated": "2026-08-16",
+    "source": "analysis/generate_operations.py",
+    "period": "2025-01-01 to 2025-12-31"
+  },
+  "kpis": {
+    "consults_per_day": 9.8,
+    "consults_per_week": 68.3,
+    "avg_wait_min": 16.5,
+    "median_wait_min": 16,
+    "doctor_utilization": 0.52,
+    "completion_rate": 0.846,
+    "no_show_rate": 0.078,
+    "cancellation_rate": 0.076,
+    "rx_conversion": 0.84,
+    "follow_up_rate": 0.28,
+    "avg_rating": 3.8,
+    "emergency_share": 0.06,
+    "stock_out_rate": 0.16,
+    "medicine_availability": 0.849,
+    "rural_share": 0.838,
+    "rural_specialist_share": 0.89,
+    "active_villages": 12,
+    "doctors": 8
+  },
+  "flow": {
+    "demand": {
+      "label": "Patient demand",
+      "consults_per_day": 9.8,
+      "emergency_per_day": 0.6,
+      "active_villages": 12,
+      "rural_share": 0.838
+    },
+    "capacity": {
+      "label": "Doctor capacity",
+      "doctors": 8,
+      "avg_utilization": 0.52,
+      "peak_hour": 11,
+      "peak_share": 7.6
+    },
+    "outcomes": {
+      "label": "Consultation outcomes",
+      "completion_rate": 0.846,
+      "avg_wait_min": 16.5,
+      "rx_conversion": 0.84,
+      "avg_rating": 3.8
+    },
+    "pharmacy": {
+      "label": "Pharmacy availability",
+      "stock_out_rate": 0.16,
+      "medicine_availability": 0.849
+    }
+  },
+  "charts": {
+    "demand_by_day": [
+      {
+        "date": "2025-12-17",
+        "consults": 6
+      },
+      {
+        "date": "2025-12-18",
+        "consults": 11
+      },
+      {
+        "date": "2025-12-19",
+        "consults": 5
+      },
+      {
+        "date": "2025-12-20",
+        "consults": 8
+      },
+      {
+        "date": "2025-12-21",
+        "consults": 16
+      },
+      {
+        "date": "2025-12-22",
+        "consults": 9
+      },
+      {
+        "date": "2025-12-23",
+        "consults": 12
+      },
+      {
+        "date": "2025-12-24",
+        "consults": 9
+      },
+      {
+        "date": "2025-12-25",
+        "consults": 8
+      },
+      {
+        "date": "2025-12-26",
+        "consults": 11
+      },
+      {
+        "date": "2025-12-27",
+        "consults": 9
+      },
+      {
+        "date": "2025-12-28",
+        "consults": 8
+      },
+      {
+        "date": "2025-12-29",
+        "consults": 11
+      },
+      {
+        "date": "2025-12-30",
+        "consults": 13
+      }
+    ],
+    "demand_by_hour": [
+      {
+        "hour": 7,
+        "consults": 228
+      },
+      {
+        "hour": 8,
+        "consults": 244
+      },
+      {
+        "hour": 9,
+        "consults": 246
+      },
+      {
+        "hour": 10,
+        "consults": 234
+      },
+      {
+        "hour": 11,
+        "consults": 270
+      },
+      {
+        "hour": 12,
+        "consults": 234
+      },
+      {
+        "hour": 13,
+        "consults": 233
+      },
+      {
+        "hour": 14,
+        "consults": 245
+      },
+      {
+        "hour": 15,
+        "consults": 231
+      },
+      {
+        "hour": 16,
+        "consults": 241
+      },
+      {
+        "hour": 17,
+        "consults": 199
+      },
+      {
+        "hour": 18,
+        "consults": 250
+      },
+      {
+        "hour": 19,
+        "consults": 230
+      },
+      {
+        "hour": 20,
+        "consults": 242
+      },
+      {
+        "hour": 21,
+        "consults": 227
+      }
+    ],
+    "wait_buckets": [
+      {
+        "bucket": "0-5m",
+        "count": 186
+      },
+      {
+        "bucket": "6-10m",
+        "count": 526
+      },
+      {
+        "bucket": "11-15m",
+        "count": 884
+      },
+      {
+        "bucket": "16-20m",
+        "count": 976
+      },
+      {
+        "bucket": "21-30m",
+        "count": 889
+      },
+      {
+        "bucket": "31-60m",
+        "count": 93
+      }
+    ],
+    "utilization_by_specialty": [
+      {
+        "specialty": "General",
+        "utilization": 22.0
+      },
+      {
+        "specialty": "Cardiology",
+        "utilization": 66.0
+      },
+      {
+        "specialty": "Pediatrics",
+        "utilization": 36.0
+      },
+      {
+        "specialty": "Neurology",
+        "utilization": 60.0
+      },
+      {
+        "specialty": "Orthopedics",
+        "utilization": 63.0
+      },
+      {
+        "specialty": "Dermatology",
+        "utilization": 45.0
+      },
+      {
+        "specialty": "Ent",
+        "utilization": 63.0
+      },
+      {
+        "specialty": "Psychiatry",
+        "utilization": 59.0
+      }
+    ],
+    "stock_risk_by_specialty": [
+      {
+        "specialty": "General",
+        "rate": 7.8
+      },
+      {
+        "specialty": "Cardiology",
+        "rate": 21.1
+      },
+      {
+        "specialty": "Pediatrics",
+        "rate": 13.3
+      },
+      {
+        "specialty": "Neurology",
+        "rate": 17.8
+      },
+      {
+        "specialty": "Orthopedics",
+        "rate": 10.0
+      },
+      {
+        "specialty": "Dermatology",
+        "rate": 14.4
+      },
+      {
+        "specialty": "Ent",
+        "rate": 11.1
+      },
+      {
+        "specialty": "Psychiatry",
+        "rate": 27.8
+      }
+    ],
+    "language_mix": [
+      {
+        "name": "English",
+        "value": 1197
+      },
+      {
+        "name": "Hindi",
+        "value": 1183
+      },
+      {
+        "name": "Punjabi",
+        "value": 1174
+      }
+    ],
+    "symptom_mix": [
+      {
+        "name": "Fungal Infection",
+        "value": 138
+      },
+      {
+        "name": "Skin Rash",
+        "value": 126
+      },
+      {
+        "name": "Bone Fracture",
+        "value": 126
+      },
+      {
+        "name": "Palpitations",
+        "value": 125
+      },
+      {
+        "name": "Sinusitis",
+        "value": 123
+      },
+      {
+        "name": "Nose Block",
+        "value": 122
+      },
+      {
+        "name": "Chest Pain",
+        "value": 120
+      },
+      {
+        "name": "Acne",
+        "value": 120
+      },
+      {
+        "name": "Bp High",
+        "value": 119
+      },
+      {
+        "name": "Joint Pain",
+        "value": 117
+      }
+    ],
+    "urgency_mix": [
+      {
+        "name": "Routine",
+        "value": 2444
+      },
+      {
+        "name": "High",
+        "value": 897
+      },
+      {
+        "name": "Emergency",
+        "value": 213
+      }
+    ],
+    "access_mix": [
+      {
+        "name": "Rural \u2192 Specialist",
+        "value": 2652
+      },
+      {
+        "name": "Rural \u2192 General",
+        "value": 327
+      },
+      {
+        "name": "Hub \u2192 Specialist",
+        "value": 507
+      },
+      {
+        "name": "Hub \u2192 General",
+        "value": 68
+      }
+    ]
+  }
+}
