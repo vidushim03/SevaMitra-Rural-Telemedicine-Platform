@@ -11,6 +11,8 @@ export const Consultations = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { data, addMessage, setQueueStatus, pendingSyncCount, flushSync } = useAppData();
+  const [message, setMessage] = useState('');
+  const [isFlushing, setIsFlushing] = useState(false);
   if (!user) return null;
   const isDoctor = user.role === 'doctor';
   const consultationId = 'live_consultation_1';
@@ -94,8 +96,8 @@ export const Consultations = () => {
                   <p className="text-sm font-medium">{q.appointmentId}</p>
                   <p className="text-xs text-muted-foreground mb-2">{q.status}</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setQueueStatus(q.id, 'ongoing')} className="text-xs px-2 py-1 rounded bg-amber-100">Mark Ongoing</button>
-                    <button onClick={() => setQueueStatus(q.id, 'finished')} className="text-xs px-2 py-1 rounded bg-emerald-100">Finish</button>
+                    <button onClick={() => setQueueStatus(q.id, 'ongoing')} className="text-xs px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">Mark Ongoing</button>
+                    <button onClick={() => setQueueStatus(q.id, 'finished')} className="text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Finish</button>
                   </div>
                 </div>
               ))}
@@ -107,7 +109,7 @@ export const Consultations = () => {
             <div className="h-56 mt-3 rounded-xl border p-2 overflow-auto space-y-2 bg-muted/20">
               {messages.length === 0 && <p className="text-xs text-muted-foreground">No messages yet.</p>}
               {messages.map((m) => (
-                <div key={m.id} className="rounded-lg bg-white p-2 border text-sm">
+                <div key={m.id} className="rounded-lg bg-white dark:bg-zinc-800 p-2 border text-sm">
                   <p className="font-medium text-xs">{m.senderId}</p>
                   <p>{m.text}</p>
                   {m.attachmentName && <p className="text-xs text-blue-600">Attachment: {m.attachmentName}</p>}
@@ -128,7 +130,7 @@ export const Consultations = () => {
                     if (!user) return;
                     addMessage({ consultationId, senderId: user.id, text: 'Shared report', attachmentName: 'lab-report.pdf' });
                   }}
-                  className="px-3 py-2 rounded-lg bg-slate-100 text-sm"
+                  className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-zinc-800 text-sm"
                 >
                   Share File
                 </button>

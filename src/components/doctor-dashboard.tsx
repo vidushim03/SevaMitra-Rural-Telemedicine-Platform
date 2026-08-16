@@ -25,6 +25,7 @@ interface DoctorDashboardProps {
 
 export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   const t = useTranslation(language);
+  const { data } = useAppData();
 
   // Existing dashboard state
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -52,6 +53,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   });
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const doctorInitiatedCallRef = useRef(false);
 
   // The logged-in doctor drives identity — no hardcoded doctor_1 fallback
   const currentDoctor = {
@@ -79,6 +81,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
       const patientName = data.users.find((u) => u.id === q.patientId)?.name || q.patientId;
       return {
         id: q.id,
+        patientUserId: q.patientId,
         name: patientName,
         age: 30,
         gender: 'M',
@@ -135,6 +138,33 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
       setIncomingCall({ callId, patientId, patientInfo });
     });
 
+    // Patient declined a doctor-initiated call
+    socket.on('call-rejected', () => {
+      doctorInitiatedCallRef.current = false;
+      endVideoCall();
+    });
+
+    // Patient isn't online for a doctor-initiated call
+    socket.on('patient-unavailable', () => {
+      doctorInitiatedCallRef.current = false;
+      endVideoCall();
+      alert('Patient is currently unavailable. Please try again later.');
+    });
+
+    socket.on('call-accepted', async ({ callId }) => {
+      // The patient accepted a doctor-initiated call: kick off WebRTC offer.
+      // Only the initiating side (doctor) creates the offer; if the doctor is
+      // merely accepting a patient-initiated call, this handler does nothing.
+      try {
+        if (webrtcService && doctorInitiatedCallRef.current) {
+          await webrtcService.initiateCall(callId);
+          doctorInitiatedCallRef.current = false;
+        }
+      } catch (err) {
+        console.error('Error initiating call after patient accepted:', err);
+      }
+    });
+
     webrtcService.onRemoteStream = (stream) => {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
@@ -174,6 +204,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         }
 
         // Accept the call
+        doctorInitiatedCallRef.current = false;
         webrtcService.acceptCall(incomingCall.callId);
 
         setIsInVideoCall(true);
@@ -216,6 +247,30 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
     }
   };
 
+  // Start a video consult for the given patient (their real user id, e.g. patient_demo)
+  const startVideoCall = async (patient: { patientUserId?: string; id?: string; name: string; condition?: string }) => {
+    if (!webrtcService) return;
+    const patientUserId = patient.patientUserId || patient.id || '';
+    setCurrentPatient({ ...patient, id: patientUserId });
+    try {
+      const localStream = await webrtcService.startLocalStream(isVideoEnabled, isAudioEnabled);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStream;
+      }
+      // Notify the signaling server that this doctor is opening a consult with the patient.
+      doctorInitiatedCallRef.current = true;
+      const socket = webrtcService.getSocket();
+      socket.emit('doctor-initiate-call', {
+        doctorId: currentDoctor.id,
+        patientId: patientUserId,
+        patientInfo: { name: patient.name, condition: patient.condition || 'General consultation' },
+      });
+      setIsInVideoCall(true);
+    } catch {
+      alert('Failed to access camera/microphone. Please check permissions.');
+    }
+  };
+
   const toggleAudio = () => {
     if (webrtcService) {
       const newState = !isAudioEnabled;
@@ -232,7 +287,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
           <CardContent className="p-8">
             <div className="text-red-500 mb-4 text-4xl">⚠️</div>
             <h3 className="text-xl font-semibold mb-2 text-red-600">Doctor Dashboard Error</h3>
-            <p className="text-gray-600 mb-6">{error}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
             <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
               Refresh Page
             </Button>
@@ -268,7 +323,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         </div>
 
         {/* Patient info overlay */}
-        <div className="absolute top-4 left-4 bg-black bg-opacity70 text-white p-4 rounded-lg min-w-64">
+        <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white p-4 rounded-lg min-w-64">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             <span className="font-semibold">Consultation in Progress</span>
@@ -325,23 +380,23 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
 
   // Main dashboard interface
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
       {/* Incoming call modal */}
       {incomingCall && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl animate-pulse">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl animate-pulse">
             <div className="text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Phone className="h-10 w-10 text-green-600 animate-bounce" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-green-600">
                 📞 {t.incomingCall || 'Incoming Video Call'}
               </h3>
               <div className="space-y-2 mb-6 text-left">
-                <div className="bg-gray-50 p-3 rounded-lg space-y-1">
-                  <p><span className="font-medium text-gray-600">Patient:</span> {incomingCall.patientInfo.name}</p>
-                  <p><span className="font-medium text-gray-600">Age:</span> {incomingCall.patientInfo.age} years</p>
-                  <p><span className="font-medium text-gray-600">Condition:</span> {incomingCall.patientInfo.condition}</p>
+                <div className="bg-gray-50 dark:bg-zinc-800 p-3 rounded-lg space-y-1">
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Patient:</span> {incomingCall.patientInfo.name}</p>
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Age:</span> {incomingCall.patientInfo.age} years</p>
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Condition:</span> {incomingCall.patientInfo.condition}</p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -369,14 +424,14 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
       )}
 
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white dark:bg-zinc-900 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {t.doctorDashboard || "Doctor Dashboard"}
               </h1>
-              <p className="text-gray-600">Welcome back, {currentDoctor.name}</p>
+              <p className="text-gray-600 dark:text-gray-300">Welcome back, {currentDoctor.name}</p>
             </div>
             <div className="flex items-center gap-4">
               <Badge
@@ -386,7 +441,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                   "text-red-600 border-red-600"
                 }
               >
-                <div className={`w-2 h-2 rounded-full mr-2 ${connectionStatus === 'connected' ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+                <div className={`w-2 h-2 rounded-full mr-2 ${connectionStatus === 'connected' ? 'bg-green-50 dark:bg-green-900/200 animate-pulse' : 'bg-red-500'
                   }`}></div>
                 {connectionStatus === 'connected' ? 'Available for calls' : 'Connection issue'}
               </Badge>
@@ -402,7 +457,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-zinc-900 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
             {[
@@ -419,7 +474,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                 }}
                 className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm ${selectedTab === id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-200 hover:border-gray-300'
                   }`}
               >
                 <Icon className="h-5 w-5 mr-2" />
@@ -436,7 +491,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
           <div className="space-y-6">
             {/* Connection Status Debug */}
             {connectionStatus !== 'connected' && (
-              <Card className="border-yellow-200 bg-yellow-50">
+              <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-yellow-600">
                     <Wifi className="h-5 w-5" />
@@ -452,14 +507,14 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
                       <Users className="h-6 w-6 text-blue-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         {t.todaysPatients || "Today's Patients"}
                       </p>
-                      <p className="text-2xl font-bold text-gray-900">{todaysStats.totalPatients}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{todaysStats.totalPatients}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -468,14 +523,14 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center">
-                    <div className="p-2 bg-yellow-100 rounded-lg">
+                    <div className="p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg">
                       <Clock className="h-6 w-6 text-yellow-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         {t.waitingPatients || "Waiting"}
                       </p>
-                      <p className="text-2xl font-bold text-gray-900">{todaysStats.waiting}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{todaysStats.waiting}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -484,14 +539,14 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
                       <Timer className="h-6 w-6 text-green-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         {t.avgTime || "Avg Time"}
                       </p>
-                      <p className="text-2xl font-bold text-gray-900">{todaysStats.avgConsultationTime}m</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{todaysStats.avgConsultationTime}m</p>
                     </div>
                   </div>
                 </CardContent>
@@ -500,14 +555,14 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center">
-                    <div className="p-2 bg-purple-100 rounded-lg">
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
                       <Star className="h-6 w-6 text-purple-600" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         {t.satisfaction || "Rating"}
                       </p>
-                      <p className="text-2xl font-bold text-gray-900">{todaysStats.satisfaction}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{todaysStats.satisfaction}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -528,12 +583,12 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                     {consultationCalls
                       .filter(call => call.status === 'ongoing' || call.status === 'incoming')
                       .map((call) => (
-                        <div key={call.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div key={call.id} className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                           <div className="flex items-center">
-                            <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                            <div className="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full mr-3 animate-pulse"></div>
                             <div>
                               <p className="font-medium">{call.patientName}</p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
                                 {call.status === 'ongoing' ? `${t.duration || 'Duration'}: ${call.duration}m` :
                                   call.status === 'incoming' ? t.incomingCall || 'Incoming Call' :
                                     t.missedCall || 'Missed Call'}
@@ -568,15 +623,15 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                         </Avatar>
                         <div>
                           <p className="font-medium">{patient.name}</p>
-                          <p className="text-sm text-gray-600">{patient.appointmentTime}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{patient.appointmentTime}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {patient.age} {patient.age > 1 ? t.years || 'years' : t.year || 'year'} • {patient.gender === 'M' ? t.male || 'Male' : t.female || 'Female'}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">{patient.condition}</p>
-                        <p className="text-sm text-gray-600">{patient.appointmentTime}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{patient.appointmentTime}</p>
                         {patient.waitTime > 0 && (
                           <Badge variant="outline" className="text-yellow-600">
                             {t.waiting || 'Waiting'}: {patient.waitTime}m
@@ -584,19 +639,19 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                         )}
                       </div>
                       <div className="text-right max-w-xs">
-                        <p className="text-sm text-gray-600">{patient.symptoms}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{patient.symptoms}</p>
                         {patient.lastVisit && (
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {t.lastVisit || 'Last Visit'}: {patient.lastVisit}
                           </p>
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => setSelectedTab('records')}>
                           <FileText className="h-4 w-4 mr-2" />
                           Records
                         </Button>
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => startVideoCall(patient)}>
                           <Video className="h-4 w-4 mr-2" />
                           Consult
                         </Button>
@@ -621,14 +676,22 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                 <div className="md:col-span-1 space-y-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">My Patients</h3>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => setSearchQuery('')}>
                       <Filter className="h-4 w-4 mr-2" /> Filter
                     </Button>
                   </div>
-                  {todaysPatients.map((patient) => (
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search patients..."
+                    className="w-full mb-3 rounded-lg border px-3 py-2 text-sm"
+                  />
+                  {todaysPatients
+                    .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map((patient) => (
                     <div
                       key={patient.id}
-                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-100 ${selectedPatient?.id === patient.id ? 'bg-blue-50 border-blue-300' : ''
+                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-100 ${selectedPatient?.id === patient.id ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300' : ''
                         }`}
                       onClick={() => setSelectedPatient(patient)}
                     >
@@ -640,11 +703,11 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                         </Avatar>
                         <div>
                           <p className="font-medium">{patient.name}</p>
-                          <p className="text-sm text-gray-600">{patient.condition}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{patient.condition}</p>
                         </div>
                       </div>
                       {selectedPatient?.id === patient.id && (
-                        <Badge className="bg-blue-500">Selected</Badge>
+                        <Badge className="bg-blue-100 dark:bg-blue-900/40">Selected</Badge>
                       )}
                     </div>
                   ))}
@@ -657,7 +720,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           <span>{selectedPatient.name}'s Overview</span>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" onClick={() => setSelectedTab('records')}>
                             <History className="h-4 w-4 mr-2" /> View History
                           </Button>
                         </CardTitle>
@@ -669,10 +732,10 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                         <p><span className="font-medium">Symptoms:</span> {selectedPatient.symptoms}</p>
                         <p><span className="font-medium">Last Visit:</span> {selectedPatient.lastVisit || 'N/A'}</p>
                         <div className="flex gap-2 mt-4">
-                          <Button size="sm">
+                          <Button size="sm" onClick={() => startVideoCall(selectedPatient)}>
                             <Video className="h-4 w-4 mr-2" /> Start Consultation
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" onClick={() => setSelectedTab('records')}>
                             <FileText className="h-4 w-4 mr-2" /> Full Records
                           </Button>
                         </div>
@@ -689,7 +752,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className="md:col-span-2 flex items-center justify-center h-full min-h-[400px] bg-gray-50 rounded-lg border border-dashed text-gray-500">
+                  <div className="md:col-span-2 flex items-center justify-center h-full min-h-[400px] bg-gray-50 dark:bg-zinc-900 rounded-lg border border-dashed text-gray-500 dark:text-gray-400">
                     <p className="text-center p-4">
                       <Users className="h-8 w-8 mx-auto mb-2" />
                       Select a patient from the list to view their details and manage their care.
@@ -708,7 +771,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <CardTitle>Appointments</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 {t.manageAppointments || "Manage your upcoming and past appointments."}
               </p>
             </CardContent>
@@ -721,7 +784,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <CardTitle>Medical Records</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 {t.accessPatientRecords || "Access comprehensive patient records and consultation history"}
               </p>
             </CardContent>

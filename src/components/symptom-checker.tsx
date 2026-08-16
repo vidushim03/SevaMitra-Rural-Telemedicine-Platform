@@ -106,27 +106,27 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
     respiratory: {
       name: t.respiratory || "Respiratory",
       symptoms: [
-        { id: 'fever', label: t.fever, icon: Thermometer, color: 'bg-red-100 border-red-200 hover:bg-red-200' },
-        { id: 'cough', label: t.cough, icon: Zap, color: 'bg-orange-100 border-orange-200 hover:bg-orange-200' },
-        { id: 'breathing', label: t.breathingIssues, icon: Heart, color: 'bg-blue-100 border-blue-200 hover:bg-blue-200' },
+        { id: 'fever', label: t.fever, icon: Thermometer, color: 'bg-red-100 border-red-200 hover:bg-red-200 dark:bg-red-900/30 dark:border-red-800 dark:hover:bg-red-900/50' },
+        { id: 'cough', label: t.cough, icon: Zap, color: 'bg-orange-100 border-orange-200 hover:bg-orange-200 dark:bg-orange-900/30 dark:border-orange-800 dark:hover:bg-orange-900/50' },
+        { id: 'breathing', label: t.breathingIssues, icon: Heart, color: 'bg-blue-100 border-blue-200 hover:bg-blue-200 dark:bg-blue-900/30 dark:border-blue-800 dark:hover:bg-blue-900/50' },
       ]
     },
     neurological: {
       name: t.neurological || "Neurological",
       symptoms: [
-        { id: 'headache', label: t.headache, icon: Zap, color: 'bg-purple-100 border-purple-200 hover:bg-purple-200' },
+        { id: 'headache', label: t.headache, icon: Zap, color: 'bg-purple-100 border-purple-200 hover:bg-purple-200 dark:bg-purple-900/30 dark:border-purple-800 dark:hover:bg-purple-900/50' },
       ]
     },
     gastrointestinal: {
       name: t.gastrointestinal || "Gastrointestinal",
       symptoms: [
-        { id: 'stomach', label: t.stomachPain, icon: AlertTriangle, color: 'bg-yellow-100 border-yellow-200 hover:bg-yellow-200' },
+        { id: 'stomach', label: t.stomachPain, icon: AlertTriangle, color: 'bg-yellow-100 border-yellow-200 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800 dark:hover:bg-yellow-900/50' },
       ]
     },
     cardiovascular: {
       name: t.cardiovascular || "Cardiovascular",
       symptoms: [
-        { id: 'chest', label: t.chestPain, icon: Heart, color: 'bg-red-100 border-red-200 hover:bg-red-200' },
+        { id: 'chest', label: t.chestPain, icon: Heart, color: 'bg-red-100 border-red-200 hover:bg-red-200 dark:bg-red-900/30 dark:border-red-800 dark:hover:bg-red-900/50' },
       ]
     }
   });
@@ -430,7 +430,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
         </div>
       </div>
       <div className="flex space-x-2">
-        <Button className="bg-white text-red-600 hover:bg-gray-100 font-bold">
+        <Button className="bg-white text-red-600 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 font-bold">
           📞 Call 108
         </Button>
         <Button
@@ -444,32 +444,35 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
   );
 
   // AI Confidence Display
-  const AIConfidenceDisplay = () => (
-    <div className="bg-blue-50 p-4 rounded-lg mb-4">
-      <h4 className="font-semibold mb-2 flex items-center">
-        <Shield className="h-4 w-4 mr-2" />
-        🤖 {t.aiAnalysisDetails || 'AI Analysis Details'}
-      </h4>
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm">{t.confidenceLevel || 'Confidence Level'}</span>
-          <div className="flex items-center">
-            <Progress value={aiConfidence} className="w-20 mr-2" />
-            <span className="text-sm font-medium">{aiConfidence}%</span>
+  const AIConfidenceDisplay = () => {
+    const confidence = results?.confidence ?? aiConfidence;
+    return (
+      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4">
+        <h4 className="font-semibold mb-2 flex items-center">
+          <Shield className="h-4 w-4 mr-2" />
+          🤖 {t.aiAnalysisDetails || 'AI Analysis Details'}
+        </h4>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm">{t.confidenceLevel || 'Confidence Level'}</span>
+            <div className="flex items-center">
+              <Progress value={confidence} className="w-20 mr-2" />
+              <span className="text-sm font-medium">{confidence}%</span>
+            </div>
           </div>
+          <p className="text-xs text-gray-600">
+            {t.basedOnMedicalDatabase || 'Based on medical database:'} {results?.dataPointsUsed} {t.medicalReferences || 'medical references'}
+          </p>
         </div>
-        <p className="text-xs text-gray-600">
-          {t.basedOnMedicalDatabase || 'Based on medical database:'} {results?.dataPointsUsed} {t.medicalReferences || 'medical references'}
-        </p>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Doctor Recommendation Component
   const DoctorRecommendation = () => (
     <Card className="border-green-500 border-2 mb-4">
       <CardHeader className="pb-3">
-        <CardTitle className="text-green-700 flex items-center">
+        <CardTitle className="text-green-700 dark:text-green-300 flex items-center">
           <CheckCircle className="h-5 w-5 mr-2" />
           {t.recommendConsultation || 'Recommended: See a Doctor'}
         </CardTitle>
@@ -590,7 +593,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
               <div className="text-sm text-gray-500">📊 Calculating risk assessment...</div>
             </div>
             <Progress value={75} className="w-full mt-4" />
-            <p className="text-xs text-gray-400 mt-2">{t.mayTakeFewMoments}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t.mayTakeFewMoments}</p>
           </CardContent>
         </Card>
       </div>
@@ -627,7 +630,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
 
               {/* Search Box */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
                 <input
                   type="text"
                   placeholder="Search symptoms..."
@@ -639,8 +642,8 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
 
               {/* Selected Symptoms Display */}
               {selectedSymptoms.length > 0 && (
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-3">Selected Symptoms:</h4>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-3">Selected Symptoms:</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedSymptoms.map(symptomId => {
                       const symptom = Object.values(getSymptomCategories())
@@ -692,7 +695,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                               text-left group focus:outline-none focus:ring-2 focus:ring-blue-500
                               ${isSelected
                                 ? 'bg-blue-600 border-blue-600 text-white shadow-lg transform scale-105'
-                                : `${symptom.color} border-gray-200 text-gray-700 hover:shadow-md hover:transform hover:scale-102`
+                                : `${symptom.color} border-gray-200 text-gray-700 dark:text-gray-200 hover:shadow-md hover:transform hover:scale-105`
                               }
                             `}
                           >
@@ -733,7 +736,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                       variant="outline"
                       size="sm"
                       disabled={isListening}
-                      className="flex items-center space-x-2 hover:bg-blue-50 transition-colors"
+                      className="flex items-center space-x-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                       title={isListening 
                         ? (language === 'hi' ? 'सुन रहा है...' : language === 'pa' ? 'ਸੁਣ ਰਿਹਾ ਹੈ...' : 'Listening...')
                         : (language === 'hi' ? 'आवाज़ से लिखें' : language === 'pa' ? 'ਆਵਾਜ਼ ਨਾਲ ਲਿਖੋ' : 'Speak to type')
@@ -756,7 +759,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                 </div>
 
                 {/* Microphone Permission Help */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
                   <div className="flex items-start gap-2">
                     <Mic className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-blue-800">
@@ -802,7 +805,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   />
                   <label htmlFor="image-upload" className="cursor-pointer">
                     <div className="space-y-3">
-                      <Upload className="h-12 w-12 mx-auto text-gray-400" />
+                      <Upload className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
                       <div>
                         <p className="text-gray-600 font-medium">
                           {t.uploadPhotoSymptoms || 'Upload photo of visible symptoms'}
@@ -814,8 +817,8 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                     </div>
                   </label>
                   {uploadedImage && (
-                    <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-center justify-center space-x-2 text-green-700">
+                    <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <div className="flex items-center justify-center space-x-2 text-green-700 dark:text-green-300">
                         <CheckCircle className="h-5 w-5" />
                         <span className="text-sm font-medium">
                           ✓ {t.imageUploaded || 'Image uploaded'}: {uploadedImage.name}
@@ -969,7 +972,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <RadioGroupItem value="mild" id="mild" />
                   <Label htmlFor="mild" className="flex-1 cursor-pointer text-lg">
                     <div>
-                      <div className="font-semibold text-green-700">{t.mild}</div>
+                      <div className="font-semibold text-green-700 dark:text-green-300">{t.mild}</div>
                       <div className="text-sm text-gray-600">{t.mildDescription}</div>
                     </div>
                   </Label>
@@ -1032,7 +1035,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <RadioGroupItem value="low" id="low" />
                   <Label htmlFor="low" className="flex-1 cursor-pointer text-lg">
                     <div>
-                      <div className="font-semibold text-green-700">{t.canWaitRegularAppointment || 'Can wait for regular appointment'}</div>
+                      <div className="font-semibold text-green-700 dark:text-green-300">{t.canWaitRegularAppointment || 'Can wait for regular appointment'}</div>
                       <div className="text-sm text-gray-600">{t.nonUrgentRoutine}</div>
                     </div>
                   </Label>

@@ -83,7 +83,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
     }
   ];
 
-  const todaysDoses = [
+  const [todaysDoses, setTodaysDoses] = useState([
     {
       medicineId: 1,
       medicine: "Paracetamol",
@@ -116,10 +116,16 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
       status: "taken",
       takenTime: "08:00"
     }
-  ];
+  ]);
 
   const markDoseTaken = (medicineId: number, scheduledTime: string) => {
-    console.log("Marking dose taken:", medicineId, scheduledTime);
+    setTodaysDoses((doses) =>
+      doses.map((dose) =>
+        dose.medicineId === medicineId && dose.scheduledTime === scheduledTime
+          ? { ...dose, status: "taken", takenTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+          : dose,
+      ),
+    );
   };
 
   const getComplianceColor = (percentage: number) => {
@@ -173,7 +179,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-full bg-purple-100">
+                                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/40">
                                   <Pill className="w-6 h-6 text-purple-600" />
                                 </div>
                                 
@@ -194,7 +200,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                               
                               <div className="flex items-center gap-2">
                                 {dose.status === 'taken' ? (
-                                  <Badge className="bg-green-100 text-green-800 border-green-300">
+                                  <Badge className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/40 dark:text-green-200 dark:border-green-800">
                                     <CheckCircle className="w-4 h-4 mr-1" />
                                     {t.taken}
                                   </Badge>
@@ -234,7 +240,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-full bg-purple-100">
+                              <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/40">
                                 <Pill className="w-5 h-5 text-purple-600" />
                               </div>
                               <div>
@@ -247,7 +253,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                             
                             <Badge 
                               variant={medicine.status === 'active' ? 'default' : 'secondary'}
-                              className={medicine.status === 'active' ? 'bg-green-100 text-green-800 border-green-300' : ''}
+                              className={medicine.status === 'active' ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/40 dark:text-green-200 dark:border-green-800' : ''}
                             >
                               {medicine.status === 'active' ? t.active : t.completed}
                             </Badge>
@@ -269,7 +275,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                           </div>
                           
                           {medicine.nextDose && (
-                            <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+                            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                               <div className="flex items-center gap-2 text-sm text-blue-700">
                                 <Bell className="w-4 h-4" />
                                 <span>{t.nextDose} {medicine.nextDose}</span>
@@ -406,7 +412,7 @@ export function MedicineTracker({ language }: MedicineTrackerProps) {
                   </div>
                   
                   {selectedMedicine.nextDose && (
-                    <Card className="border-blue-200 bg-blue-50">
+                    <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
                       <CardContent className="p-3">
                         <div className="flex items-center gap-2 text-blue-700">
                           <Bell className="w-4 h-4" />

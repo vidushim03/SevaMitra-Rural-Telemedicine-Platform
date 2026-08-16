@@ -21,11 +21,14 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   const [connectionQuality, setConnectionQuality] = useState<'good' | 'poor'>('good');
   const [currentCallId, setCurrentCallId] = useState<string | null>(null);
   const [callStatus, setCallStatus] = useState<'idle' | 'calling' | 'ringing' | 'connected'>('idle');
+  const [incomingCall, setIncomingCall] = useState<any>(null);
 
   // WebRTC service and video refs
   const [webrtcService] = useState(() => new WebRTCService());
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  // True when this patient is answering a doctor-initiated call (doctor creates the offer)
+  const patientInitiatedCallRef = useRef(true);
 
   const t = useTranslation(language);
 
@@ -87,6 +90,10 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
     });
 
     socket.on('call-accepted', async ({ callId }) => {
+      // When the doctor initiated the call, this patient already started the
+      // stream + accepted in the incoming-call UI — nothing further to do here.
+      if (!patientInitiatedCallRef.current) return;
+
       setCallStatus('connected');
       setIsInCall(true);
 
@@ -115,6 +122,12 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
       setCallStatus('idle');
     });
 
+    // A doctor can also initiate a call to this patient (from the doctor dashboard)
+    socket.on('incoming-call', ({ callId, doctorId, patientInfo }) => {
+      patientInitiatedCallRef.current = false;
+      setIncomingCall({ callId, doctorId, patientInfo });
+    });
+
     // Handle remote stream
     webrtcService.onRemoteStream = (stream) => {
       if (remoteVideoRef.current) {
@@ -132,11 +145,6 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
       setConnectionQuality(state === 'connected' ? 'good' : 'poor');
     };
 
-    // Handle call ended
-    webrtcService.onCallEnded = () => {
-      endCall();
-    };
-
     return () => {
       webrtcService.disconnect();
     };
@@ -145,6 +153,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   const startConsultation = async (doctorId: number) => {
     if (callStatus !== 'idle') return;
 
+    patientInitiatedCallRef.current = true;
     setCallStatus('calling');
 
     // Ring the real seeded doctor account (doctor_1, doctor_2, ...) using the
@@ -173,6 +182,32 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
     }
+  };
+
+  // Answer a doctor-initiated call
+  const acceptIncomingCall = async () => {
+    if (!incomingCall) return;
+    try {
+      const localStream = await webrtcService.startLocalStream(isVideoEnabled, isAudioEnabled);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStream;
+      }
+      // Sets currentCallId + tells the signaling server the call is accepted
+      webrtcService.acceptCall(incomingCall.callId);
+      setCurrentCallId(incomingCall.callId);
+      setIncomingCall(null);
+      setCallStatus('connected');
+      setIsInCall(true);
+    } catch (error) {
+      alert('Failed to access camera/microphone. Please check permissions.');
+    }
+  };
+
+  // Decline a doctor-initiated call
+  const rejectIncomingCall = () => {
+    if (!incomingCall) return;
+    webrtcService.rejectCall(incomingCall.callId);
+    setIncomingCall(null);
   };
 
   const toggleVideo = () => {
@@ -266,16 +301,16 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   // Calling/Ringing interface
   if (callStatus === 'calling' || callStatus === 'ringing') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-950 dark:to-zinc-900 flex items-center justify-center">
         <Card className="w-96 text-center">
           <CardContent className="p-8">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-24 h-24 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
               <Phone className="h-12 w-12 text-green-600 animate-pulse" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
               {callStatus === 'calling' ? 'Calling Doctor...' : 'Doctor is being notified...'}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               {callStatus === 'calling'
                 ? 'Please wait while we connect you'
                 : 'Please wait for the doctor to accept your call'
@@ -295,12 +330,43 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
 
   // Main consultation interface (existing code with updated button)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-950 dark:to-zinc-900 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.consultWithDoctor}</h1>
-          <p className="text-gray-600">{t.selectAvailableDoctor}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t.consultWithDoctor}</h1>
+          <p className="text-gray-600 dark:text-gray-300">{t.selectAvailableDoctor}</p>
         </div>
+
+        {incomingCall && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Card className="w-96 text-center">
+              <CardContent className="p-8">
+                <div className="w-24 h-24 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Phone className="h-12 w-12 text-green-600 animate-pulse" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Incoming Doctor Call</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  {incomingCall.patientInfo?.name || 'Your doctor'} would like to start a video consultation with you.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    onClick={rejectIncomingCall}
+                    variant="destructive"
+                    className="rounded-full h-14 w-14"
+                  >
+                    <PhoneOff className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    onClick={acceptIncomingCall}
+                    className="rounded-full h-14 w-14 bg-green-600 hover:bg-green-700"
+                  >
+                    <Phone className="h-6 w-6" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {availableDoctors.map((doctor) => (
@@ -313,29 +379,29 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
                   </AvatarFallback>
                 </Avatar>
                 <CardTitle className="text-xl">{doctor.name}</CardTitle>
-                <p className="text-gray-600">{doctor.specialty}</p>
+                <p className="text-gray-600 dark:text-gray-300">{doctor.specialty}</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{t.rating}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">{t.rating}</span>
                     <div className="flex items-center">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                       <span className="font-medium">{doctor.rating}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{t.experience}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">{t.experience}</span>
                     <span className="font-medium">{doctor.experience}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{t.fee}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">{t.fee}</span>
                     <span className="font-bold text-green-600">{doctor.consultationFee}</span>
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">{t.languages}:</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{t.languages}:</p>
                   <div className="flex flex-wrap gap-1">
                     {doctor.languages.map((lang, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
@@ -359,7 +425,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
                 ) : (
                   <div className="text-center py-4">
                     <Badge variant="destructive" className="mb-2">{t.unavailable}</Badge>
-                    <p className="text-sm text-gray-500">{t.allDoctorsBusy}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t.allDoctorsBusy}</p>
                   </div>
                 )}
               </CardContent>

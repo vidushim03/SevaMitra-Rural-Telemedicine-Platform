@@ -66,9 +66,9 @@ export function PaymentsPage() {
                 <td className="p-3 uppercase">{p.method}</td>
                 <td className="p-3 capitalize">{p.status}</td>
                 <td className="p-3 flex gap-2">
-                  <button onClick={() => markPayment(p.id, 'paid')} className="px-2 py-1 rounded bg-emerald-100">Mark Paid</button>
-                  <button onClick={() => markPayment(p.id, 'failed')} className="px-2 py-1 rounded bg-rose-100">Fail</button>
-                  <button onClick={() => markPayment(p.id, 'refunded')} className="px-2 py-1 rounded bg-slate-200">Refund</button>
+                  <button onClick={() => markPayment(p.id, 'paid')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Mark Paid</button>
+                  <button onClick={() => markPayment(p.id, 'failed')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/40">Fail</button>
+                  <button onClick={() => markPayment(p.id, 'refunded')} className="px-2 py-1 rounded bg-slate-200 dark:bg-zinc-700">Refund</button>
                 </td>
               </tr>
             ))}

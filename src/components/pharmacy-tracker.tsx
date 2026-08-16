@@ -128,7 +128,7 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
     }
   ];
 
-  const medicines = [
+  const [medicines, setMedicines] = useState([
     {
       id: 1,
       name: "Paracetamol",
@@ -197,7 +197,7 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
         6: { quantity: 0, status: "out_of_stock", lastUpdated: "2024-01-24 20:00" }
       }
     }
-  ];
+  ]);
 
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
@@ -333,13 +333,13 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'in_stock':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200 border-green-300';
       case 'low_stock':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-200 dark:border-yellow-800';
       case 'out_of_stock':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700';
     }
   };
 
@@ -370,12 +370,18 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
   };
 
   const updateStock = (medicineId: number, pharmacyId: number, newQuantity: number) => {
-    console.log("Updating stock:", { medicineId, pharmacyId, newQuantity });
-    // In real app, this would update the backend
+    const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    const status = newQuantity === 0 ? 'out_of_stock' : newQuantity <= 20 ? 'low_stock' : 'in_stock';
+    setMedicines((meds) =>
+      meds.map((m) =>
+        m.id === medicineId && m.stocks[pharmacyId]
+          ? { ...m, stocks: { ...m.stocks, [pharmacyId]: { quantity: newQuantity, status, lastUpdated: now } } }
+          : m,
+      ),
+    );
   };
 
   const syncData = () => {
-    console.log("Syncing pharmacy data...");
     setLastSyncTime(new Date());
     if (userLocation) {
       findNearbyPharmacies(userLocation);
@@ -383,7 +389,6 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
   };
 
   const callPharmacy = (phone: string) => {
-    console.log("Calling pharmacy:", phone);
     window.open(`tel:${phone}`);
   };
 
@@ -521,7 +526,7 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
 
         {/* Location Error */}
         {locationError && (
-          <Card className="mb-6 border-red-200 bg-red-50">
+          <Card className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600" />

@@ -54,7 +54,7 @@ export const Dashboard = () => {
                   <p className="font-medium">{q.appointmentId}</p>
                   <p className="text-xs text-muted-foreground">Joined: {new Date(q.joinedAt).toLocaleString()}</p>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-slate-100">{q.status}</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-zinc-800">{q.status}</span>
               </div>
             ))}
           </div>

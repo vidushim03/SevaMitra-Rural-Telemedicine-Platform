@@ -155,6 +155,36 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Doctor initiates call to patient (used by the doctor dashboard's Consult flow)
+    socket.on('doctor-initiate-call', ({ doctorId, patientId, patientInfo }) => {
+        console.log(`Call initiated from doctor ${doctorId} to patient ${patientId}`);
+        const patient = userSessions.get(patientId);
+
+        if (patient && patient.status === 'available') {
+            const callId = `call_${Date.now()}`;
+
+            activeCalls.set(callId, {
+                doctorId,
+                patientId,
+                status: 'ringing',
+                createdAt: new Date()
+            });
+            ringTimeouts.set(callId, setTimeout(() => expireRingingCall(callId), RING_TIMEOUT_MS));
+
+            console.log('Notifying patient of incoming call');
+            io.to(patient.socketId).emit('incoming-call', {
+                callId,
+                patientId,
+                patientInfo
+            });
+
+            socket.emit('call-initiated', { callId });
+        } else {
+            console.log('Patient unavailable');
+            socket.emit('patient-unavailable');
+        }
+    });
+
     // Doctor accepts call
     socket.on('accept-call', ({ callId }) => {
         console.log('Doctor accepting call:', callId);
@@ -165,9 +195,14 @@ io.on('connection', (socket) => {
             if (t) clearTimeout(t);
             ringTimeouts.delete(callId);
             const patient = userSessions.get(call.patientId);
+            const doctor = userSessions.get(call.doctorId);
 
             if (patient) {
                 io.to(patient.socketId).emit('call-accepted', { callId });
+            }
+            // For doctor-initiated calls, notify the calling doctor too
+            if (doctor) {
+                io.to(doctor.socketId).emit('call-accepted', { callId });
             }
         }
     });
@@ -178,8 +213,13 @@ io.on('connection', (socket) => {
         const call = activeCalls.get(callId);
         if (call) {
             const patient = userSessions.get(call.patientId);
+            const doctor = userSessions.get(call.doctorId);
             if (patient) {
                 io.to(patient.socketId).emit('call-rejected');
+            }
+            // For doctor-initiated calls, notify the calling doctor too
+            if (doctor) {
+                io.to(doctor.socketId).emit('call-rejected');
             }
             activeCalls.delete(callId);
             const t = ringTimeouts.get(callId);

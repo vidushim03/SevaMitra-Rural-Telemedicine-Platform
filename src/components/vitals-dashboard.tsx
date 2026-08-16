@@ -22,7 +22,7 @@ export function VitalsDashboard({ language }: { language: string }) {
             <p className="text-sm font-medium text-muted-foreground">Heart Rate</p>
             <h3 className="text-2xl font-bold">78 BPM</h3>
           </div>
-          <div className="p-3 bg-red-100 rounded-2xl">
+          <div className="p-3 bg-red-100 dark:bg-red-900/40 rounded-2xl">
             <Heart className="text-red-500 animate-pulse" size={24} />
           </div>
         </CardContent>
@@ -34,7 +34,7 @@ export function VitalsDashboard({ language }: { language: string }) {
             <p className="text-sm font-medium text-muted-foreground">Blood Pressure</p>
             <h3 className="text-2xl font-bold">120/80</h3>
           </div>
-          <div className="p-3 bg-blue-100 rounded-2xl">
+          <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl">
             <Activity className="text-blue-500" size={24} />
           </div>
         </CardContent>
@@ -46,7 +46,7 @@ export function VitalsDashboard({ language }: { language: string }) {
             <p className="text-sm font-medium text-muted-foreground">Temperature</p>
             <h3 className="text-2xl font-bold">98.6 °F</h3>
           </div>
-          <div className="p-3 bg-orange-100 rounded-2xl">
+          <div className="p-3 bg-orange-100 dark:bg-orange-900/40 rounded-2xl">
             <Thermometer className="text-orange-500" size={24} />
           </div>
         </CardContent>
@@ -67,6 +67,10 @@ export function VitalsDashboard({ language }: { language: string }) {
                 <linearGradient id="colorHr" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorBp" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -94,7 +98,7 @@ export function VitalsDashboard({ language }: { language: string }) {
                 dataKey="bp" 
                 stroke="#6366f1" 
                 fillOpacity={1} 
-                fill="url(#colorHr)" 
+                fill="url(#colorBp)" 
                 strokeWidth={3}
               />
             </AreaChart>
