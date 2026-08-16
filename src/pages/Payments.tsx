@@ -7,6 +7,7 @@ export function PaymentsPage() {
   const { user } = useAuth();
   const [amount, setAmount] = useState(500);
   const [method, setMethod] = useState<'upi' | 'card' | 'cash' | 'wallet'>('upi');
+  const [patientId, setPatientId] = useState('patient_demo');
 
   const payments = useMemo(() => {
     if (!user) return [];
@@ -19,7 +20,7 @@ export function PaymentsPage() {
     e.preventDefault();
     addPayment({
       appointmentId: data.appointments[0]?.id ?? 'apt_manual',
-      patientId: user.role === 'patient' ? user.id : 'patient_demo',
+      patientId: user.role === 'admin' ? patientId : user.id,
       amount,
       status: 'pending',
       method,
@@ -44,6 +45,16 @@ export function PaymentsPage() {
             <option value="wallet">Wallet</option>
           </select>
         </div>
+        {user.role === 'admin' && (
+          <div>
+            <label className="text-xs">Patient</label>
+            <select value={patientId} onChange={(e) => setPatientId(e.target.value)} className="block border rounded-lg px-3 py-2">
+              {data.users.filter((u) => u.role === 'patient').map((u) => (
+                <option key={u.id} value={u.id}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <button className="px-4 py-2 rounded-lg bg-blue-600 text-white">Create Payment</button>
       </form>
 

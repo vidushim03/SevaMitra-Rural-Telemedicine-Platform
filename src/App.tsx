@@ -45,27 +45,68 @@ const LanguageToggle = () => {
   );
 };
 
+const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activity }[]> = {
+  patient: [
+    { to: '/', label: 'Dashboard', icon: Activity },
+    { to: '/symptoms', label: 'Symptom Checker', icon: Stethoscope },
+    { to: '/consultations', label: 'Consultations', icon: Video },
+    { to: '/appointments', label: 'Appointments', icon: Calendar },
+    { to: '/records', label: 'Records', icon: FileText },
+    { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
+    { to: '/medicines', label: 'Medicines', icon: Pill },
+    { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
+    { to: '/vitals', label: 'Vitals', icon: HeartPulse },
+    { to: '/payments', label: 'Payments', icon: CreditCard },
+  ],
+  doctor: [
+    { to: '/', label: 'Dashboard', icon: Activity },
+    { to: '/consultations', label: 'Consultations', icon: Video },
+    { to: '/appointments', label: 'Appointments', icon: Calendar },
+    { to: '/records', label: 'Records', icon: FileText },
+    { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
+    { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
+  ],
+  admin: [
+    { to: '/', label: 'Dashboard', icon: Activity },
+    { to: '/symptoms', label: 'Symptom Checker', icon: Stethoscope },
+    { to: '/consultations', label: 'Consultations', icon: Video },
+    { to: '/appointments', label: 'Appointments', icon: Calendar },
+    { to: '/records', label: 'Records', icon: FileText },
+    { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
+    { to: '/medicines', label: 'Medicines', icon: Pill },
+    { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
+    { to: '/vitals', label: 'Vitals', icon: HeartPulse },
+    { to: '/payments', label: 'Payments', icon: CreditCard },
+    { to: '/admin', label: 'Admin', icon: Shield },
+  ],
+};
+
+const ROLE_ACCESS: Record<string, string[]> = {
+  patient: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments'],
+  doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/pharmacy'],
+  admin: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments', '/admin'],
+};
+
+function AccessGuard({ path, children }: { path: string; children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user || !ROLE_ACCESS[user.role]?.includes(path)) {
+    return (
+      <div className="rounded-2xl border bg-card p-6">
+        This page is not available for your role. Use the sidebar to navigate your portal.
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
+
 function ProtectedApp() {
-  const { t } = useLanguage();
   const { user, logout } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  const links = [
-    { to: '/', label: t('dashboard'), icon: Activity },
-    { to: '/symptoms', label: 'Symptom Checker', icon: Stethoscope },
-    { to: '/consultations', label: 'Consultations', icon: Video },
-    { to: '/appointments', label: 'Appointments', icon: Calendar },
-    { to: '/records', label: 'Records', icon: FileText },
-    { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
-    { to: '/medicines', label: 'Medicines', icon: Pill },
-    { to: '/vitals', label: 'Vitals', icon: HeartPulse },
-    { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
-    { to: '/payments', label: 'Payments', icon: CreditCard },
-    ...(user.role === 'admin' ? [{ to: '/admin', label: 'Admin', icon: Shield }] : []),
-  ];
+  const links = ROLE_LINKS[user.role] ?? [];
 
   return (
     <div className="flex h-screen w-full bg-slate-50 dark:bg-[#09090b] text-foreground transition-colors duration-300 relative overflow-hidden">
@@ -95,17 +136,17 @@ function ProtectedApp() {
       <main className="flex-1 p-8 overflow-y-auto z-10">
         <div className="animate-in">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/symptoms" element={<SymptomsPage />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/consultations" element={<Consultations />} />
-            <Route path="/records" element={<RecordsPage />} />
-            <Route path="/pharmacy" element={<PharmacyPage />} />
-            <Route path="/medicines" element={<MedicinesPage />} />
-            <Route path="/vitals" element={<VitalsPage />} />
-            <Route path="/prescriptions" element={<PrescriptionsPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/" element={<AccessGuard path="/"><Dashboard /></AccessGuard>} />
+            <Route path="/symptoms" element={<AccessGuard path="/symptoms"><SymptomsPage /></AccessGuard>} />
+            <Route path="/appointments" element={<AccessGuard path="/appointments"><Appointments /></AccessGuard>} />
+            <Route path="/consultations" element={<AccessGuard path="/consultations"><Consultations /></AccessGuard>} />
+            <Route path="/records" element={<AccessGuard path="/records"><RecordsPage /></AccessGuard>} />
+            <Route path="/pharmacy" element={<AccessGuard path="/pharmacy"><PharmacyPage /></AccessGuard>} />
+            <Route path="/medicines" element={<AccessGuard path="/medicines"><MedicinesPage /></AccessGuard>} />
+            <Route path="/vitals" element={<AccessGuard path="/vitals"><VitalsPage /></AccessGuard>} />
+            <Route path="/prescriptions" element={<AccessGuard path="/prescriptions"><PrescriptionsPage /></AccessGuard>} />
+            <Route path="/payments" element={<AccessGuard path="/payments"><PaymentsPage /></AccessGuard>} />
+            <Route path="/admin" element={<AccessGuard path="/admin"><AdminPage /></AccessGuard>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
