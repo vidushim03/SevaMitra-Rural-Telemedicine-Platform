@@ -6,9 +6,17 @@ const STORAGE_KEY = 'sevamitra.data.v1';
 const syncQueue = new SyncQueue();
 
 const seedUsers: SessionUser[] = [
+  // Patients
   { id: 'patient_demo', name: 'Rohan Verma', role: 'patient', email: 'rohan@demo.com' },
-  { id: 'doctor_1', name: 'Dr. Priya Sharma', role: 'doctor', email: 'priya@demo.com' },
-  { id: 'doctor_2', name: 'Dr. Rajesh Kumar', role: 'doctor', email: 'rajesh@demo.com' },
+  { id: 'patient_2', name: 'Anjali Singh', role: 'patient', email: 'anjali@demo.com' },
+  { id: 'patient_3', name: 'Mohan Yadav', role: 'patient', email: 'mohan@demo.com' },
+  // Doctors
+  { id: 'doctor_1', name: 'Dr. Priya Sharma', role: 'doctor', email: 'priya@demo.com', specialty: 'General Physician' },
+  { id: 'doctor_2', name: 'Dr. Rajesh Kumar', role: 'doctor', email: 'rajesh@demo.com', specialty: 'Cardiologist' },
+  { id: 'doctor_3', name: 'Dr. Meena Iyer', role: 'doctor', email: 'meena@demo.com', specialty: 'Dermatologist' },
+  { id: 'doctor_4', name: 'Dr. Arjun Patel', role: 'doctor', email: 'arjun@demo.com', specialty: 'Pediatrician' },
+  { id: 'doctor_5', name: 'Dr. Sunita Rao', role: 'doctor', email: 'sunita@demo.com', specialty: 'Gynecologist' },
+  // Admin
   { id: 'admin_1', name: 'System Admin', role: 'admin', email: 'admin@demo.com' },
 ];
 
@@ -80,6 +88,7 @@ interface AppDataContextValue {
   patients: SessionUser[];
   pendingSyncCount: number;
   flushSync: () => Promise<number>;
+  ensureUser: (user: SessionUser) => void;
   addAppointment: (payload: Omit<Appointment, 'id' | 'status'>) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   addRecord: (payload: Omit<MedicalRecord, 'id' | 'date'>) => void;
@@ -133,6 +142,11 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       patients,
       pendingSyncCount,
       flushSync,
+      ensureUser: (user: SessionUser) => {
+        if (!data.users.find((u) => u.id === user.id)) {
+          persist({ ...data, users: [...data.users, user] });
+        }
+      },
       addAppointment: (payload) => {
         const id = `apt_${Date.now()}`;
         const appointment: Appointment = { ...payload, id, status: 'scheduled' };
