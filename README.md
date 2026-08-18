@@ -87,12 +87,12 @@ Symptom check / complaint → Room code or QR onboarding → Video consultation
 
 ```
 ┌─────────────────────────────┐        ┌────────────────────────────────────┐
-│  React SPA (Vite + TS)      │        │  telemed-backend (Node + Express)  │
-│  ─────────────────────      │  WS    │  ────────────────────────────────   │
-│  WebRTC service             │───────▶│  Socket.IO signaling (offer/answer/ │
-│  SyncQueue (offline queue)  │  HTTP   │  ICE, call lifecycle)              │
+│  React SPA (Vite + TS)      │        │  telemed-backend (Python + FastAPI)│
+│  ─────────────────────      │  WS    │  ────────────────────────────────  │
+│  WebRTC service             │───────▶│  Socket.IO signaling (offer/answer/│
+│  SyncQueue (offline queue)  │  HTTP  │  ICE, call lifecycle)              │
 │  Room onboarding (QR/code)  │───────▶│  POST /api/sync (offline flush)    │
-│  Triage, EMR, pharmacy, i18n│        │  GET  /api/health                  │
+│  Triage (AI), EMR, i18n     │        │  POST /api/triage (Gemini AI)      │
 └─────────────────────────────┘        └────────────────────────────────────┘
         │ localStorage (offline persistence + sync queue)
         ▼
@@ -100,7 +100,7 @@ Symptom check / complaint → Room code or QR onboarding → Video consultation
 ```
 
 - **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Socket.IO client, WebRTC, shadcn/ui.
-- **Backend:** Node.js, Express, Socket.IO.
+- **Backend:** Python, FastAPI, Socket.IO, Gemini API.
 - **Persistence:** localStorage-backed offline queue (`src/services/sync-queue.ts`) with automatic
   flush on the `online` event.
 
@@ -188,7 +188,7 @@ The interesting engineering problems here are the ones the problem statement *re
 │   │   └── operations-analytics.json  # generated aggregates for the analytics dashboard
 │   ├── pages/                 # router pages (dashboard, admin, etc.)
 │   └── types/                 # shared domain types
-├── telemed-backend/           # Express + Socket.IO signaling + /api/sync
+├── telemed-backend/           # Python FastAPI + Socket.IO signaling + Gemini Triage
 ├── analysis/                  # operations analytics: generator, SQL, EDA notebook, CSVs
 └── ARCHITECTURE.md            # deeper system write-up
 ```
