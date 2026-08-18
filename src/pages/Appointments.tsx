@@ -1,4 +1,4 @@
-﻿import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -68,8 +68,12 @@ export const Appointments = () => {
                 <td className="p-3">₹{a.fee}</td>
                 <td className="p-3 capitalize">{a.status}</td>
                 <td className="p-3 flex gap-2">
-                  <button onClick={() => updateAppointmentStatus(a.id, 'in-progress')} className="px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">Start</button>
-                  <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Complete</button>
+                  {(user.role === 'doctor' || user.role === 'admin') && (
+                    <>
+                      <button onClick={() => updateAppointmentStatus(a.id, 'in-progress')} className="px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">Start</button>
+                      <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Complete</button>
+                    </>
+                  )}
                   <button onClick={() => updateAppointmentStatus(a.id, 'cancelled')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/40">Cancel</button>
                 </td>
               </tr>
