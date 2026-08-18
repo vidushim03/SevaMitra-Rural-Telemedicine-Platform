@@ -12,6 +12,9 @@ import uvicorn
 import asyncio
 import google.generativeai as genai
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
