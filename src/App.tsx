@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } f
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { translations } from './components/translations';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppDataProvider } from './contexts/AppDataContext';
 import { Dashboard } from './pages/Dashboard';
@@ -102,12 +103,19 @@ function AccessGuard({ path, children }: { path: string; children: React.ReactNo
 function ProtectedApp() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const { language } = useLanguage();
+  const t = translations[language as keyof typeof translations];
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  const links = ROLE_LINKS[user.role] ?? [];
+  const baseLinks = ROLE_LINKS[user.role] ?? [];
+  const links = baseLinks.map(link => {
+    // Map hardcoded English labels to translation keys if they match
+    const key = link.label.toLowerCase().replace(' ', '') as keyof typeof t;
+    return { ...link, label: t[key] || link.label };
+  });
 
   return (
     <div className="flex h-screen w-full bg-slate-50 dark:bg-[#09090b] text-foreground transition-colors duration-300 relative overflow-hidden">
