@@ -190,13 +190,13 @@ export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <LanguageProvider>
-        <AuthProvider>
-          <AppDataProvider>
+        <AppDataProvider>
+          <AuthProvider>
             <Router>
               <AppRouter />
             </Router>
-          </AppDataProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </AppDataProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
