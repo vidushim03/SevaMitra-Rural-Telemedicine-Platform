@@ -8,16 +8,17 @@ decisions are auditable.
 
 ```
 ┌────────────────────────────────┐         ┌─────────────────────────────────────┐
-│  React SPA (Vite + TypeScript) │  HTTP   │  telemed-backend (Node + Express)    │
-│  ────────────────────────────  │  + WS   │  ─────────────────────────────────   │
-│  App shell (routing, auth,     │────────▶│  Socket.IO signaling server           │
-│    language, app-data context) │         │   · register / call lifecycle        │
+│  React SPA (Vite + TypeScript) │         │  telemed-backend (Python + FastAPI)  │
+│  ────────────────────────────  │  HTTP   │  ──────────────────────────────────  │
+│  App shell (routing, auth,     │  + WS   │  Socket.IO signaling server           │
+│    language, app-data context) │────────▶│   · register / call lifecycle        │
 │  WebRTC media + signaling      │         │   · offer / answer / ICE relay       │
 │  Offline sync queue            │         │   · chat-message relay                │
 │  Room onboarding (QR / code)   │         │  REST endpoints                       │
 │  Triage, EMR, pharmacy, admin  │         │   · POST /api/sync  (offline flush)   │
-└────────────────────────────────┘         │   · GET  /api/health (ops counter)    │
-        │                                   └─────────────────────────────────────┘
+└────────────────────────────────┘         │   · POST /api/triage (Gemini AI)      │
+        │                                  │   · GET  /api/health (ops counter)    │
+        │                                  └─────────────────────────────────────┘
         │ localStorage (device-authoritative offline store)
         ▼
    survives disconnects; reconciles on reconnect
@@ -40,7 +41,7 @@ exchanges the *metadata* needed to establish the P2P connection.
 `VITE_TURN_URL`/`VITE_TURN_USERNAME`/`VITE_TURN_PASSWORD` for strict-NAT fallback.
 - Media flows **peer-to-peer**; the signaling server only relays `webrtc-offer`, `webrtc-answer`,
   and `ice-candidate` messages between the two socket clients in the same call.
-- `telemed-backend/server.js` routes signaling by looking up the **other party** of the call
+- `telemed-backend/main.py` routes signaling by looking up the **other party** of the call
   (`call.doctorId` / `call.patientId`) and emitting to that user's socket. This keeps the relay
   stateless w.r.t. media while holding only the tiny call map in memory.
 - Connection state changes (`connected` / `disconnected` / `failed`) surface to the UI as a quality
