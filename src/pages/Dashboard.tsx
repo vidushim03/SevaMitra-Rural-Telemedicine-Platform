@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -39,8 +39,8 @@ export const Dashboard = () => {
 
   const quickActions = [
     { to: '/appointments', label: 'Manage Appointments' },
-    { to: '/consultations', label: 'Run Consultations' },
-    { to: '/prescriptions', label: 'Issue Prescriptions' },
+    ...(isDoctor ? [{ to: '/consultations', label: 'Run Consultations' }] : []),
+    ...(isDoctor ? [{ to: '/prescriptions', label: 'Issue Prescriptions' }] : []),
     { to: '/records', label: 'Open EMR Timeline' },
     ...(isDoctor ? [] : [{ to: '/symptoms', label: 'Symptom Checker' }]),
     ...(isDoctor ? [] : [{ to: '/payments', label: 'Track Payments' }]),
