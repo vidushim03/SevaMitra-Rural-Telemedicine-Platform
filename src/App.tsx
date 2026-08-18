@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -101,6 +101,7 @@ function AccessGuard({ path, children }: { path: string; children: React.ReactNo
 
 function ProtectedApp() {
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -119,12 +120,23 @@ function ProtectedApp() {
           <p className="text-xs text-muted-foreground mt-2">{user.name} ({user.role})</p>
         </div>
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
-          {links.map(({ to, label, icon: Icon }) => (
-            <Link key={to} to={to} className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-sm font-medium transition-all group">
-              <Icon className="text-primary group-hover:scale-110 transition-transform" size={18} />
-              {label}
-            </Link>
-          ))}
+          {links.map(({ to, label, icon: Icon }) => {
+            const isActive = pathname === to;
+            return (
+              <Link 
+                key={to} 
+                to={to} 
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all group ${
+                  isActive 
+                    ? 'bg-primary/10 text-primary font-bold shadow-sm' 
+                    : 'hover:bg-primary/5 text-muted-foreground hover:text-foreground font-medium'
+                }`}
+              >
+                <Icon className={`${isActive ? 'text-primary' : 'text-primary/70'} group-hover:scale-110 transition-transform`} size={18} />
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="p-4 border-t border-border/50 flex items-center justify-between">
           <ThemeToggle />
