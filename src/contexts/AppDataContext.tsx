@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 import { AppDataState, Appointment, ChatMessage, MedicalRecord, Payment, Prescription, QueueItem, SessionUser } from '../types/app';
 import { SyncQueue, SyncOperation } from '../services/sync-queue';
 
@@ -83,7 +83,9 @@ interface AppDataContextValue {
   addAppointment: (payload: Omit<Appointment, 'id' | 'status'>) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   addRecord: (payload: Omit<MedicalRecord, 'id' | 'date'>) => void;
+  deleteRecord: (id: string) => void;
   addPrescription: (payload: Omit<Prescription, 'id' | 'date'>) => void;
+  deletePrescription: (id: string) => void;
   addPayment: (payload: Omit<Payment, 'id' | 'date'>) => void;
   markPayment: (id: string, status: Payment['status']) => void;
   setQueueStatus: (id: string, status: QueueItem['status']) => void;
@@ -166,6 +168,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         persist({ ...data, records: [rec, ...data.records] });
         sync({ type: 'record.created', payload: rec });
       },
+      deleteRecord: (id) => {
+        persist({ ...data, records: data.records.filter((r) => r.id !== id) });
+      },
       addPrescription: (payload) => {
         const rx: Prescription = {
           ...payload,
@@ -174,6 +179,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         };
         persist({ ...data, prescriptions: [rx, ...data.prescriptions] });
         sync({ type: 'prescription.created', payload: rx });
+      },
+      deletePrescription: (id) => {
+        persist({ ...data, prescriptions: data.prescriptions.filter((p) => p.id !== id) });
       },
       addPayment: (payload) => {
         const payment: Payment = {
