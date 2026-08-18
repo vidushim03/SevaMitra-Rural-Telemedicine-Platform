@@ -1,15 +1,15 @@
-﻿import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export function PrescriptionsPage() {
   const { data, addPrescription } = useAppData();
   const { user } = useAuth();
-  const [medicine, setMedicine] = useState('Levocetirizine');
-  const [dosage, setDosage] = useState('1 tab');
-  const [frequency, setFrequency] = useState('Night');
-  const [duration, setDuration] = useState('7 days');
-  const [instructions, setInstructions] = useState('Take after dinner');
+  const [medicine, setMedicine] = useState('');
+  const [dosage, setDosage] = useState('');
+  const [frequency, setFrequency] = useState('');
+  const [duration, setDuration] = useState('');
+  const [instructions, setInstructions] = useState('');
 
   const prescriptions = useMemo(() => {
     if (!user) return [];

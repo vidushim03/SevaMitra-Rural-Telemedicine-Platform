@@ -1,12 +1,12 @@
-﻿import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export function RecordsPage() {
   const { data, addRecord } = useAppData();
   const { user } = useAuth();
-  const [diagnosis, setDiagnosis] = useState('Seasonal allergy');
-  const [notes, setNotes] = useState('Increase fluids and start anti-allergic medication.');
+  const [diagnosis, setDiagnosis] = useState('');
+  const [notes, setNotes] = useState('');
 
   const records = useMemo(() => {
     if (!user) return [];

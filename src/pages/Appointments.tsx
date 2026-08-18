@@ -8,9 +8,9 @@ export const Appointments = () => {
 
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? 'doctor_1');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [time, setTime] = useState('10:00');
-  const [reason, setReason] = useState('General consultation');
-  const [fee, setFee] = useState(400);
+  const [time, setTime] = useState('');
+  const [reason, setReason] = useState('');
+  const [fee, setFee] = useState(0);
 
   const appointments = useMemo(() => {
     if (!user) return [];
