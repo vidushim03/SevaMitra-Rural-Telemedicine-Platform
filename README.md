@@ -108,10 +108,17 @@ Symptom check / complaint → Room code or QR onboarding → Video consultation
 
 ```bash
 # 1. Backend (terminal 1)
-cd telemed-backend && npm i && npm start   # http://localhost:4001
+cd telemed-backend
+python -m venv .venv
+.venv\Scripts\activate      # On Windows
+# source .venv/bin/activate # On macOS/Linux
+pip install -r requirements.txt
+set GEMINI_API_KEY=your_api_key_here  # Windows (or export on macOS/Linux)
+python main.py              # http://localhost:4001
 
 # 2. Frontend (terminal 2)
-npm i && npm run dev                        # http://localhost:3000
+npm i
+npm run dev                 # http://localhost:3000
 ```
 
 - The frontend auto-detects the signaling server at `http://<host>:4001`.
