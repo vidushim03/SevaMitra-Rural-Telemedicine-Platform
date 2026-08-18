@@ -49,41 +49,29 @@ const SYMPTOM_SPECIALIST_MAP: Record<string, { specialist: string; specialtyCode
   },
 };
 
-export const analyzeSymptoms = (symptoms: string): SymptomAnalysis => {
-  const normalized = symptoms.toLowerCase();
-  let bestMatch = { specialist: 'General Physician', specialtyCode: 'general', score: 0 };
-
-  for (const [key, data] of Object.entries(SYMPTOM_SPECIALIST_MAP)) {
-    let score = 0;
-    data.keywords.forEach(keyword => {
-      if (normalized.includes(keyword.toLowerCase())) {
-        score += 1;
-      }
+export const analyzeSymptoms = async (symptoms: string): Promise<SymptomAnalysis> => {
+  try {
+    const response = await fetch("http://localhost:4001/api/triage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ symptoms }),
     });
-
-    if (score > bestMatch.score) {
-      bestMatch = { ...data, score };
+    
+    if (!response.ok) {
+      throw new Error(`Triage API failed: ${response.statusText}`);
     }
+    
+    const result = await response.json();
+    return result as SymptomAnalysis;
+  } catch (error) {
+    console.error("AI Triage Error:", error);
+    // Fallback on error
+    return {
+      specialist: 'General Physician',
+      specialtyCode: 'general',
+      urgency: 'medium',
+      likelihood: 0.5,
+      reasoning: 'An error occurred during AI analysis. Please consult a general physician.',
+    };
   }
-
-  // Determine urgency
-  let urgency: 'low' | 'medium' | 'high' | 'emergency' = 'low';
-  const emergencyKeywords = ['chest pain', 'breathing', 'unconscious', 'severe bleeding'];
-  const highKeywords = ['fever', 'severe', 'acute', 'pain'];
-
-  if (emergencyKeywords.some(kw => normalized.includes(kw))) {
-    urgency = 'emergency';
-  } else if (highKeywords.some(kw => normalized.includes(kw))) {
-    urgency = 'high';
-  } else if (normalized.length > 50) {
-    urgency = 'medium';
-  }
-
-  return {
-    specialist: bestMatch.specialist,
-    specialtyCode: bestMatch.specialtyCode,
-    urgency,
-    likelihood: Math.min(0.95, 0.4 + bestMatch.score * 0.2),
-    reasoning: `Based on your symptoms, we recommend consulting a ${bestMatch.specialist}.`,
-  };
 };

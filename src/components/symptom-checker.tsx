@@ -329,7 +329,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
     const isEmergency = checkEmergencySymptoms(symptoms);
     setShowEmergencyAlert(isEmergency);
 
-    const aiRes = analyzeAI(symptoms);
+    const aiRes = await analyzeAI(symptoms);
     setAiAnalysis(aiRes);
 
     setTimeout(() => {
