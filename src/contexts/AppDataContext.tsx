@@ -89,6 +89,8 @@ interface AppDataContextValue {
   pendingSyncCount: number;
   flushSync: () => Promise<number>;
   ensureUser: (user: SessionUser) => void;
+  addUser: (user: SessionUser) => void;
+  removeUser: (id: string) => void;
   addAppointment: (payload: Omit<Appointment, 'id' | 'status'>) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   addRecord: (payload: Omit<MedicalRecord, 'id' | 'date'>) => void;
@@ -146,6 +148,14 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         if (!data.users.find((u) => u.id === user.id)) {
           persist({ ...data, users: [...data.users, user] });
         }
+      },
+      addUser: (user: SessionUser) => {
+        if (!data.users.find((u) => u.id === user.id)) {
+          persist({ ...data, users: [...data.users, user] });
+        }
+      },
+      removeUser: (id: string) => {
+        persist({ ...data, users: data.users.filter((u) => u.id !== id) });
       },
       addAppointment: (payload) => {
         const id = `apt_${Date.now()}`;
