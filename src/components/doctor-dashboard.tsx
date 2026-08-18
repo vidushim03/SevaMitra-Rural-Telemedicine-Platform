@@ -204,7 +204,6 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         }
 
         // Accept the call
-        doctorInitiatedCallRef.current = false;
         webrtcService.acceptCall(incomingCall.callId);
 
         setIsInVideoCall(true);

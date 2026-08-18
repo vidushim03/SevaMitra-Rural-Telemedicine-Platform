@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
@@ -168,7 +168,7 @@ function AppRouter() {
 
 export default function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <LanguageProvider>
         <AuthProvider>
           <AppDataProvider>

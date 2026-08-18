@@ -13,3 +13,6 @@ pnpm-debug.log*
 .idea/
 *.tmp
 *.swp
+
+__pycache__/
+.venv/
