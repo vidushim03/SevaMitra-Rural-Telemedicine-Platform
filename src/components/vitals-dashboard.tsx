@@ -46,7 +46,7 @@ export function VitalsDashboard({ language }: { language: string }) {
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{t.temperature}</p>
-            <h3 className="text-2xl font-bold">98.6 °F</h3>
+            <h3 className="text-2xl font-bold">98.6 &deg;F</h3>
           </div>
           <div className="p-3 bg-orange-100 dark:bg-orange-900/40 rounded-2xl">
             <Thermometer className="text-orange-500" size={24} />
@@ -90,6 +90,7 @@ export function VitalsDashboard({ language }: { language: string }) {
               <Area 
                 type="monotone" 
                 dataKey="heartRate" 
+                name={t.heartRate}
                 stroke="#3b82f6" 
                 fillOpacity={1} 
                 fill="url(#colorHr)" 
@@ -98,6 +99,7 @@ export function VitalsDashboard({ language }: { language: string }) {
               <Area 
                 type="monotone" 
                 dataKey="bp" 
+                name={t.bloodPressure}
                 stroke="#6366f1" 
                 fillOpacity={1} 
                 fill="url(#colorBp)" 
