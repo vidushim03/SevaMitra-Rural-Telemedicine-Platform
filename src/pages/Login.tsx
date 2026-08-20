@@ -1,4 +1,4 @@
-import { FormEvent, useState, useEffect } from 'react';
+import { FormEvent, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppData } from '../contexts/AppDataContext';
 import { UserRole } from '../types/app';
@@ -11,29 +11,23 @@ export function LoginPage() {
   const { language } = useLanguage();
   const t = translations[language];
 
-  const [role, setRole] = useState<UserRole>('doctor');
+  const [role, setRole] = useState<UserRole>('patient');
   
-  // Get all users for the currently selected role
-  const roleUsers = data.users.filter(u => u.role === role);
-  
-  // Default to the first user in that role if available
-  const [selectedUserId, setSelectedUserId] = useState(roleUsers.length > 0 ? roleUsers[0].id : '');
-
-  useEffect(() => {
-    // When role changes, update the selected user to the first one in the new role
-    const newRoleUsers = data.users.filter(u => u.role === role);
-    if (newRoleUsers.length > 0) {
-      setSelectedUserId(newRoleUsers[0].id);
-    } else {
-      setSelectedUserId('');
-    }
-  }, [role, data.users]);
+  // For Doctor
+  const doctorUsers = data.users.filter(u => u.role === 'doctor');
+  const [selectedDoctorId, setSelectedDoctorId] = useState(doctorUsers.length > 0 ? doctorUsers[0].id : '');
 
   const onSubmit = (ev: FormEvent) => {
     ev.preventDefault();
-    const user = data.users.find(u => u.id === selectedUserId);
-    if (user) {
-      login({ name: user.name, email: user.email || `${user.id}@demo.com`, role: user.role });
+    if (role === 'doctor') {
+      const doc = doctorUsers.find(u => u.id === selectedDoctorId);
+      if (doc) {
+        login({ name: doc.name, email: doc.email || `${doc.id}@demo.com`, role: 'doctor' });
+      }
+    } else if (role === 'admin') {
+      login({ name: 'System Admin', email: 'admin@demo.com', role: 'admin' });
+    } else {
+      login({ name: 'Rohan Verma', email: 'rohan@demo.com', role: 'patient' });
     }
   };
 
@@ -53,24 +47,38 @@ export function LoginPage() {
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm">Select User</label>
-            <select 
-              value={selectedUserId} 
-              onChange={(e) => setSelectedUserId(e.target.value)} 
-              className="w-full rounded-xl bg-slate-900 border border-white/25 px-4 py-3 outline-none"
-              required
-            >
-              {roleUsers.length === 0 && <option value="" disabled>No {role}s available</option>}
-              {roleUsers.map(u => (
-                <option key={u.id} value={u.id}>
-                  {u.name} ({u.email || `${u.id}@demo.com`})
-                </option>
-              ))}
-            </select>
-          </div>
+          {role === 'patient' && (
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white/80">
+              You will be signed in securely as Rohan Verma (rohan@demo.com).
+            </div>
+          )}
 
-          <button type="submit" className="w-full rounded-xl bg-blue-500 hover:bg-blue-400 transition py-3 font-semibold" disabled={!selectedUserId}>
+          {role === 'doctor' && (
+            <div className="space-y-2">
+              <label className="text-sm">Select Doctor</label>
+              <select 
+                value={selectedDoctorId} 
+                onChange={(e) => setSelectedDoctorId(e.target.value)} 
+                className="w-full rounded-xl bg-slate-900 border border-white/25 px-4 py-3 outline-none"
+                required
+              >
+                {doctorUsers.length === 0 && <option value="" disabled>No doctors available</option>}
+                {doctorUsers.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.email || `${u.id}@demo.com`})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {role === 'admin' && (
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white/80">
+              You will be signed in securely as System Administrator (admin@demo.com).
+            </div>
+          )}
+
+          <button type="submit" className="w-full rounded-xl bg-blue-500 hover:bg-blue-400 transition py-3 font-semibold" disabled={role === 'doctor' && !selectedDoctorId}>
             {t.continueBtn}
           </button>
         </form>
