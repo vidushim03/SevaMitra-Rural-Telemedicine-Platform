@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import socketio
 import uvicorn
 import asyncio
-import google.generativeai as genai
+from google import genai
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -81,10 +81,7 @@ class TriageRequest(BaseModel):
 @app.post("/api/triage")
 async def triage(request: TriageRequest):
     api_key = os.environ.get("GEMINI_API_KEY")
-    genai.configure(api_key=api_key)
-    
-    # We use gemini-3.6-flash
-    model = genai.GenerativeModel('gemini-3.6-flash')
+    client = genai.Client(api_key=api_key)
     
     prompt = f"""
     You are a medical triage assistant for a rural telemedicine platform. 
@@ -101,9 +98,10 @@ async def triage(request: TriageRequest):
     """
     
     try:
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.GenerationConfig(
+        response = client.models.generate_content(
+            model='gemini-3.6-flash',
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
                 response_mime_type="application/json",
             )
         )
