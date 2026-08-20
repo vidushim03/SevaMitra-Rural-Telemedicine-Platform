@@ -194,10 +194,10 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
       
       // Show user-friendly permission instructions
       const permissionMessage = language === 'hi' 
-        ? 'माइक्रोफोन की अनुमति चाहिए। कृपया ब्राउज़र में माइक्रोफोन की अनुमति दें।'
+        ? t.microphoneAccessRequired
         : language === 'pa'
-        ? 'ਮਾਈਕਰੋਫੋਨ ਦੀ ਇਜਾਜ਼ਤ ਚਾਹੀਦੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਮਾਈਕਰੋਫੋਨ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।'
-        : 'Microphone access is required for voice input. Please allow microphone access in your browser settings.';
+        ? t.microphoneAccessRequired
+        : t.microphoneAccessRequired;
       
       alert(permissionMessage);
       return;
@@ -225,10 +225,10 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
           
           // Show success message
           const successMessage = language === 'hi' 
-            ? 'आवाज़ सफलतापूर्वक पहचानी गई'
+            ? t.voiceInputSuccessful
             : language === 'pa'
-            ? 'ਆਵਾਜ਼ ਸਫਲਤਾਪੂਰਵਕ ਪਛਾਣੀ ਗਈ'
-            : 'Voice input successful';
+            ? t.voiceInputSuccessful
+            : t.voiceInputSuccessful;
           
           // Could show a toast notification here instead of console
           console.log('✅', successMessage);
@@ -245,39 +245,19 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
         let errorMessage = '';
         switch (event.error) {
           case 'not-allowed':
-            errorMessage = language === 'hi' 
-              ? 'माइक्रोफोन की अनुमति अस्वीकार कर दी गई। कृपया ब्राउज़र सेटिंग्स में माइक्रोफोन की अनुमति दें।'
-              : language === 'pa'
-              ? 'ਮਾਈਕਰੋਫੋਨ ਦੀ ਇਜਾਜ਼ਤ ਨਾਂਹ ਕੀਤੀ ਗਈ। ਕਿਰਪਾ ਕਰਕੇ ਬ੍ਰਾਊਜ਼ਰ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਮਾਈਕਰੋਫੋਨ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।'
-              : 'Microphone access denied. Please enable microphone permissions in your browser settings and try again.';
+            errorMessage = t.microphoneAccessDenied;
             break;
           case 'no-speech':
-            errorMessage = language === 'hi' 
-              ? 'कोई आवाज़ नहीं सुनाई दी। कृपया फिर से कोशिश करें।'
-              : language === 'pa'
-              ? 'ਕੋਈ ਆਵਾਜ਼ ਨਹੀਂ ਸੁਣਾਈ ਦਿੱਤੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।'
-              : 'No speech detected. Please speak clearly and try again.';
+            errorMessage = t.noSpeechDetected;
             break;
           case 'audio-capture':
-            errorMessage = language === 'hi' 
-              ? 'माइक्रोफोन उपलब्ध नहीं है। कृपया अपना माइक्रोफोन जांचें।'
-              : language === 'pa'
-              ? 'ਮਾਈਕਰੋਫੋਨ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਮਾਈਕਰੋਫੋਨ ਜਾਂਚੋ।'
-              : 'Microphone not available. Please check your microphone connection.';
+            errorMessage = t.microphoneNotAvailable;
             break;
           case 'network':
-            errorMessage = language === 'hi' 
-              ? 'नेटवर्क त्रुटि। कृपया अपना इंटरनेट कनेक्शन जांचें।'
-              : language === 'pa'
-              ? 'ਨੈਟਵਰਕ ਗਲਤੀ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਇੰਟਰਨੈਟ ਕਨੈਕਸ਼ਨ ਜਾਂਚੋ।'
-              : 'Network error. Please check your internet connection.';
+            errorMessage = t.networkErrorCheckConnection;
             break;
           default:
-            errorMessage = language === 'hi' 
-              ? 'आवाज़ पहचान में त्रुटि। कृपया फिर से कोशिश करें।'
-              : language === 'pa'
-              ? 'ਆਵਾਜ਼ ਪਛਾਣ ਵਿੱਚ ਗਲਤੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।'
-              : 'Speech recognition error. Please try again.';
+            errorMessage = t.speechRecognitionError;
         }
         
         alert(errorMessage);
@@ -292,11 +272,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
     } catch (error) {
       console.error('❌ Error starting speech recognition:', error);
       
-      const errorMessage = language === 'hi' 
-        ? 'आवाज़ इनपुट शुरू करने में त्रुटि। कृपया फिर से कोशिश करें।'
-        : language === 'pa'
-        ? 'ਆਵਾਜ਼ ਇਨਪੁਟ ਸ਼ੁਰੂ ਕਰਨ ਵਿੱਚ ਗਲਤੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।'
-        : 'Error starting voice input. Please try again.';
+      const errorMessage = t.errorStartingVoiceInput;
       
       alert(errorMessage);
       setIsListening(false);
@@ -308,12 +284,12 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
     const file = event.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file only');
+        alert(t.uploadImageOnly);
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB');
+        alert(t.imageSizeLimit);
         return;
       }
 
@@ -347,7 +323,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
         confidence: Math.round(aiRes.likelihood * 100),
         dataPointsUsed: 1247,
         possibleConditions: [
-          { name: aiRes.specialist + " Consult", probability: Math.round(aiRes.likelihood * 100), description: aiRes.reasoning },
+          { name: aiRes.specialist + ` ${t.consult}`, probability: Math.round(aiRes.likelihood * 100), description: aiRes.reasoning },
           { name: t.commonCold, probability: 75, description: t.commonColdDesc },
           { name: t.flu, probability: 60, description: t.fluDesc },
         ],
@@ -394,13 +370,13 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
   const shareResults = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'Health Analysis Report',
-        text: `Symptom analysis completed. Urgency: ${results?.urgencyLevel}`,
+        title: t.healthAnalysisReport,
+        text: `${t.symptomAnalysisUrgency}${results?.urgencyLevel}`,
         url: window.location.href
       }).catch(console.error);
     } else {
       navigator.clipboard.writeText(`Health Analysis: ${results?.urgencyLevel} - ${symptoms}`)
-        .then(() => alert('Results copied to clipboard!'))
+        .then(() => alert(t.resultsCopiedToClipboard))
         .catch(() => console.error('Could not copy to clipboard'));
     }
   };
@@ -431,13 +407,13 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
       </div>
       <div className="flex space-x-2">
         <Button className="bg-white text-red-600 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 font-bold">
-          📞 Call 108
+          📞 {t.call108}
         </Button>
         <Button
           onClick={() => onPageChange('consultation')}
           className="bg-yellow-500 text-red-800 hover:bg-yellow-400 font-bold"
         >
-          🎥 Emergency Consult
+          🎥 {t.emergencyConsult}
         </Button>
       </div>
     </div>
@@ -588,9 +564,9 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
             <h2 className="text-xl font-semibold mb-2">{t.analyzingSymptoms}</h2>
             <p className="text-gray-600 mb-4">{t.aiProcessingSymptoms}</p>
             <div className="space-y-2">
-              <div className="text-sm text-gray-500">🧠 Processing medical knowledge base...</div>
-              <div className="text-sm text-gray-500">🔍 Analyzing symptom patterns...</div>
-              <div className="text-sm text-gray-500">📊 Calculating risk assessment...</div>
+              <div className="text-sm text-gray-500">🧠 {t.processingMedicalKnowledge}</div>
+              <div className="text-sm text-gray-500">🔍 {t.analyzingSymptomPatterns}</div>
+              <div className="text-sm text-gray-500">📊 {t.calculatingRiskAssessment}</div>
             </div>
             <Progress value={75} className="w-full mt-4" />
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t.mayTakeFewMoments}</p>
@@ -633,7 +609,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
                 <input
                   type="text"
-                  placeholder="Search symptoms..."
+                  placeholder={t.searchSymptomsPlaceholder}
                   value={symptomFilter}
                   onChange={(e) => setSymptomFilter(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors"
@@ -643,7 +619,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
               {/* Selected Symptoms Display */}
               {selectedSymptoms.length > 0 && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-3">Selected Symptoms:</h4>
+                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-3">{t.selectedSymptomsLabel}</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedSymptoms.map(symptomId => {
                       const symptom = Object.values(getSymptomCategories())
@@ -737,21 +713,18 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                       size="sm"
                       disabled={isListening}
                       className="flex items-center space-x-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                      title={isListening 
-                        ? (language === 'hi' ? 'सुन रहा है...' : language === 'pa' ? 'ਸੁਣ ਰਿਹਾ ਹੈ...' : 'Listening...')
-                        : (language === 'hi' ? 'आवाज़ से लिखें' : language === 'pa' ? 'ਆਵਾਜ਼ ਨਾਲ ਲਿਖੋ' : 'Speak to type')
-                      }
+                      title={isListening ? t.listening : t.speakToType}
                     >
                       {isListening ? (
                         <>
                           <div className="animate-pulse h-2 w-2 bg-red-500 rounded-full"></div>
                           <MicOff className="h-4 w-4" />
-                          <span>{language === 'hi' ? 'सुन रहा है...' : language === 'pa' ? 'ਸੁਣ ਰਿਹਾ ਹੈ...' : 'Listening...'}</span>
+                          <span>{t.listening}</span>
                         </>
                       ) : (
                         <>
                           <Mic className="h-4 w-4" />
-                          <span>{language === 'hi' ? 'आवाज़ इनपुट' : language === 'pa' ? 'ਆਵਾਜ਼ ਇਨਪੁਟ' : 'Voice Input'}</span>
+                          <span>{t.voiceInput}</span>
                         </>
                       )}
                     </Button>
@@ -764,14 +737,10 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                     <Mic className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-blue-800">
                       <p className="font-medium mb-1">
-                        {language === 'hi' ? 'आवाज़ इनपुट का उपयोग करने के लिए:' : 
-                         language === 'pa' ? 'ਆਵਾਜ਼ ਇਨਪੁਟ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ:' : 
-                         'To use voice input:'}
+                        {t.toUseVoiceInput}
                       </p>
                       <p className="text-xs">
-                        {language === 'hi' ? '• ब्राउज़र में माइक्रोफोन की अनुमति दें\n• स्पष्ट रूप से बोलें\n• शांत वातावरण में उपयोग करें' : 
-                         language === 'pa' ? '• ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਮਾਈਕਰੋਫੋਨ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ\n• ਸਪਸ਼ਟ ਰੂਪ ਵਿੱਚ ਬੋਲੋ\n• ਸ਼ਾੰਤ ਮਾਹੌਲ ਵਿੱਚ ਵਰਤੋ' : 
-                         '• Allow microphone access in browser\n• Speak clearly\n• Use in quiet environment'}
+                        {t.voiceInputHelp}
                       </p>
                     </div>
                   </div>
@@ -786,7 +755,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                 />
 
                 <div className="text-xs text-gray-500 text-right">
-                  {symptoms.length}/500 characters
+                  {symptoms.length}/500 {t.quantity}
                 </div>
               </div>
 
@@ -865,7 +834,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   {t.howLongSymptoms}
                 </h3>
                 <p className="text-gray-600">
-                  Select the duration of your symptoms
+                  {t.selectDurationOfSymptoms}
                 </p>
               </div>
 
@@ -875,7 +844,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <Label htmlFor="less-than-24h" className="flex-1 cursor-pointer text-lg">
                     <div>
                       <div className="font-semibold">{t.lessThan24Hours}</div>
-                      <div className="text-sm text-gray-600">Recent onset symptoms</div>
+                      <div className="text-sm text-gray-600">{t.recentOnsetSymptoms}</div>
                     </div>
                   </Label>
                 </div>
@@ -885,7 +854,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <Label htmlFor="1-7-days" className="flex-1 cursor-pointer text-lg">
                     <div>
                       <div className="font-semibold">{t.days1to7}</div>
-                      <div className="text-sm text-gray-600">Short-term symptoms</div>
+                      <div className="text-sm text-gray-600">{t.shortTermSymptoms}</div>
                     </div>
                   </Label>
                 </div>
@@ -895,7 +864,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <Label htmlFor="more-than-week" className="flex-1 cursor-pointer text-lg">
                     <div>
                       <div className="font-semibold">{t.moreThanWeek}</div>
-                      <div className="text-sm text-gray-600">Extended duration symptoms</div>
+                      <div className="text-sm text-gray-600">{t.extendedDurationSymptoms}</div>
                     </div>
                   </Label>
                 </div>
@@ -905,7 +874,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   <Label htmlFor="chronic" className="flex-1 cursor-pointer text-lg">
                     <div>
                       <div className="font-semibold">{t.ongoingChronic}</div>
-                      <div className="text-sm text-gray-600">Long-term or recurring symptoms</div>
+                      <div className="text-sm text-gray-600">{t.longTermRecurringSymptoms}</div>
                     </div>
                   </Label>
                 </div>
@@ -938,14 +907,14 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   {t.howSevereSymptoms}
                 </h3>
                 <p className="text-gray-600">
-                  Rate the severity of your symptoms
+                  {t.rateSeverityOfSymptoms}
                 </p>
               </div>
 
               {/* Enhanced Severity Slider */}
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <Label className="text-lg font-semibold">Symptom Severity Scale</Label>
+                  <Label className="text-lg font-semibold">{t.symptomSeverityScale}</Label>
                   <input
                     type="range"
                     min="1"
@@ -955,9 +924,9 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                     className="w-full h-3 bg-gradient-to-r from-green-200 via-yellow-200 to-red-200 rounded-lg appearance-none cursor-pointer slider"
                   />
                   <div className="flex justify-between text-sm text-gray-600">
-                    <span>Mild (1)</span>
-                    <span>Moderate (5)</span>
-                    <span>Severe (10)</span>
+                    <span>{t.mildScale}</span>
+                    <span>{t.moderateScale}</span>
+                    <span>{t.severeScale}</span>
                   </div>
                   <div className="text-center">
                     <span className="inline-block px-4 py-2 bg-blue-600 text-white rounded-full text-lg font-bold">
@@ -1026,7 +995,7 @@ export function SymptomChecker({ language, onPageChange }: SymptomCheckerProps) 
                   {t.urgencyLevel}
                 </h3>
                 <p className="text-gray-600">
-                  How urgent do you feel your condition is?
+                  {t.howUrgentCondition}
                 </p>
               </div>
 

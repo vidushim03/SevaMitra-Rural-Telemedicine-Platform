@@ -1,6 +1,8 @@
 import { FormEvent, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppData } from '../contexts/AppDataContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../components/translations';
 import { AdminAnalytics } from '../components/admin-analytics';
 import { OperationsAnalytics } from '../components/operations-analytics';
 import { SessionUser, UserRole } from '../types/app';
@@ -24,6 +26,8 @@ const SPECIALTIES = [
 export function AdminPage() {
   const { user } = useAuth();
   const { data, doctors, patients, addUser, removeUser, updateAppointmentStatus, markPayment } = useAppData();
+  const { language } = useLanguage();
+  const t = translations[language];
   const [tab, setTab] = useState<Tab>('analytics');
 
   // Add Doctor form state
@@ -38,7 +42,7 @@ export function AdminPage() {
   const [patEmail, setPatEmail] = useState('');
 
   if (!user || user.role !== 'admin') {
-    return <div className="rounded-2xl border bg-card p-6">Admin access only.</div>;
+    return <div className="rounded-2xl border bg-card p-6">{t.adminAccessOnly}</div>;
   }
 
   const handleAddDoctor = (e: FormEvent) => {
@@ -71,19 +75,19 @@ export function AdminPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: React.FC<any> }[] = [
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'doctors', label: `Doctors (${doctors.length})`, icon: Stethoscope },
-    { id: 'patients', label: `Patients (${patients.length})`, icon: UserCheck },
-    { id: 'appointments', label: `Appointments (${data.appointments.length})`, icon: Calendar },
-    { id: 'records', label: `Records (${data.records.length})`, icon: FileText },
-    { id: 'payments', label: `Payments (${data.payments.length})`, icon: CreditCard },
+    { id: 'analytics', label: t.analytics, icon: BarChart3 },
+    { id: 'doctors', label: `${t.doctors} (${doctors.length})`, icon: Stethoscope },
+    { id: 'patients', label: `${t.patients} (${patients.length})`, icon: UserCheck },
+    { id: 'appointments', label: `${t.appointments} (${data.appointments.length})`, icon: Calendar },
+    { id: 'records', label: `${t.records} (${data.records.length})`, icon: FileText },
+    { id: 'payments', label: `${t.payments} (${data.payments.length})`, icon: CreditCard },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold">Admin Panel</h2>
-        <p className="text-muted-foreground mt-1">Manage users, appointments, records, and platform analytics.</p>
+        <h2 className="text-3xl font-bold">{t.adminPanel}</h2>
+        <p className="text-muted-foreground mt-1">{t.manageUsersDesc}</p>
       </div>
 
       {/* Tab Bar */}
@@ -109,7 +113,7 @@ export function AdminPage() {
         <div className="space-y-8">
           <OperationsAnalytics />
           <div>
-            <h3 className="text-xl font-bold mb-4">Live Platform Activity</h3>
+            <h3 className="text-xl font-bold mb-4">{t.livePlatformActivity}</h3>
             <AdminAnalytics />
           </div>
         </div>
@@ -119,30 +123,30 @@ export function AdminPage() {
       {tab === 'doctors' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold">Registered Doctors</h3>
+            <h3 className="text-xl font-bold">{t.registeredDoctors}</h3>
             <button
               onClick={() => setShowAddDoctor(!showAddDoctor)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               <Plus size={15} />
-              Add Doctor
+              {t.addDoctor}
             </button>
           </div>
 
           {showAddDoctor && (
             <form onSubmit={handleAddDoctor} className="rounded-2xl border bg-card p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
-                <p className="font-semibold text-sm">New Doctor</p>
+                <p className="font-semibold text-sm">{t.newDoctor}</p>
                 <button type="button" onClick={() => setShowAddDoctor(false)}><X size={16} /></button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <input value={docName} onChange={e => setDocName(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder="Full name *" required />
-                <input value={docEmail} onChange={e => setDocEmail(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder="Email" type="email" />
+                <input value={docName} onChange={e => setDocName(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={`${t.name} *`} required />
+                <input value={docEmail} onChange={e => setDocEmail(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={t.email} type="email" />
                 <select value={docSpecialty} onChange={e => setDocSpecialty(e.target.value)} className="border rounded-lg px-3 py-2 text-sm">
                   {SPECIALTIES.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <button className="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">Add Doctor</button>
+              <button className="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">{t.addDoctor}</button>
             </form>
           )}
 
@@ -150,11 +154,11 @@ export function AdminPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="p-3 text-left">Name</th>
-                  <th className="p-3 text-left">Specialty</th>
-                  <th className="p-3 text-left">Email</th>
-                  <th className="p-3 text-left">Appointments</th>
-                  <th className="p-3 text-left">Action</th>
+                  <th className="p-3 text-left">{t.nameLabel}</th>
+                  <th className="p-3 text-left">{t.specialty}</th>
+                  <th className="p-3 text-left">{t.email}</th>
+                  <th className="p-3 text-left">{t.appointments}</th>
+                  <th className="p-3 text-left">{t.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -170,7 +174,7 @@ export function AdminPage() {
                         <button
                           onClick={() => removeUser(doc.id)}
                           className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
-                          title="Remove doctor"
+                          title={t.removeDoctor}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -188,27 +192,27 @@ export function AdminPage() {
       {tab === 'patients' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold">Registered Patients</h3>
+            <h3 className="text-xl font-bold">{t.registeredPatients}</h3>
             <button
               onClick={() => setShowAddPatient(!showAddPatient)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
             >
               <Plus size={15} />
-              Add Patient
+              {t.addPatient}
             </button>
           </div>
 
           {showAddPatient && (
             <form onSubmit={handleAddPatient} className="rounded-2xl border bg-card p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
-                <p className="font-semibold text-sm">New Patient</p>
+                <p className="font-semibold text-sm">{t.newPatient}</p>
                 <button type="button" onClick={() => setShowAddPatient(false)}><X size={16} /></button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input value={patName} onChange={e => setPatName(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder="Full name *" required />
-                <input value={patEmail} onChange={e => setPatEmail(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder="Email" type="email" />
+                <input value={patName} onChange={e => setPatName(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={`${t.name} *`} required />
+                <input value={patEmail} onChange={e => setPatEmail(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={t.email} type="email" />
               </div>
-              <button className="px-5 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium">Add Patient</button>
+              <button className="px-5 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium">{t.addPatient}</button>
             </form>
           )}
 
@@ -216,12 +220,12 @@ export function AdminPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="p-3 text-left">Name</th>
-                  <th className="p-3 text-left">Email</th>
-                  <th className="p-3 text-left">Appointments</th>
-                  <th className="p-3 text-left">Records</th>
-                  <th className="p-3 text-left">Prescriptions</th>
-                  <th className="p-3 text-left">Action</th>
+                  <th className="p-3 text-left">{t.nameLabel}</th>
+                  <th className="p-3 text-left">{t.email}</th>
+                  <th className="p-3 text-left">{t.appointments}</th>
+                  <th className="p-3 text-left">{t.records}</th>
+                  <th className="p-3 text-left">{t.prescriptions}</th>
+                  <th className="p-3 text-left">{t.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -240,7 +244,7 @@ export function AdminPage() {
                         <button
                           onClick={() => removeUser(pat.id)}
                           className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
-                          title="Remove patient"
+                          title={t.removePatient}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -257,23 +261,23 @@ export function AdminPage() {
       {/* Appointments Tab */}
       {tab === 'appointments' && (
         <div className="space-y-4">
-          <h3 className="text-xl font-bold">All Appointments</h3>
+          <h3 className="text-xl font-bold">{t.allAppointments}</h3>
           <div className="rounded-2xl border overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="p-3 text-left">Patient</th>
-                  <th className="p-3 text-left">Doctor</th>
-                  <th className="p-3 text-left">When</th>
-                  <th className="p-3 text-left">Reason</th>
-                  <th className="p-3 text-left">Fee</th>
-                  <th className="p-3 text-left">Status</th>
-                  <th className="p-3 text-left">Actions</th>
+                  <th className="p-3 text-left">{t.patient}</th>
+                  <th className="p-3 text-left">{t.doctor}</th>
+                  <th className="p-3 text-left">{t.when}</th>
+                  <th className="p-3 text-left">{t.reason}</th>
+                  <th className="p-3 text-left">{t.fee}</th>
+                  <th className="p-3 text-left">{t.status}</th>
+                  <th className="p-3 text-left">{t.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.appointments.length === 0 && (
-                  <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No appointments.</td></tr>
+                  <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">{t.noAppointments}</td></tr>
                 )}
                 {data.appointments.map(a => {
                   const patName = data.users.find(u => u.id === a.patientId)?.name || a.patientId;
@@ -294,8 +298,8 @@ export function AdminPage() {
                         }`}>{a.status}</span>
                       </td>
                       <td className="p-3 flex gap-1">
-                        <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">Complete</button>
-                        <button onClick={() => updateAppointmentStatus(a.id, 'cancelled')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-xs">Cancel</button>
+                        <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">{t.completeBtn}</button>
+                        <button onClick={() => updateAppointmentStatus(a.id, 'cancelled')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-xs">{t.cancel}</button>
                       </td>
                     </tr>
                   );
@@ -309,21 +313,21 @@ export function AdminPage() {
       {/* Records Tab */}
       {tab === 'records' && (
         <div className="space-y-4">
-          <h3 className="text-xl font-bold">All EMR Records</h3>
+          <h3 className="text-xl font-bold">{t.allEmrRecords}</h3>
           <div className="rounded-2xl border overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="p-3 text-left">Patient</th>
-                  <th className="p-3 text-left">Doctor</th>
-                  <th className="p-3 text-left">Date</th>
-                  <th className="p-3 text-left">Diagnosis</th>
-                  <th className="p-3 text-left">Notes</th>
+                  <th className="p-3 text-left">{t.patient}</th>
+                  <th className="p-3 text-left">{t.doctor}</th>
+                  <th className="p-3 text-left">{t.date}</th>
+                  <th className="p-3 text-left">{t.diagnosis}</th>
+                  <th className="p-3 text-left">{t.notes}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.records.length === 0 && (
-                  <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No records.</td></tr>
+                  <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">{t.noRecords}</td></tr>
                 )}
                 {data.records.map(r => {
                   const patName = data.users.find(u => u.id === r.patientId)?.name || r.patientId;
@@ -348,15 +352,15 @@ export function AdminPage() {
       {tab === 'payments' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold">All Bills & Payments</h3>
+            <h3 className="text-xl font-bold">{t.allBills}</h3>
             <div className="flex gap-3">
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <IndianRupee size={14} />
-                Total collected: ₹{data.payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0)}
+                {t.totalCollected}: ₹{data.payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0)}
               </span>
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Clock size={14} />
-                Pending: ₹{data.payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0)}
+                {t.pending}: ₹{data.payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0)}
               </span>
             </div>
           </div>
@@ -364,19 +368,19 @@ export function AdminPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="p-3 text-left">Bill ID</th>
-                  <th className="p-3 text-left">Patient</th>
-                  <th className="p-3 text-left">Doctor</th>
-                  <th className="p-3 text-left">Consultation</th>
-                  <th className="p-3 text-left">Medicines</th>
-                  <th className="p-3 text-left">Total</th>
-                  <th className="p-3 text-left">Status</th>
-                  <th className="p-3 text-left">Actions</th>
+                  <th className="p-3 text-left">{t.billId}</th>
+                  <th className="p-3 text-left">{t.patient}</th>
+                  <th className="p-3 text-left">{t.doctor}</th>
+                  <th className="p-3 text-left">{t.consultation}</th>
+                  <th className="p-3 text-left">{t.medicines}</th>
+                  <th className="p-3 text-left">{t.billTotal}</th>
+                  <th className="p-3 text-left">{t.status}</th>
+                  <th className="p-3 text-left">{t.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.payments.length === 0 && (
-                  <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No bills yet.</td></tr>
+                  <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">{t.noBillsYet}</td></tr>
                 )}
                 {data.payments.map(p => {
                   const patName = data.users.find(u => u.id === p.patientId)?.name || p.patientId;
@@ -400,8 +404,8 @@ export function AdminPage() {
                       <td className="p-3 flex gap-1">
                         {p.status === 'pending' && (
                           <>
-                            <button onClick={() => markPayment(p.id, 'paid')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">Mark Paid</button>
-                            <button onClick={() => markPayment(p.id, 'failed')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-xs">Fail</button>
+                            <button onClick={() => markPayment(p.id, 'paid')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">{t.markPaid}</button>
+                            <button onClick={() => markPayment(p.id, 'failed')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-xs">{t.failBtn}</button>
                           </>
                         )}
                       </td>

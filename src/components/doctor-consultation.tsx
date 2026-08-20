@@ -107,18 +107,18 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
         // Initiate WebRTC call
         await webrtcService.initiateCall(callId);
       } catch (error) {
-        alert('Failed to access camera/microphone. Please check permissions.');
+        alert(t.cameraAccessFailed);
       }
     });
 
     socket.on('call-rejected', () => {
-      alert('Doctor is currently unavailable. Please try again later.');
+      alert(t.doctorUnavailable);
       setCallStatus('idle');
       setCurrentCallId(null);
     });
 
     socket.on('doctor-unavailable', () => {
-      alert('Doctor is currently unavailable. Please try again later.');
+      alert(t.doctorUnavailable);
       setCallStatus('idle');
     });
 
@@ -199,7 +199,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
       setCallStatus('connected');
       setIsInCall(true);
     } catch (error) {
-      alert('Failed to access camera/microphone. Please check permissions.');
+      alert(t.cameraAccessFailed);
     }
   };
 
@@ -251,7 +251,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
         <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-3 rounded-lg">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span>Connected with Doctor</span>
+            <span>{t.connectedWithDoctor}</span>
           </div>
           <div className="flex items-center gap-2 mt-1">
             {connectionQuality === 'good' ? (
@@ -260,7 +260,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
               <WifiOff className="h-4 w-4 text-red-400" />
             )}
             <span className="text-sm">
-              {connectionQuality === 'good' ? 'Good connection' : 'Poor connection'}
+              {connectionQuality === 'good' ? t.goodConnection : t.poorConnection}
             </span>
           </div>
         </div>
@@ -308,19 +308,19 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
               <Phone className="h-12 w-12 text-green-600 animate-pulse" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
-              {callStatus === 'calling' ? 'Calling Doctor...' : 'Doctor is being notified...'}
+              {callStatus === 'calling' ? t.callingDoctor : t.doctorBeingNotified}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
               {callStatus === 'calling'
-                ? 'Please wait while we connect you'
-                : 'Please wait for the doctor to accept your call'
+                ? t.pleaseWaitConnect
+                : t.pleaseWaitAccept
               }
             </p>
             <Button onClick={() => {
               setCallStatus('idle');
               setCurrentCallId(null);
             }} variant="outline">
-              Cancel Call
+              {t.cancelCall}
             </Button>
           </CardContent>
         </Card>
@@ -344,9 +344,9 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
                 <div className="w-24 h-24 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="h-12 w-12 text-green-600 animate-pulse" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Incoming Doctor Call</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.incomingDoctorCall}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  {incomingCall.patientInfo?.name || 'Your doctor'} would like to start a video consultation with you.
+                  {incomingCall.patientInfo?.name || t.yourDoctor} would like to start a video consultation with you.
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Button
@@ -420,7 +420,7 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
                     disabled={callStatus !== 'idle'}
                   >
                     <Video className="h-4 w-4 mr-2" />
-                    {callStatus !== 'idle' ? 'Connecting...' : t.startVideoCall}
+                    {callStatus !== 'idle' ? t.connecting : t.startVideoCall}
                   </Button>
                 ) : (
                   <div className="text-center py-4">

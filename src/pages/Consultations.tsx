@@ -1,5 +1,6 @@
 ﻿import React, { useMemo, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../components/translations';
 import { DoctorConsultation } from '../components/doctor-consultation';
 import { DoctorDashboard } from '../components/doctor-dashboard';
 import { RoomOnboarding } from '../components/room-onboarding';
@@ -9,6 +10,7 @@ import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 
 export const Consultations = () => {
   const { language } = useLanguage();
+  const t = translations[language];
   const { user } = useAuth();
   const { data, addMessage, setQueueStatus, pendingSyncCount, flushSync } = useAppData();
   const [message, setMessage] = useState('');
@@ -36,11 +38,11 @@ export const Consultations = () => {
   return (
     <div className="space-y-6 w-full">
       <div className="rounded-2xl border bg-card p-4">
-        <h2 className="text-2xl font-bold">Consultation Workspace</h2>
+        <h2 className="text-2xl font-bold">{t.consultationWorkspace}</h2>
         <p className="text-sm text-muted-foreground mt-1">
           {isDoctor
-            ? 'Incoming patient calls appear below. Accept to start the video consult.'
-            : 'Search for a doctor and start your video consultation.'}
+            ? t.doctorConsultDesc
+            : t.patientConsultDesc}
         </p>
       </div>
 
@@ -57,19 +59,19 @@ export const Consultations = () => {
 
           <div className="rounded-2xl border bg-card p-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Offline Sync</h3>
+              <h3 className="font-semibold">{t.offlineSync}</h3>
               {pendingSyncCount === 0 ? (
                 <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-                  <Wifi size={14} /> Synced
+                  <Wifi size={14} /> {t.synced}
                 </span>
               ) : (
                 <span className="flex items-center gap-1.5 text-xs text-amber-600 font-medium">
-                  <WifiOff size={14} /> {pendingSyncCount} pending
+                  <WifiOff size={14} /> {pendingSyncCount} {t.pending}
                 </span>
               )}
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              Changes made offline are queued on this device and flushed automatically when the connection returns.
+              {t.offlineChangesDesc}
             </p>
             {pendingSyncCount > 0 && (
               <button
@@ -82,22 +84,22 @@ export const Consultations = () => {
                 className="mt-3 flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-3 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
               >
                 <RefreshCw size={14} className={isFlushing ? 'animate-spin' : ''} />
-                {isFlushing ? 'Syncing...' : 'Sync Now'}
+                {isFlushing ? t.syncing : t.syncNow}
               </button>
             )}
           </div>
 
           <div className="rounded-2xl border bg-card p-4">
-            <h3 className="font-semibold">Waiting Queue</h3>
+            <h3 className="font-semibold">{t.waitingQueue}</h3>
             <div className="space-y-2 mt-3">
-              {queueItems.length === 0 && <p className="text-sm text-muted-foreground">No active queue entries.</p>}
+              {queueItems.length === 0 && <p className="text-sm text-muted-foreground">{t.noActiveQueue}</p>}
               {queueItems.map((q) => (
                 <div key={q.id} className="rounded-lg border p-3">
                   <p className="text-sm font-medium">{q.appointmentId}</p>
                   <p className="text-xs text-muted-foreground mb-2">{q.status}</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setQueueStatus(q.id, 'ongoing')} className="text-xs px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">Mark Ongoing</button>
-                    <button onClick={() => setQueueStatus(q.id, 'finished')} className="text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Finish</button>
+                    <button onClick={() => setQueueStatus(q.id, 'ongoing')} className="text-xs px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">{t.markOngoing}</button>
+                    <button onClick={() => setQueueStatus(q.id, 'finished')} className="text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">{t.finish}</button>
                   </div>
                 </div>
               ))}
@@ -105,14 +107,14 @@ export const Consultations = () => {
           </div>
 
           <div className="rounded-2xl border bg-card p-4">
-            <h3 className="font-semibold">Consultation Chat & Files</h3>
+            <h3 className="font-semibold">{t.consultationChatFiles}</h3>
             <div className="h-56 mt-3 rounded-xl border p-2 overflow-auto space-y-2 bg-muted/20">
-              {messages.length === 0 && <p className="text-xs text-muted-foreground">No messages yet.</p>}
+              {messages.length === 0 && <p className="text-xs text-muted-foreground">{t.noMessagesYet}</p>}
               {messages.map((m) => (
                 <div key={m.id} className="rounded-lg bg-white dark:bg-zinc-800 p-2 border text-sm">
                   <p className="font-medium text-xs">{m.senderId}</p>
                   <p>{m.text}</p>
-                  {m.attachmentName && <p className="text-xs text-blue-600">Attachment: {m.attachmentName}</p>}
+                  {m.attachmentName && <p className="text-xs text-blue-600">{t.attachment} {m.attachmentName}</p>}
                 </div>
               ))}
             </div>
@@ -120,11 +122,11 @@ export const Consultations = () => {
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type update, advice, or attach note name"
+                placeholder={t.chatPlaceholder}
                 className="w-full rounded-lg border px-3 py-2"
               />
               <div className="flex gap-2">
-                <button onClick={sendMessage} className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm">Send</button>
+                <button onClick={sendMessage} className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm">{t.send}</button>
                 <button
                   onClick={() => {
                     if (!user) return;
@@ -132,7 +134,7 @@ export const Consultations = () => {
                   }}
                   className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-zinc-800 text-sm"
                 >
-                  Share File
+                  {t.shareFile}
                 </button>
               </div>
             </div>

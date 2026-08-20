@@ -1,10 +1,14 @@
 import { FormEvent, useMemo, useState } from 'react';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../components/translations';
 
 export const Appointments = () => {
   const { data, doctors, patients, addAppointment, updateAppointmentStatus } = useAppData();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? 'doctor_1');
   const [patientId, setPatientId] = useState('');
@@ -50,14 +54,13 @@ export const Appointments = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Appointment System</h2>
+      <h2 className="text-3xl font-bold">{t.appointmentSystem}</h2>
 
       <form onSubmit={onCreate} className="rounded-2xl border bg-card p-4 space-y-3">
         <p className="text-sm font-medium text-muted-foreground">
-          {isDoctor ? 'Schedule an appointment for a patient' : 'Book an appointment with a doctor'}
+          {isDoctor ? t.scheduleForPatient : t.bookWithDoctor}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
-          {/* Doctor picks a patient; Patient picks a doctor */}
           {isDoctor ? (
             <select
               value={patientId}
@@ -65,7 +68,7 @@ export const Appointments = () => {
               className="border rounded-lg px-3 py-2 col-span-2"
               required
             >
-              <option value="">Select Patient</option>
+              <option value="">{t.selectPatient}</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
@@ -83,29 +86,29 @@ export const Appointments = () => {
           )}
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="border rounded-lg px-3 py-2" required />
           <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="border rounded-lg px-3 py-2" required />
-          <input value={reason} onChange={(e) => setReason(e.target.value)} className="border rounded-lg px-3 py-2" placeholder="Reason" required />
-          <input type="number" value={fee || ''} onChange={(e) => setFee(Number(e.target.value))} className="border rounded-lg px-3 py-2" placeholder="Fee (₹)" min={0} />
+          <input value={reason} onChange={(e) => setReason(e.target.value)} className="border rounded-lg px-3 py-2" placeholder={t.reason} required />
+          <input type="number" value={fee || ''} onChange={(e) => setFee(Number(e.target.value))} className="border rounded-lg px-3 py-2" placeholder={t.fee} min={0} />
         </div>
-        <button className="rounded-lg bg-blue-600 text-white px-6 py-2 font-medium">Book</button>
+        <button className="rounded-lg bg-blue-600 text-white px-6 py-2 font-medium">{t.book}</button>
       </form>
 
       <div className="rounded-2xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/40">
             <tr>
-              {isDoctor && <th className="p-3 text-left">Patient</th>}
-              {!isDoctor && <th className="p-3 text-left">Doctor</th>}
-              <th className="p-3 text-left">When</th>
-              <th className="p-3 text-left">Reason</th>
-              <th className="p-3 text-left">Fee</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Actions</th>
+              {isDoctor && <th className="p-3 text-left">{t.patient}</th>}
+              {!isDoctor && <th className="p-3 text-left">{t.doctor}</th>}
+              <th className="p-3 text-left">{t.when}</th>
+              <th className="p-3 text-left">{t.reason}</th>
+              <th className="p-3 text-left">{t.fee}</th>
+              <th className="p-3 text-left">{t.status}</th>
+              <th className="p-3 text-left">{t.actions}</th>
             </tr>
           </thead>
           <tbody>
             {appointments.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-4 text-center text-muted-foreground text-sm">No appointments yet.</td>
+                <td colSpan={6} className="p-4 text-center text-muted-foreground text-sm">{t.noAppointmentsYet}</td>
               </tr>
             )}
             {appointments.map((a) => (
@@ -119,11 +122,11 @@ export const Appointments = () => {
                 <td className="p-3 flex gap-2">
                   {(user.role === 'doctor' || user.role === 'admin') && (
                     <>
-                      <button onClick={() => updateAppointmentStatus(a.id, 'in-progress')} className="px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">Start</button>
-                      <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">Complete</button>
+                      <button onClick={() => updateAppointmentStatus(a.id, 'in-progress')} className="px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40">{t.start}</button>
+                      <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40">{t.complete}</button>
                     </>
                   )}
-                  <button onClick={() => updateAppointmentStatus(a.id, 'cancelled')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/40">Cancel</button>
+                  <button onClick={() => updateAppointmentStatus(a.id, 'cancelled')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/40">{t.cancel}</button>
                 </td>
               </tr>
             ))}

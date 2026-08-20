@@ -2,10 +2,14 @@ import { FormEvent, useMemo, useState } from 'react';
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Trash2 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../components/translations';
 
 export function PrescriptionsPage() {
   const { data, patients, addPrescription, deletePrescription } = useAppData();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = translations[language];
   const [patientId, setPatientId] = useState('');
   const [medicine, setMedicine] = useState('');
   const [dosage, setDosage] = useState('');
@@ -45,11 +49,11 @@ export function PrescriptionsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">E-Prescriptions</h2>
+      <h2 className="text-3xl font-bold">{t.ePrescriptions}</h2>
 
       {isDoctor && (
         <form onSubmit={onCreate} className="rounded-2xl border bg-card p-4 space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">Issue a new prescription for a patient</p>
+          <p className="text-sm font-medium text-muted-foreground">{t.issuePrescription}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
             <select
               value={patientId}
@@ -57,34 +61,34 @@ export function PrescriptionsPage() {
               className="border rounded-lg px-3 py-2 col-span-2"
               required
             >
-              <option value="">Select Patient</option>
+              <option value="">{t.selectPatient}</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
-            <input value={medicine} onChange={(e) => setMedicine(e.target.value)} className="border rounded-lg px-3 py-2" placeholder="Medicine name" required />
-            <input value={dosage} onChange={(e) => setDosage(e.target.value)} className="border rounded-lg px-3 py-2" placeholder="Dosage (e.g. 1 tab)" />
-            <input value={frequency} onChange={(e) => setFrequency(e.target.value)} className="border rounded-lg px-3 py-2" placeholder="Frequency (e.g. Twice daily)" />
-            <input value={duration} onChange={(e) => setDuration(e.target.value)} className="border rounded-lg px-3 py-2" placeholder="Duration (e.g. 5 days)" />
+            <input value={medicine} onChange={(e) => setMedicine(e.target.value)} className="border rounded-lg px-3 py-2" placeholder={t.medicineNamePlaceholder} required />
+            <input value={dosage} onChange={(e) => setDosage(e.target.value)} className="border rounded-lg px-3 py-2" placeholder={t.dosagePlaceholder} />
+            <input value={frequency} onChange={(e) => setFrequency(e.target.value)} className="border rounded-lg px-3 py-2" placeholder={t.frequencyPlaceholder} />
+            <input value={duration} onChange={(e) => setDuration(e.target.value)} className="border rounded-lg px-3 py-2" placeholder={t.durationPlaceholder} />
           </div>
           <div className="flex gap-3">
-            <input value={instructions} onChange={(e) => setInstructions(e.target.value)} className="flex-1 border rounded-lg px-3 py-2" placeholder="Special instructions (optional)" />
-            <button className="rounded-lg bg-blue-600 text-white px-6 py-2 font-medium">Generate Rx</button>
+            <input value={instructions} onChange={(e) => setInstructions(e.target.value)} className="flex-1 border rounded-lg px-3 py-2" placeholder={t.specialInstructions} />
+            <button className="rounded-lg bg-blue-600 text-white px-6 py-2 font-medium">{t.generateRx}</button>
           </div>
         </form>
       )}
 
       <div className="space-y-3">
         {prescriptions.length === 0 && (
-          <p className="text-muted-foreground text-sm">No prescriptions found.</p>
+          <p className="text-muted-foreground text-sm">{t.noPrescriptionsYet}</p>
         )}
         {prescriptions.map((p) => (
           <div key={p.id} className="rounded-2xl border p-4 bg-card">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-semibold">Prescription #{p.id}</p>
+                <p className="font-semibold">{t.prescription} #{p.id}</p>
                 {isDoctor && (
-                  <p className="text-xs text-blue-600 mt-0.5">Patient: {getPatientName(p.patientId)}</p>
+                  <p className="text-xs text-blue-600 mt-0.5">{t.patientLabel} {getPatientName(p.patientId)}</p>
                 )}
                 <p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleString()}</p>
               </div>
@@ -92,7 +96,7 @@ export function PrescriptionsPage() {
                 <button
                   onClick={() => deletePrescription(p.id)}
                   className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
-                  title="Delete prescription"
+                  title={t.deletePrescription}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -103,7 +107,7 @@ export function PrescriptionsPage() {
                 <li key={idx}>{m.name} - {m.dosage} - {m.frequency} - {m.duration}</li>
               ))}
             </ul>
-            <p className="text-sm mt-2"><span className="font-medium">Instructions:</span> {p.instructions}</p>
+            <p className="text-sm mt-2"><span className="font-medium">{t.instructions}:</span> {p.instructions}</p>
           </div>
         ))}
       </div>
