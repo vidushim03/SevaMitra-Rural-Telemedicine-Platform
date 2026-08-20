@@ -18,6 +18,8 @@ import { AlertTriangle, CalendarClock, HeartPulse, Store } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getStockAlerts, getStockBreakdown } from "../services/pharmacy-data";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useTranslation } from "./translations";
 
 const URGENCY_COLORS: Record<string, string> = {
   emergency: "#ef4444",
@@ -37,6 +39,8 @@ const STOCK_COLORS: Record<string, string> = {
 export function AdminAnalytics() {
   const { data } = useAppData();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = useTranslation(language);
 
   const metrics = useMemo(() => {
     const appointments = data.appointments;
@@ -107,20 +111,20 @@ export function AdminAnalytics() {
   const stockBreakdown = useMemo(() => getStockBreakdown(), []);
 
   if (!user || user.role !== "admin") {
-    return <div className="rounded-2xl border bg-card p-6">Admin access only.</div>;
+    return <div className="rounded-2xl border bg-card p-6">{t.adminAccessOnly}</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard icon={<CalendarClock size={20} />} label="Total Consultations" value={metrics.total} sub={`${metrics.inProgress} in progress`} />
-        <KpiCard icon={<HeartPulse size={20} />} label="Completed" value={metrics.completed} sub={`${metrics.cancelled} cancelled`} />
-        <KpiCard icon={<Store size={20} />} label="Paid Consultations (₹)" value={metrics.revenue.toLocaleString("en-IN")} sub={`${metrics.pendingSync} ops pending sync`} />
-        <KpiCard icon={<AlertTriangle size={20} />} label="Urgent Cases" value={urgencyMix.find((u) => u.name === "emergency")?.value ?? 0} sub="emergency triaged" />
+        <KpiCard icon={<CalendarClock size={20} />} label={t.totalConsultations} value={metrics.total} sub={`${metrics.inProgress} ${t.inProgress}`} />
+        <KpiCard icon={<HeartPulse size={20} />} label={t.completedConsultations} value={metrics.completed} sub={`${metrics.cancelled} ${t.cancelledConsultations}`} />
+        <KpiCard icon={<Store size={20} />} label={`${t.paidConsultations} (₹)`} value={metrics.revenue.toLocaleString("en-IN")} sub={`${metrics.pendingSync} ${t.opsPendingSync}`} />
+        <KpiCard icon={<AlertTriangle size={20} />} label={t.urgentCases} value={urgencyMix.find((u) => u.name === "emergency")?.value ?? 0} sub={t.emergencyTriaged} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <ChartCard title="Consultation Volume (last 14 days)">
+        <ChartCard title={t.consultationVolume}>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={consultTrend}>
               <defs>
@@ -140,7 +144,7 @@ export function AdminAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Urgency Mix">
+        <ChartCard title={t.urgencyMix}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={urgencyMix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -154,7 +158,7 @@ export function AdminAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Symptom / Diagnosis Mix">
+        <ChartCard title={t.symptomDiagnosisMix}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={symptomMix} layout="vertical" margin={{ left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -166,7 +170,7 @@ export function AdminAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Pharmacy Stock Health">
+        <ChartCard title={t.pharmacyStockHealth}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={stockBreakdown} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -183,11 +187,11 @@ export function AdminAnalytics() {
 
       <div className="rounded-2xl border bg-card p-4">
         <h3 className="font-semibold flex items-center gap-2">
-          <AlertTriangle size={16} className="text-amber-500" /> Stock Alerts
+          <AlertTriangle size={16} className="text-amber-500" /> {t.stockAlerts}
         </h3>
         {pharmacyAlerts.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">
-            No low-stock alerts right now. Connect pharmacy stock data to surface alerts here.
+            {t.noLowStockAlerts}
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -196,7 +200,7 @@ export function AdminAnalytics() {
                 <span className="font-medium">{a.pharmacy}</span>
                 <span className="text-muted-foreground">{a.medicine}</span>
                 <span className={`font-semibold ${a.status === "out_of_stock" ? "text-red-600" : "text-amber-600"}`}>
-                  {a.status.replace("_", " ")} ({a.quantity})
+                  {a.status === "out_of_stock" ? t.outOfStock : t.lowStock} ({a.quantity})
                 </span>
               </li>
             ))}

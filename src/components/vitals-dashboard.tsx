@@ -2,6 +2,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Activity, Heart, Thermometer, Zap } from "lucide-react";
+import { useTranslation } from "./translations";
 
 const mockVitals = [
   { time: '10:00', heartRate: 72, bp: 120, temp: 98.6 },
@@ -13,13 +14,14 @@ const mockVitals = [
 ];
 
 export function VitalsDashboard({ language }: { language: string }) {
+  const t = useTranslation(language);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-1">
       {/* Real-time stats cards */}
       <Card className="glass-card">
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Heart Rate</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.heartRate}</p>
             <h3 className="text-2xl font-bold">78 BPM</h3>
           </div>
           <div className="p-3 bg-red-100 dark:bg-red-900/40 rounded-2xl">
@@ -31,7 +33,7 @@ export function VitalsDashboard({ language }: { language: string }) {
       <Card className="glass-card">
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Blood Pressure</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.bloodPressure}</p>
             <h3 className="text-2xl font-bold">120/80</h3>
           </div>
           <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl">
@@ -43,7 +45,7 @@ export function VitalsDashboard({ language }: { language: string }) {
       <Card className="glass-card">
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Temperature</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.temperature}</p>
             <h3 className="text-2xl font-bold">98.6 °F</h3>
           </div>
           <div className="p-3 bg-orange-100 dark:bg-orange-900/40 rounded-2xl">
@@ -57,7 +59,7 @@ export function VitalsDashboard({ language }: { language: string }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="text-primary" size={20} />
-            Patient Health Trends
+            {t.patientHealthTrends}
           </CardTitle>
         </CardHeader>
         <CardContent className="h-[300px]">

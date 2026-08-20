@@ -17,6 +17,8 @@ import {
 import { CreditCard, IndianRupee, ReceiptText, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useTranslation } from "./translations";
 
 const STATUS_COLORS: Record<string, string> = {
   paid: "#10b981",
@@ -50,6 +52,8 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 export function PaymentAnalytics() {
   const { data } = useAppData();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = useTranslation(language);
 
   const doctorMap = useMemo(() => {
     const m = new Map<string, { name: string; specialty: string }>();
@@ -68,15 +72,15 @@ export function PaymentAnalytics() {
   }, [data.users]);
 
   if (!user) {
-    return <div className="rounded-2xl border bg-card p-6">Please log in to view payment analytics.</div>;
+    return <div className="rounded-2xl border bg-card p-6">{t.pleaseLoginToViewAnalytics}</div>;
   }
 
- if (user.role === "admin") return <AdminView data={data} doctorMap={doctorMap} patientMap={patientMap} />;
-  if (user.role === "doctor") return <DoctorView data={data} user={user} doctorMap={doctorMap} patientMap={patientMap} />;
-  return <PatientView data={data} user={user} doctorMap={doctorMap} />;
+ if (user.role === "admin") return <AdminView data={data} doctorMap={doctorMap} patientMap={patientMap} t={t} />;
+  if (user.role === "doctor") return <DoctorView data={data} user={user} doctorMap={doctorMap} patientMap={patientMap} t={t} />;
+  return <PatientView data={data} user={user} doctorMap={doctorMap} t={t} />;
 }
 
-function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof useAppData>["data"]; doctorMap: Map<string, { name: string; specialty: string }>; patientMap: Map<string, string> }) {
+function AdminView({ data, doctorMap, patientMap, t }: { data: ReturnType<typeof useAppData>["data"]; doctorMap: Map<string, { name: string; specialty: string }>; patientMap: Map<string, string>; t: any }) {
   const paidBills = useMemo(() => data.payments.filter((p) => p.status === "paid"), [data.payments]);
   const pendingBills = useMemo(() => data.payments.filter((p) => p.status === "pending"), [data.payments]);
 
@@ -143,26 +147,26 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard icon={<IndianRupee size={20} />} label="Total Revenue" value={`₹${totalRevenue.toLocaleString("en-IN")}`} sub={`${paidBills.length} paid bills`} />
-        <KpiCard icon={<AlertCircle size={20} />} label="Outstanding Dues" value={`₹${totalPending.toLocaleString("en-IN")}`} sub={`${pendingBills.length} pending`} />
-        <KpiCard icon={<ReceiptText size={20} />} label="Total Bills" value={data.payments.length} sub={`₹${(totalRevenue + totalPending).toLocaleString("en-IN")} billed`} />
-        <KpiCard icon={<CheckCircle size={20} />} label="Collection Rate" value={`${collectionRate}%`} sub="paid out of total" />
+        <KpiCard icon={<IndianRupee size={20} />} label={t.totalRevenue} value={`₹${totalRevenue.toLocaleString("en-IN")}`} sub={`${paidBills.length} ${t.paid}`} />
+        <KpiCard icon={<AlertCircle size={20} />} label={t.outstandingDues} value={`₹${totalPending.toLocaleString("en-IN")}`} sub={`${pendingBills.length} ${t.pending}`} />
+        <KpiCard icon={<ReceiptText size={20} />} label={t.totalBills} value={data.payments.length} sub={`₹${(totalRevenue + totalPending).toLocaleString("en-IN")} ${t.bills}`} />
+        <KpiCard icon={<CheckCircle size={20} />} label={t.collectionRate} value={`${collectionRate}%`} sub={t.paymentStatus} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <ChartCard title="Revenue by Doctor">
+        <ChartCard title={t.revenueByDoctor}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={revenueByDoctor}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]} />
-              <Bar dataKey="value" name="Revenue" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, t.revenue]} />
+              <Bar dataKey="value" name={t.revenue} fill="#3b82f6" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Revenue by Specialty">
+        <ChartCard title={t.revenueBySpecialty}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={revenueBySpecialty} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -170,13 +174,13 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
                   <Cell key={entry.name} fill={["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#06b6d4"][i % 6]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]} />
+              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, t.revenue]} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Payment Status Distribution">
+        <ChartCard title={t.paymentStatusDistribution}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={statusDistribution} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -190,7 +194,7 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Monthly Revenue Trend">
+        <ChartCard title={t.monthlyTrend}>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={monthlyRevenue}>
               <defs>
@@ -202,8 +206,8 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]} />
-              <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#10b981" fill="url(#gRevenue)" />
+              <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, t.revenue]} />
+              <Area type="monotone" dataKey="revenue" name={t.revenue} stroke="#10b981" fill="url(#gRevenue)" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -211,19 +215,19 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
 
       <div className="rounded-2xl border bg-card p-4">
         <h3 className="font-semibold flex items-center gap-2">
-          <AlertCircle size={16} className="text-amber-500" /> Outstanding Dues by Doctor
+          <AlertCircle size={16} className="text-amber-500" /> {t.outstandingDuesByDoctor}
         </h3>
         {outstandingByDoctor.length === 0 ? (
-          <p className="text-sm text-muted-foreground mt-2">No outstanding dues. All bills are paid.</p>
+          <p className="text-sm text-muted-foreground mt-2">{t.noOutstandingDues}</p>
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 pr-4">Doctor</th>
-                  <th className="pb-2 pr-4">Specialty</th>
-                  <th className="pb-2 pr-4 text-right">Pending Amount</th>
-                  <th className="pb-2 text-right">Pending Bills</th>
+                  <th className="pb-2 pr-4">{t.doctorLabel}</th>
+                  <th className="pb-2 pr-4">{t.specialtyLabel}</th>
+                  <th className="pb-2 pr-4 text-right">{t.pendingAmount}</th>
+                  <th className="pb-2 text-right">{t.pendingBills}</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,7 +248,7 @@ function AdminView({ data, doctorMap, patientMap }: { data: ReturnType<typeof us
   );
 }
 
-function DoctorView({ data, user, doctorMap, patientMap }: { data: ReturnType<typeof useAppData>["data"]; user: { id: string }; doctorMap: Map<string, { name: string; specialty: string }>; patientMap: Map<string, string> }) {
+function DoctorView({ data, user, doctorMap, patientMap, t }: { data: ReturnType<typeof useAppData>["data"]; user: { id: string }; doctorMap: Map<string, { name: string; specialty: string }>; patientMap: Map<string, string>; t: any }) {
   const myPaid = useMemo(() => data.payments.filter((p) => p.doctorId === user.id && p.status === "paid"), [data.payments, user.id]);
   const myPending = useMemo(() => data.payments.filter((p) => p.doctorId === user.id && p.status === "pending"), [data.payments, user.id]);
   const myAll = useMemo(() => data.payments.filter((p) => p.doctorId === user.id), [data.payments, user.id]);
@@ -265,26 +269,26 @@ function DoctorView({ data, user, doctorMap, patientMap }: { data: ReturnType<ty
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard icon={<IndianRupee size={20} />} label="My Revenue" value={`₹${myRevenue.toLocaleString("en-IN")}`} sub={`${myPaid.length} paid bills`} />
-        <KpiCard icon={<AlertCircle size={20} />} label="My Pending" value={`₹${myPendingAmount.toLocaleString("en-IN")}`} sub={`${myPending.length} pending`} />
-        <KpiCard icon={<ReceiptText size={20} />} label="My Bills" value={myAll.length} sub={`${myAll.length} total`} />
+        <KpiCard icon={<IndianRupee size={20} />} label={t.myRevenue} value={`₹${myRevenue.toLocaleString("en-IN")}`} sub={`${myPaid.length} ${t.paid}`} />
+        <KpiCard icon={<AlertCircle size={20} />} label={t.myPending} value={`₹${myPendingAmount.toLocaleString("en-IN")}`} sub={`${myPending.length} ${t.pending}`} />
+        <KpiCard icon={<ReceiptText size={20} />} label={t.myBillsLabel} value={myAll.length} sub={`${myAll.length} ${t.all}`} />
       </div>
 
       <div className="rounded-2xl border bg-card p-4">
         <h3 className="font-semibold flex items-center gap-2">
-          <AlertCircle size={16} className="text-amber-500" /> Patient Outstanding Dues
+          <AlertCircle size={16} className="text-amber-500" /> {t.patientOutstandingDues}
         </h3>
         {patientDues.length === 0 ? (
-          <p className="text-sm text-muted-foreground mt-2">No pending dues from your patients.</p>
+          <p className="text-sm text-muted-foreground mt-2">{t.noPendingDuesFromPatients}</p>
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 pr-4">Patient</th>
-                  <th className="pb-2 pr-4">Date</th>
-                  <th className="pb-2 pr-4">Method</th>
-                  <th className="pb-2 text-right">Amount</th>
+                  <th className="pb-2 pr-4">{t.patientLabel}</th>
+                  <th className="pb-2 pr-4">{t.dateLabel}</th>
+                  <th className="pb-2 pr-4">{t.methodLabel}</th>
+                  <th className="pb-2 text-right">{t.amountLabel}</th>
                 </tr>
               </thead>
               <tbody>
@@ -305,7 +309,7 @@ function DoctorView({ data, user, doctorMap, patientMap }: { data: ReturnType<ty
   );
 }
 
-function PatientView({ data, user, doctorMap }: { data: ReturnType<typeof useAppData>["data"]; user: { id: string }; doctorMap: Map<string, { name: string; specialty: string }> }) {
+function PatientView({ data, user, doctorMap, t }: { data: ReturnType<typeof useAppData>["data"]; user: { id: string }; doctorMap: Map<string, { name: string; specialty: string }>; t: any }) {
   const myBills = useMemo(() => data.payments.filter((p) => p.patientId === user.id), [data.payments, user.id]);
   const totalBilled = useMemo(() => myBills.reduce((s, p) => s + p.amount, 0), [myBills]);
   const totalPaid = useMemo(() => myBills.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0), [myBills]);
@@ -313,26 +317,26 @@ function PatientView({ data, user, doctorMap }: { data: ReturnType<typeof useApp
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard icon={<ReceiptText size={20} />} label="Total Billed" value={`₹${totalBilled.toLocaleString("en-IN")}`} sub={`${myBills.length} bills`} />
-        <KpiCard icon={<CheckCircle size={20} />} label="Total Paid" value={`₹${totalPaid.toLocaleString("en-IN")}`} sub={`₹${(totalBilled - totalPaid).toLocaleString("en-IN")} remaining`} />
+        <KpiCard icon={<ReceiptText size={20} />} label={t.totalBilled} value={`₹${totalBilled.toLocaleString("en-IN")}`} sub={`${myBills.length} ${t.bills}`} />
+        <KpiCard icon={<CheckCircle size={20} />} label={t.totalPaidLabel} value={`₹${totalPaid.toLocaleString("en-IN")}`} sub={`₹${(totalBilled - totalPaid).toLocaleString("en-IN")} ${t.pending}`} />
       </div>
 
       <div className="rounded-2xl border bg-card p-4">
         <h3 className="font-semibold flex items-center gap-2">
-          <CreditCard size={16} className="text-blue-500" /> Bills History
+          <CreditCard size={16} className="text-blue-500" /> {t.billsHistory}
         </h3>
         {myBills.length === 0 ? (
-          <p className="text-sm text-muted-foreground mt-2">No bills yet.</p>
+          <p className="text-sm text-muted-foreground mt-2">{t.noBillsYet}</p>
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 pr-4">Doctor</th>
-                  <th className="pb-2 pr-4">Date</th>
-                  <th className="pb-2 pr-4">Method</th>
-                  <th className="pb-2 pr-4 text-right">Amount</th>
-                  <th className="pb-2 text-right">Status</th>
+                  <th className="pb-2 pr-4">{t.doctorLabel}</th>
+                  <th className="pb-2 pr-4">{t.dateLabel}</th>
+                  <th className="pb-2 pr-4">{t.methodLabel}</th>
+                  <th className="pb-2 pr-4 text-right">{t.amountLabel}</th>
+                  <th className="pb-2 text-right">{t.statusLabel}</th>
                 </tr>
               </thead>
               <tbody>
@@ -351,7 +355,7 @@ function PatientView({ data, user, doctorMap }: { data: ReturnType<typeof useApp
                       }`}>
                         {bill.status === "paid" && <CheckCircle size={12} />}
                         {bill.status === "failed" && <XCircle size={12} />}
-                        {bill.status}
+                        {t[`${bill.status}Status`] || bill.status}
                       </span>
                     </td>
                   </tr>

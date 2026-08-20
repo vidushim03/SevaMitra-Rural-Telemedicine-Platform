@@ -2,6 +2,7 @@
 import { useAppData } from '../contexts/AppDataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../components/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -13,6 +14,7 @@ export function PaymentsPage() {
   const { data, markPayment } = useAppData();
   const { user } = useAuth();
   const { language } = useLanguage();
+  const t = translations[language];
   const [filter, setFilter] = useState<'all' | 'pending' | 'paid'>('all');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [expandedPayId, setExpandedPayId] = useState<string | null>(null);
@@ -155,7 +157,7 @@ export function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">
-          {user.role === 'patient' ? 'My Bills' : 'Bills & Payments'}
+          {user.role === 'patient' ? t.myBills : t.allBills}
         </h2>
         <div className="flex gap-2">
           {(['all', 'pending', 'paid'] as const).map(f => (
@@ -166,7 +168,7 @@ export function PaymentsPage() {
               className="rounded-xl"
               onClick={() => setFilter(f)}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {f === 'all' ? t.all : f === 'pending' ? t.pending : t.paid}
             </Button>
           ))}
         </div>
@@ -176,7 +178,7 @@ export function PaymentsPage() {
         <Card className="glass-card">
           <CardContent className="p-12 text-center">
             <CreditCard className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">No bills found</p>
+            <p className="text-muted-foreground">{t.noBillsFound}</p>
           </CardContent>
         </Card>
       ) : (
@@ -206,14 +208,14 @@ export function PaymentsPage() {
                     onClick={() => handlePrintBill(p)}
                   >
                     <Printer size={14} />
-                    Print Bill
+                    {t.printBill}
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="rounded-xl bg-slate-50 dark:bg-zinc-900 p-4">
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                    <FileText size={14} /> Bill Details
+                    <FileText size={14} /> {t.billDetails}
                   </h4>
                   {p.lineItems && p.lineItems.length > 0 ? (
                     <div className="space-y-1">
@@ -226,12 +228,12 @@ export function PaymentsPage() {
                     </div>
                   ) : (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Consultation fee</span>
+                      <span className="text-muted-foreground">{t.consultationFee}</span>
                       <span className="font-medium">₹{p.amount}</span>
                     </div>
                   )}
                   <div className="border-t mt-2 pt-2 flex justify-between font-bold">
-                    <span>Total</span>
+                    <span>{t.billTotal}</span>
                     <span className="text-primary flex items-center gap-1">
                       <IndianRupee size={14} />{p.amount}
                     </span>
@@ -250,13 +252,13 @@ export function PaymentsPage() {
                     <div className="flex flex-col gap-2 items-end">
                       {expandedPayId === p.id ? (
                         <div className="w-72 space-y-2 rounded-xl border p-3 bg-white dark:bg-zinc-950">
-                          <p className="text-xs font-semibold text-muted-foreground mb-2">Choose how to pay ₹{p.amount}:</p>
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">{t.chooseHowToPay} ₹{p.amount}:</p>
 
                           {/* UPI Option */}
                           <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg px-3 py-2">
                             <Smartphone size={14} className="text-emerald-600 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium">Pay via UPI</p>
+                              <p className="text-xs font-medium">{t.payViaUpi}</p>
                               <p className="text-xs font-mono text-muted-foreground truncate">{HOSPITAL_UPI_ID}</p>
                             </div>
                             <button
@@ -270,14 +272,14 @@ export function PaymentsPage() {
                               <Copy size={12} className="text-emerald-600" />
                             </button>
                           </div>
-                          {copiedUpi && <p className="text-xs text-emerald-600">UPI ID copied!</p>}
+                            {copiedUpi && <p className="text-xs text-emerald-600">{t.upiIdCopied}</p>}
 
                           {/* ASHA Worker Option */}
                           <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
                             <Users size={14} className="text-blue-600 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium">Pay via ASHA Worker</p>
-                              <p className="text-xs text-muted-foreground">Ask your local ASHA worker to collect</p>
+                              <p className="text-xs font-medium">{t.payViaAshaWorker}</p>
+                              <p className="text-xs text-muted-foreground">{t.askAshaToCollect}</p>
                             </div>
                           </div>
 
@@ -285,8 +287,8 @@ export function PaymentsPage() {
                           <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg px-3 py-2">
                             <Truck size={14} className="text-orange-600 shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium">Pay on Medicine Delivery</p>
-                              <p className="text-xs text-muted-foreground">Pay cash when medicines arrive</p>
+                              <p className="text-xs font-medium">{t.payOnDelivery}</p>
+                              <p className="text-xs text-muted-foreground">{t.payCashWhenDelivered}</p>
                             </div>
                           </div>
 

@@ -47,7 +47,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
     try {
       return new WebRTCService();
     } catch (err) {
-      setError('Failed to initialize video call service');
+      setError(t.videoServiceInitFailed);
       return null;
     }
   });
@@ -107,7 +107,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   // Video call setup
   useEffect(() => {
     if (!webrtcService) {
-      setError('Video call service not available');
+      setError(t.videoServiceUnavailable);
       return;
     }
 
@@ -127,7 +127,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
 
     socket.on('connect_error', () => {
       setConnectionStatus('disconnected');
-      setError('Failed to connect to server. Please refresh the page.');
+      setError(t.connectionFailedRefresh);
     });
 
     socket.on('disconnect', () => {
@@ -148,7 +148,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
     socket.on('patient-unavailable', () => {
       doctorInitiatedCallRef.current = false;
       endVideoCall();
-      alert('Patient is currently unavailable. Please try again later.');
+      alert(t.patientUnavailable);
     });
 
     socket.on('call-accepted', async ({ callId }) => {
@@ -182,7 +182,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
     // Test connection after 2 seconds
     setTimeout(() => {
       if (!socket.connected) {
-        setError('Connection timeout. Please refresh the page.');
+        setError(t.connectionTimeout);
       }
     }, 3000);
 
@@ -210,7 +210,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         setCurrentPatient(incomingCall.patientInfo);
         setIncomingCall(null);
       } catch (error) {
-        alert('Failed to access camera/microphone. Please check permissions.');
+        alert(t.cameraAccessFailed);
       }
     }
   };
@@ -285,10 +285,10 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         <Card className="w-96 text-center">
           <CardContent className="p-8">
             <div className="text-red-500 mb-4 text-4xl">⚠️</div>
-            <h3 className="text-xl font-semibold mb-2 text-red-600">Doctor Dashboard Error</h3>
+            <h3 className="text-xl font-semibold mb-2 text-red-600">{t.doctorDashboardError}</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
             <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
-              Refresh Page
+              {t.refreshPage}
             </Button>
           </CardContent>
         </Card>
@@ -325,12 +325,12 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white p-4 rounded-lg min-w-64">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="font-semibold">Consultation in Progress</span>
+            <span className="font-semibold">{t.consultationInProgress}</span>
           </div>
           <div className="space-y-1 text-sm">
-            <div><span className="text-gray-300">Patient:</span> {currentPatient?.name}</div>
-            <div><span className="text-gray-300">Age:</span> {currentPatient?.age} years</div>
-            <div><span className="text-gray-300">Condition:</span> {currentPatient?.condition}</div>
+            <div><span className="text-gray-300">{t.patientLabel}</span> {currentPatient?.name}</div>
+            <div><span className="text-gray-300">{t.ageLabel}</span> {currentPatient?.age} {t.years}</div>
+            <div><span className="text-gray-300">{t.conditionLabel}</span> {currentPatient?.condition}</div>
           </div>
           <div className="flex items-center gap-2 mt-3">
             {connectionQuality === 'good' ? (
@@ -339,7 +339,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <WifiOff className="h-4 w-4 text-red-400" />
             )}
             <span className="text-sm">
-              {connectionQuality === 'good' ? 'Good connection' : 'Poor connection'}
+              {connectionQuality === 'good' ? t.goodConnection : t.poorConnection}
             </span>
           </div>
         </div>
@@ -393,9 +393,9 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               </h3>
               <div className="space-y-2 mb-6 text-left">
                 <div className="bg-gray-50 dark:bg-zinc-800 p-3 rounded-lg space-y-1">
-                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Patient:</span> {incomingCall.patientInfo.name}</p>
-                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Age:</span> {incomingCall.patientInfo.age} years</p>
-                  <p><span className="font-medium text-gray-600 dark:text-gray-300">Condition:</span> {incomingCall.patientInfo.condition}</p>
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">{t.patientLabel}</span> {incomingCall.patientInfo.name}</p>
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">{t.ageLabel}</span> {incomingCall.patientInfo.age} {t.years}</p>
+                  <p><span className="font-medium text-gray-600 dark:text-gray-300">{t.conditionLabel}</span> {incomingCall.patientInfo.condition}</p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -405,7 +405,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                   size="lg"
                 >
                   <Video className="h-4 w-4 mr-2" />
-                  Accept Call
+                  {t.acceptCall}
                 </Button>
                 <Button
                   onClick={rejectCall}
@@ -414,7 +414,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                   size="lg"
                 >
                   <PhoneOff className="h-4 w-4 mr-2" />
-                  Decline
+                  {t.decline}
                 </Button>
               </div>
             </div>
@@ -430,7 +430,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {t.doctorDashboard || "Doctor Dashboard"}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300">Welcome back, {currentDoctor.name}</p>
+              <p className="text-gray-600 dark:text-gray-300">{t.welcomeBack.replace('{name}', currentDoctor.name)}</p>
             </div>
             <div className="flex items-center gap-4">
               <Badge
@@ -442,7 +442,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               >
                 <div className={`w-2 h-2 rounded-full mr-2 ${connectionStatus === 'connected' ? 'bg-green-50 dark:bg-green-900/200 animate-pulse' : 'bg-red-500'
                   }`}></div>
-                {connectionStatus === 'connected' ? 'Available for calls' : 'Connection issue'}
+                {connectionStatus === 'connected' ? t.availableForCalls : t.connectionIssue}
               </Badge>
               <Avatar>
                 <AvatarImage src="/api/placeholder/40/40" />
@@ -494,7 +494,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-yellow-600">
                     <Wifi className="h-5 w-5" />
-                    <span>Connection Status: {connectionStatus}</span>
+                    <span>{t.connectionStatusLabel} {connectionStatus}</span>
                     {connectionStatus === 'connecting' && <span className="animate-spin">⟳</span>}
                   </div>
                 </CardContent>
@@ -574,7 +574,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Phone className="h-5 w-5 mr-2" />
-                    Active Consultations
+                    {t.activeConsultations}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -594,9 +594,9 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                               </p>
                             </div>
                           </div>
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                             <Button size="sm" className="bg-green-600 hover:bg-green-700">
                             <Video className="h-4 w-4 mr-2" />
-                            {call.status === 'incoming' ? 'Answer' : 'Join'}
+                            {call.status === 'incoming' ? t.answer : t.join}
                           </Button>
                         </div>
                       ))}
@@ -608,7 +608,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
             {/* Today's Patients */}
             <Card>
               <CardHeader>
-                <CardTitle>Today's Patient Queue</CardTitle>
+                <CardTitle>{t.todaysPatientQueue}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -648,11 +648,11 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => setSelectedTab('records')}>
                           <FileText className="h-4 w-4 mr-2" />
-                          Records
+                          {t.records}
                         </Button>
                         <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => startVideoCall(patient)}>
                           <Video className="h-4 w-4 mr-2" />
-                          Consult
+                          {t.consult}
                         </Button>
                       </div>
                     </div>
@@ -667,22 +667,22 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         {selectedTab === 'patients' && (
           <Card>
             <CardHeader>
-              <CardTitle>Patient Management</CardTitle>
+              <CardTitle>{t.patientManagement}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Patient List */}
                 <div className="md:col-span-1 space-y-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">My Patients</h3>
+                    <h3 className="text-lg font-semibold">{t.myPatients}</h3>
                     <Button variant="outline" size="sm" onClick={() => setSearchQuery('')}>
-                      <Filter className="h-4 w-4 mr-2" /> Filter
+                      <Filter className="h-4 w-4 mr-2" /> {t.filter}
                     </Button>
                   </div>
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search patients..."
+                    placeholder={t.searchPatients}
                     className="w-full mb-3 rounded-lg border px-3 py-2 text-sm"
                   />
                   {todaysPatients
@@ -706,7 +706,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                         </div>
                       </div>
                       {selectedPatient?.id === patient.id && (
-                        <Badge className="bg-blue-100 dark:bg-blue-900/40">Selected</Badge>
+                        <Badge className="bg-blue-100 dark:bg-blue-900/40">{t.selected}</Badge>
                       )}
                     </div>
                   ))}
@@ -718,24 +718,24 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
-                          <span>{selectedPatient.name}'s Overview</span>
+                          <span>{t.patientOverview.replace('{name}', selectedPatient.name)}</span>
                           <Button variant="outline" size="sm" onClick={() => setSelectedTab('records')}>
-                            <History className="h-4 w-4 mr-2" /> View History
+                            <History className="h-4 w-4 mr-2" /> {t.viewHistory}
                           </Button>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
-                        <p><span className="font-medium">Age:</span> {selectedPatient.age} years</p>
-                        <p><span className="font-medium">Gender:</span> {selectedPatient.gender === 'M' ? 'Male' : 'Female'}</p>
-                        <p><span className="font-medium">Condition:</span> {selectedPatient.condition}</p>
-                        <p><span className="font-medium">Symptoms:</span> {selectedPatient.symptoms}</p>
-                        <p><span className="font-medium">Last Visit:</span> {selectedPatient.lastVisit || 'N/A'}</p>
+                        <p><span className="font-medium">{t.ageLabel}</span> {selectedPatient.age} {t.years}</p>
+                        <p><span className="font-medium">{t.genderLabel}</span> {selectedPatient.gender === 'M' ? t.male : t.female}</p>
+                        <p><span className="font-medium">{t.conditionLabel}</span> {selectedPatient.condition}</p>
+                        <p><span className="font-medium">{t.symptomsLabel}</span> {selectedPatient.symptoms}</p>
+                        <p><span className="font-medium">{t.lastVisit}:</span> {selectedPatient.lastVisit || t.notAvailable}</p>
                         <div className="flex gap-2 mt-4">
                           <Button size="sm" onClick={() => startVideoCall(selectedPatient)}>
-                            <Video className="h-4 w-4 mr-2" /> Start Consultation
+                            <Video className="h-4 w-4 mr-2" /> {t.startConsultation}
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => setSelectedTab('records')}>
-                            <FileText className="h-4 w-4 mr-2" /> Full Records
+                            <FileText className="h-4 w-4 mr-2" /> {t.fullRecords}
                           </Button>
                         </div>
                       </CardContent>
@@ -759,7 +759,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                   <div className="md:col-span-2 flex items-center justify-center h-full min-h-[400px] bg-gray-50 dark:bg-zinc-900 rounded-lg border border-dashed text-gray-500 dark:text-gray-400">
                     <p className="text-center p-4">
                       <Users className="h-8 w-8 mx-auto mb-2" />
-                      Select a patient from the list to view their details and manage their care.
+                      {t.selectPatientFromList}
                     </p>
                   </div>
                 )}
@@ -772,7 +772,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         {selectedTab === 'appointments' && (
           <Card>
             <CardHeader>
-              <CardTitle>Appointments</CardTitle>
+              <CardTitle>{t.appointments}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300">
@@ -785,7 +785,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
         {selectedTab === 'records' && (
           <Card>
             <CardHeader>
-              <CardTitle>Medical Records</CardTitle>
+              <CardTitle>{t.medicalRecords}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300">

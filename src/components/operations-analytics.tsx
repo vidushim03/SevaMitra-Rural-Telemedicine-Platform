@@ -28,6 +28,8 @@ import {
   Zap,
 } from "lucide-react";
 import operationsData from "../lib/operations-analytics.json";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useTranslation } from "./translations";
 
 interface OpsMeta {
   title: string;
@@ -70,6 +72,8 @@ function pct(v: number): string {
 }
 
 export function OperationsAnalytics() {
+  const { language } = useLanguage();
+  const t = useTranslation(language);
   const k = data.kpis;
   const flow = data.flow;
 
@@ -77,39 +81,43 @@ export function OperationsAnalytics() {
     {
       key: "demand",
       icon: <Users size={18} />,
+      label: t.demandStage,
       items: [
-        { label: "Consults / day", value: `${flow.demand.consults_per_day}` },
-        { label: "Emergency / day", value: flow.demand.emergency_per_day },
-        { label: "Active villages", value: flow.demand.active_villages },
-        { label: "Rural share", value: pct(Number(flow.demand.rural_share)) },
+        { label: t.consultsPerDayLabel, value: `${flow.demand.consults_per_day}` },
+        { label: t.emergencyPerDayLabel, value: flow.demand.emergency_per_day },
+        { label: t.activeVillagesLabel, value: flow.demand.active_villages },
+        { label: t.ruralShareLabel, value: pct(Number(flow.demand.rural_share)) },
       ],
     },
     {
       key: "capacity",
       icon: <Stethoscope size={18} />,
+      label: t.capacityStage,
       items: [
-        { label: "Doctors", value: flow.capacity.doctors },
-        { label: "Avg utilization", value: pct(Number(flow.capacity.avg_utilization)) },
-        { label: "Peak hour", value: `${flow.capacity.peak_hour}:00` },
-        { label: "Peak share of day", value: `${flow.capacity.peak_share}%` },
+        { label: t.doctorsLabel, value: flow.capacity.doctors },
+        { label: t.avgUtilizationLabel, value: pct(Number(flow.capacity.avg_utilization)) },
+        { label: t.peakHourLabel, value: `${flow.capacity.peak_hour}:00` },
+        { label: t.peakShareOfDayLabel, value: `${flow.capacity.peak_share}%` },
       ],
     },
     {
       key: "outcomes",
       icon: <HeartPulse size={18} />,
+      label: t.outcomesStage,
       items: [
-        { label: "Completion", value: pct(Number(flow.outcomes.completion_rate)) },
-        { label: "Avg wait", value: `${flow.outcomes.avg_wait_min} min` },
-        { label: "Rx issued", value: pct(Number(flow.outcomes.rx_conversion)) },
-        { label: "Rating", value: flow.outcomes.avg_rating },
+        { label: t.completionLabel, value: pct(Number(flow.outcomes.completion_rate)) },
+        { label: t.avgWaitLabel, value: `${flow.outcomes.avg_wait_min} min` },
+        { label: t.rxIssuedLabel, value: pct(Number(flow.outcomes.rx_conversion)) },
+        { label: t.ratingLabel, value: flow.outcomes.avg_rating },
       ],
     },
     {
       key: "pharmacy",
       icon: <Pill size={18} />,
+      label: t.pharmacyStage,
       items: [
-        { label: "Stock-out rate", value: pct(Number(flow.pharmacy.stock_out_rate)) },
-        { label: "Med availability", value: pct(Number(flow.pharmacy.medicine_availability)) },
+        { label: t.stockOutRateLabel, value: pct(Number(flow.pharmacy.stock_out_rate)) },
+        { label: t.medAvailabilityLabel, value: pct(Number(flow.pharmacy.medicine_availability)) },
       ],
     },
   ];
@@ -134,15 +142,15 @@ export function OperationsAnalytics() {
 
       {/* KPI row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard icon={<CalendarClock size={20} />} label="Consultations / day" value={k.consults_per_day} sub={`${k.consults_per_week}/week across ${k.active_villages} villages`} />
-        <KpiCard icon={<Clock size={20} />} label="Avg wait time" value={`${k.avg_wait_min} min`} sub={`median ${k.median_wait_min} min on completed consults`} />
-        <KpiCard icon={<Activity size={20} />} label="Doctor utilization" value={pct(k.doctor_utilization)} sub={`${k.doctors} doctors in the panel`} />
-        <KpiCard icon={<Zap size={20} />} label="Appointment completion" value={pct(k.completion_rate)} sub={`no-show ${pct(k.no_show_rate)} · cancelled ${pct(k.cancellation_rate)}`} />
+        <KpiCard icon={<CalendarClock size={20} />} label={t.consultsPerDay} value={k.consults_per_day} sub={`${k.consults_per_week}/week across ${k.active_villages} villages`} />
+        <KpiCard icon={<Clock size={20} />} label={t.avgWaitTime} value={`${k.avg_wait_min} min`} sub={`median ${k.median_wait_min} min`} />
+        <KpiCard icon={<Activity size={20} />} label={t.doctorUtilization} value={pct(k.doctor_utilization)} sub={`${k.doctors} doctors in the panel`} />
+        <KpiCard icon={<Zap size={20} />} label={t.appointmentCompletion} value={pct(k.completion_rate)} sub={`no-show ${pct(k.no_show_rate)} · cancelled ${pct(k.cancellation_rate)}`} />
       </div>
 
       {/* Demand → Capacity → Outcomes → Pharmacy */}
       <div>
-        <h3 className="font-semibold mb-3">Operational flow: patient demand → doctor capacity → consultation outcomes → pharmacy availability</h3>
+        <h3 className="font-semibold mb-3">{t.operationalFlow}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {flowStages.map((stage) => (
             <div key={stage.key} className="rounded-2xl border bg-card p-4">
@@ -164,7 +172,7 @@ export function OperationsAnalytics() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <ChartCard title="Daily consultation volume (last 14 days)">
+        <ChartCard title={t.demandTrendTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={data.charts.demand_by_day}>
               <defs>
@@ -182,7 +190,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Demand by hour of day">
+        <ChartCard title={t.hourlyDemandTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data.charts.demand_by_hour}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -194,7 +202,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Consultation wait-time distribution">
+        <ChartCard title={t.waitTimeDistributionTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data.charts.wait_buckets}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -206,7 +214,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Doctor utilization by specialty">
+        <ChartCard title={t.doctorUtilizationBySpecialtyTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data.charts.utilization_by_specialty} layout="vertical" margin={{ left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -218,7 +226,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Urgency mix">
+        <ChartCard title={t.urgencyMixTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={data.charts.urgency_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -232,7 +240,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Patient language mix">
+        <ChartCard title={t.languageMixTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={data.charts.language_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -246,7 +254,7 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Top symptoms">
+        <ChartCard title={t.topSymptomsTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data.charts.symptom_mix} layout="vertical" margin={{ left: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -258,19 +266,19 @@ export function OperationsAnalytics() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Pharmacy stock-out rate by specialty">
+        <ChartCard title={t.pharmacyStockOutTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data.charts.stock_risk_by_specialty}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="specialty" tick={{ fontSize: 10 }} />
               <YAxis unit="%" tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v) => [`${v}%`, "Stock-out rate"]} />
-              <Bar dataKey="rate" name="Stock-out rate" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              <Tooltip formatter={(v) => [`${v}%`, t.stockOutRateLabel]} />
+              <Bar dataKey="rate" name={t.stockOutRateLabel} fill="#ef4444" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Specialist access: rural vs hub">
+        <ChartCard title={t.specialistAccessTitle}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={data.charts.access_mix} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
@@ -288,13 +296,13 @@ export function OperationsAnalytics() {
       {/* Takeaway strip */}
       <div className="rounded-2xl border bg-card p-4 space-y-2">
         <h3 className="font-semibold flex items-center gap-2">
-          <AlertTriangle size={16} className="text-amber-500" /> What the numbers say (simulated)
+          <AlertTriangle size={16} className="text-amber-500" /> {t.whatNumbersSay}
         </h3>
         <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
-          <li>Peak load at {flow.capacity.peak_hour}:00 — capacity should follow demand, and wait-time tail (21–60 min) is where experience degrades.</li>
-          <li>~{pct(Number(k.cancellation_rate) + Number(k.no_show_rate))} of appointments never happen — a target for health-worker reminder nudges.</li>
-          <li>Chronic-medicine stock risk clusters in psychiatry ({data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Psychiatry")?.rate}%) and cardiology ({data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Cardiology")?.rate}%) — prioritize stock alerts there.</li>
-          <li>Rural users reach specialists {pct(k.rural_specialist_share)} of the time — the platform's core access value prop.</li>
+          <li>{t.peakLoadTakeaway.replace('{peakHour}', flow.capacity.peak_hour.toString())}</li>
+          <li>{t.appointmentsNeverHappenTakeaway.replace('{cancelNoShowPct}', pct(Number(k.cancellation_rate) + Number(k.no_show_rate)))}</li>
+          <li>{t.chronicMedicineStockRiskTakeaway.replace('{psychRate}', data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Psychiatry")?.rate?.toString() || '0').replace('{cardioRate}', data.charts.stock_risk_by_specialty.find((c) => String(c.specialty) === "Cardiology")?.rate?.toString() || '0')}</li>
+          <li>{t.ruralSpecialistAccessTakeaway.replace('{ruralSpecialistPct}', pct(k.rural_specialist_share))}</li>
         </ul>
       </div>
     </div>
