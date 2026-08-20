@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { CreditCard, CheckCircle, Clock, FileText, IndianRupee, Copy, Smartphone, Users, Truck } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, FileText, IndianRupee, Copy, Smartphone, Users, Truck, Printer } from 'lucide-react';
 
 const HOSPITAL_UPI_ID = 'sevamitra@upi';
 
@@ -28,6 +28,126 @@ export function PaymentsPage() {
 
   const getDoctorName = (doctorId: string) => data.users.find(u => u.id === doctorId)?.name ?? 'Unknown';
   const getPatientName = (patientId: string) => data.users.find(u => u.id === patientId)?.name ?? 'Unknown';
+  const getSpecialty = (doctorId: string) => data.users.find(u => u.id === doctorId)?.specialty ?? '';
+
+  const handlePrintBill = (p: typeof payments[0]) => {
+    const patientName = getPatientName(p.patientId);
+    const doctorName = getDoctorName(p.doctorId);
+    const specialty = getSpecialty(p.doctorId);
+    const billNumber = p.id.replace('pay_', '');
+    const billDate = new Date(p.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    const lineItemsHtml = p.lineItems && p.lineItems.length > 0
+      ? p.lineItems.map(item => `
+          <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${item.description}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${item.quantity}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">₹${item.unitPrice.toFixed(2)}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">₹${item.total.toFixed(2)}</td>
+          </tr>`).join('')
+      : `<tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;" colspan="2">Consultation Fee</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">1</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">₹${p.consultationFee.toFixed(2)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">₹${p.consultationFee.toFixed(2)}</td>
+        </tr>`;
+
+    const statusColor = p.status === 'paid' ? '#16a34a' : p.status === 'pending' ? '#d97706' : '#dc2626';
+    const statusBg = p.status === 'paid' ? '#dcfce7' : p.status === 'pending' ? '#fef3c7' : '#fee2e2';
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bill #${billNumber} - SevaMitra</title>
+<style>
+  @media print {
+    body { margin: 0; }
+    .no-print { display: none !important; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; background: #fff; }
+  .bill-container { max-width: 750px; margin: 20px auto; padding: 40px; border: 1px solid #e2e8f0; }
+  .header { text-align: center; border-bottom: 2px solid #0d9488; padding-bottom: 20px; margin-bottom: 24px; }
+  .header h1 { font-size: 22px; color: #0d9488; margin-bottom: 4px; }
+  .header p { font-size: 13px; color: #64748b; }
+  .meta { display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 14px; }
+  .meta div { line-height: 1.8; }
+  .meta strong { color: #475569; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+  thead th { background: #f1f5f9; padding: 10px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #cbd5e1; }
+  thead th:nth-child(2) { text-align: center; }
+  thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+  .summary { margin-left: auto; width: 280px; font-size: 14px; }
+  .summary-row { display: flex; justify-content: space-between; padding: 6px 0; }
+  .summary-row.total { border-top: 2px solid #0d9488; padding-top: 10px; margin-top: 4px; font-weight: 700; font-size: 16px; color: #0d9488; }
+  .status-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; color: ${statusColor}; background: ${statusBg}; }
+  .notes { background: #f8fafc; border-left: 3px solid #94a3b8; padding: 12px 16px; margin: 20px 0; font-size: 13px; color: #475569; border-radius: 0 6px 6px 0; }
+  .footer { text-align: center; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="bill-container">
+  <div class="header">
+    <h1>SevaMitra - Rural Telemedicine Platform</h1>
+    <p>Quality healthcare, accessible to everyone</p>
+  </div>
+
+  <div class="meta">
+    <div>
+      <strong>Bill No:</strong> #${billNumber}<br>
+      <strong>Date:</strong> ${billDate}<br>
+      <strong>Payment Method:</strong> ${p.method.toUpperCase()}
+    </div>
+    <div style="text-align:right;">
+      <strong>Status:</strong> <span class="status-badge">${p.status.toUpperCase()}</span>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div>
+      <strong>Patient:</strong> ${patientName}
+    </div>
+    <div style="text-align:right;">
+      <strong>Doctor:</strong> ${doctorName}${specialty ? ` (${specialty})` : ''}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${lineItemsHtml}
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <div class="summary-row"><span>Consultation Fee</span><span>₹${p.consultationFee.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Medicine Total</span><span>₹${p.medicineTotal.toFixed(2)}</span></div>
+    <div class="summary-row total"><span>Grand Total</span><span>₹${p.amount.toFixed(2)}</span></div>
+  </div>
+
+  ${p.notes ? `<div class="notes"><strong>Notes:</strong> ${p.notes}</div>` : ''}
+
+  <div class="footer">This is a computer-generated bill</div>
+</div>
+</body>
+</html>`;
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+  };
 
   if (!user) return null;
 
@@ -79,6 +199,15 @@ export function PaymentsPage() {
                   <Badge variant={p.status === 'paid' ? 'default' : 'secondary'} className={p.status === 'paid' ? 'bg-green-600' : 'bg-amber-500'}>
                     {p.status}
                   </Badge>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl gap-1.5"
+                    onClick={() => handlePrintBill(p)}
+                  >
+                    <Printer size={14} />
+                    Print Bill
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">

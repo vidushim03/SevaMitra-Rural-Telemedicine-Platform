@@ -365,7 +365,20 @@ export const translations = {
     patientPaysBill: "Patient views and pays bills",
     govtRate: "Govt Hospital Rate",
     janAushadhiPrice: "Jan Aushadhi Price",
-    pricePerUnit: "per unit"
+    pricePerUnit: "per unit",
+    paymentAnalytics: "Payment Analytics",
+    revenue: "Revenue",
+    outstandingDues: "Outstanding Dues",
+    collectionRate: "Collection Rate",
+    totalRevenue: "Total Revenue",
+    revenueByDoctor: "Revenue by Doctor",
+    revenueBySpecialty: "Revenue by Specialty",
+    paymentStatus: "Payment Status",
+    monthlyTrend: "Monthly Trend",
+    printBill: "Print Bill",
+    billHeader: "SevaMitra - Rural Telemedicine Platform",
+    computerGeneratedBill: "This is a computer-generated bill",
+    grandTotal: "Grand Total"
   },
   hi: {
     // Navigation
@@ -730,7 +743,20 @@ export const translations = {
     patientPaysBill: "मरीज़ बिल देखता है और भुगतान करता है",
     govtRate: "सरकारी अस्पताल दर",
     janAushadhiPrice: "जन औषधि मूल्य",
-    pricePerUnit: "प्रति इकाई"
+    pricePerUnit: "प्रति इकाई",
+    paymentAnalytics: "भुगतान विश्लेषण",
+    revenue: "राजस्व",
+    outstandingDues: "बकाया राशि",
+    collectionRate: "संग्रह दर",
+    totalRevenue: "कुल राजस्व",
+    revenueByDoctor: "डॉक्टर अनुसार राजस्व",
+    revenueBySpecialty: "विशेषज्ञता अनुसार राजस्व",
+    paymentStatus: "भुगतान स्थिति",
+    monthlyTrend: "मासिक रुझान",
+    printBill: "बिल प्रिंट करें",
+    billHeader: "सेवामित्र - ग्रामीण टेलीमेडिसिन प्लेटफॉर्म",
+    computerGeneratedBill: "यह एक कंप्यूटर-जनित बिल है",
+    grandTotal: "कुल योग"
   },
   pa: {
     // Navigation
@@ -1094,7 +1120,20 @@ export const translations = {
     patientPaysBill: "ਮਰੀਜ਼ ਬਿੱਲ ਵੇਖਦਾ ਹੈ ਅਤੇ ਭੁਗਤਾਨ ਕਰਦਾ ਹੈ",
     govtRate: "ਸਰਕਾਰੀ ਹਸਪਤਾਲ ਦਰ",
     janAushadhiPrice: "ਜਨ ਔਸ਼ਧੀ ਮੁੱਲ",
-    pricePerUnit: "ਪ੍ਰਤੀ ਇਕਾਈ"
+    pricePerUnit: "ਪ੍ਰਤੀ ਇਕਾਈ",
+    paymentAnalytics: "ਭੁਗਤਾਨ ਵਿਸ਼ਲੇਸ਼ਣ",
+    revenue: "ਰਾਜਸਵ",
+    outstandingDues: "ਬਕਾਇਆ ਰਾਸ਼ੀ",
+    collectionRate: "ਇਕੱਠੇ ਕਰਨ ਦੀ ਦਰ",
+    totalRevenue: "ਕੁੱਲ ਰਾਜਸਵ",
+    revenueByDoctor: "ਡਾਕਟਰ ਅਨੁਸਾਰ ਰਾਜਸਵ",
+    revenueBySpecialty: "ਵਿਸ਼ੇਸ਼ਤਾ ਅਨੁਸਾਰ ਰਾਜਸਵ",
+    paymentStatus: "ਭੁਗਤਾਨ ਸਥਿਤੀ",
+    monthlyTrend: "ਮਹੀਨਾਵਾਰ ਰੁਝਾਨ",
+    printBill: "ਬਿੱਲ ਪ੍ਰਿੰਟ ਕਰੋ",
+    billHeader: "ਸੇਵਾਮਿਤ੍ਰ - ਪੇਂਡੂ ਟੈਲੀਮੈਡੀਸਿਨ ਪਲੇਟਫਾਰਮ",
+    computerGeneratedBill: "ਇਹ ਇੱਕ ਕੰਪਿਊਟਰ-ਜਨਿਤ ਬਿੱਲ ਹੈ",
+    grandTotal: "ਕੁੱਲ ਜੋੜ"
   }
 };
 

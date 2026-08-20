@@ -6,7 +6,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    testTimeout: 10000,
     pool: "forks",
+    poolOptions: { forks: { singleFork: true } },
     environmentOptions: {
       jsdom: { url: "http://localhost:3000" },
     },

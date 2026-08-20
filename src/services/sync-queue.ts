@@ -126,7 +126,12 @@ export class SyncQueue {
     this.flushing = true;
     try {
       const batch = this.queue.slice(0, 50);
-      const ok = await this.transport(batch);
+      let ok = false;
+      try {
+        ok = await this.transport(batch);
+      } catch {
+        ok = false;
+      }
 
       if (ok) {
         const acked = new Set(batch.map((b) => b.id));

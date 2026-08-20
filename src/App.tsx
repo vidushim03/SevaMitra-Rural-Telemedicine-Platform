@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
@@ -6,18 +6,20 @@ import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { translations } from './components/translations';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppDataProvider } from './contexts/AppDataContext';
-import { Dashboard } from './pages/Dashboard';
-import { Appointments } from './pages/Appointments';
-import { Consultations } from './pages/Consultations';
-import { RecordsPage } from './pages/Records';
-import { PrescriptionsPage } from './pages/Prescriptions';
-import { PaymentsPage } from './pages/Payments';
-import { AdminPage } from './pages/Admin';
-import { LoginPage } from './pages/Login';
-import { SymptomsPage } from './pages/Symptoms';
-import { PharmacyPage } from './pages/Pharmacy';
-import { MedicinesPage } from './pages/Medicines';
-import { VitalsPage } from './pages/Vitals';
+
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const Appointments = lazy(() => import('./pages/Appointments').then(m => ({ default: m.Appointments })));
+const Consultations = lazy(() => import('./pages/Consultations').then(m => ({ default: m.Consultations })));
+const RecordsPage = lazy(() => import('./pages/Records').then(m => ({ default: m.RecordsPage })));
+const PrescriptionsPage = lazy(() => import('./pages/Prescriptions').then(m => ({ default: m.PrescriptionsPage })));
+const PaymentsPage = lazy(() => import('./pages/Payments').then(m => ({ default: m.PaymentsPage })));
+const PaymentAnalyticsPage = lazy(() => import('./pages/PaymentAnalytics').then(m => ({ default: m.PaymentAnalyticsPage })));
+const AdminPage = lazy(() => import('./pages/Admin').then(m => ({ default: m.AdminPage })));
+const LoginPage = lazy(() => import('./pages/Login').then(m => ({ default: m.LoginPage })));
+const SymptomsPage = lazy(() => import('./pages/Symptoms').then(m => ({ default: m.SymptomsPage })));
+const PharmacyPage = lazy(() => import('./pages/Pharmacy').then(m => ({ default: m.PharmacyPage })));
+const MedicinesPage = lazy(() => import('./pages/Medicines').then(m => ({ default: m.MedicinesPage })));
+const VitalsPage = lazy(() => import('./pages/Vitals').then(m => ({ default: m.VitalsPage })));
 
 const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
@@ -66,6 +68,7 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
     { to: '/records', label: 'Records', icon: FileText },
     { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
     { to: '/payments', label: 'Payments', icon: CreditCard },
+    { to: '/payment-analytics', label: 'Analytics', icon: Activity },
     { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
   ],
   admin: [
@@ -79,14 +82,15 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
     { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
     { to: '/vitals', label: 'Vitals', icon: HeartPulse },
     { to: '/payments', label: 'Payments', icon: CreditCard },
+    { to: '/payment-analytics', label: 'Analytics', icon: Activity },
     { to: '/admin', label: 'Admin', icon: Shield },
   ],
 };
 
 const ROLE_ACCESS: Record<string, string[]> = {
   patient: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments'],
-  doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/payments', '/pharmacy'],
-  admin: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments', '/admin'],
+  doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/payments', '/payment-analytics', '/pharmacy'],
+  admin: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments', '/payment-analytics', '/admin'],
 };
 
 function AccessGuard({ path, children }: { path: string; children: React.ReactNode }) {
@@ -156,20 +160,23 @@ function ProtectedApp() {
 
       <main className="flex-1 p-8 overflow-y-auto z-10">
         <div className="animate-in">
-          <Routes>
-            <Route path="/" element={<AccessGuard path="/"><Dashboard /></AccessGuard>} />
-            <Route path="/symptoms" element={<AccessGuard path="/symptoms"><SymptomsPage /></AccessGuard>} />
-            <Route path="/appointments" element={<AccessGuard path="/appointments"><Appointments /></AccessGuard>} />
-            <Route path="/consultations" element={<AccessGuard path="/consultations"><Consultations /></AccessGuard>} />
-            <Route path="/records" element={<AccessGuard path="/records"><RecordsPage /></AccessGuard>} />
-            <Route path="/pharmacy" element={<AccessGuard path="/pharmacy"><PharmacyPage /></AccessGuard>} />
-            <Route path="/medicines" element={<AccessGuard path="/medicines"><MedicinesPage /></AccessGuard>} />
-            <Route path="/vitals" element={<AccessGuard path="/vitals"><VitalsPage /></AccessGuard>} />
-            <Route path="/prescriptions" element={<AccessGuard path="/prescriptions"><PrescriptionsPage /></AccessGuard>} />
-            <Route path="/payments" element={<AccessGuard path="/payments"><PaymentsPage /></AccessGuard>} />
-            <Route path="/admin" element={<AccessGuard path="/admin"><AdminPage /></AccessGuard>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-muted-foreground text-lg">Loading...</div></div>}>
+            <Routes>
+              <Route path="/" element={<AccessGuard path="/"><Dashboard /></AccessGuard>} />
+              <Route path="/symptoms" element={<AccessGuard path="/symptoms"><SymptomsPage /></AccessGuard>} />
+              <Route path="/appointments" element={<AccessGuard path="/appointments"><Appointments /></AccessGuard>} />
+              <Route path="/consultations" element={<AccessGuard path="/consultations"><Consultations /></AccessGuard>} />
+              <Route path="/records" element={<AccessGuard path="/records"><RecordsPage /></AccessGuard>} />
+              <Route path="/pharmacy" element={<AccessGuard path="/pharmacy"><PharmacyPage /></AccessGuard>} />
+              <Route path="/medicines" element={<AccessGuard path="/medicines"><MedicinesPage /></AccessGuard>} />
+              <Route path="/vitals" element={<AccessGuard path="/vitals"><VitalsPage /></AccessGuard>} />
+              <Route path="/prescriptions" element={<AccessGuard path="/prescriptions"><PrescriptionsPage /></AccessGuard>} />
+              <Route path="/payments" element={<AccessGuard path="/payments"><PaymentsPage /></AccessGuard>} />
+              <Route path="/payment-analytics" element={<AccessGuard path="/payment-analytics"><PaymentAnalyticsPage /></AccessGuard>} />
+              <Route path="/admin" element={<AccessGuard path="/admin"><AdminPage /></AccessGuard>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
     </div>
@@ -181,7 +188,7 @@ function AppRouter() {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/login" element={<Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="text-muted-foreground text-lg">Loading...</div></div>}>{user ? <Navigate to="/" replace /> : <LoginPage />}</Suspense>} />
       <Route path="/*" element={<ProtectedApp />} />
     </Routes>
   );
