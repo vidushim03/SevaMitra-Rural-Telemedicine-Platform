@@ -65,6 +65,7 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
     { to: '/appointments', label: 'Appointments', icon: Calendar },
     { to: '/records', label: 'Records', icon: FileText },
     { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
+    { to: '/payments', label: 'Payments', icon: CreditCard },
     { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
   ],
   admin: [
@@ -84,7 +85,7 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
 
 const ROLE_ACCESS: Record<string, string[]> = {
   patient: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments'],
-  doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/pharmacy'],
+  doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/payments', '/pharmacy'],
   admin: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments', '/admin'],
 };
 

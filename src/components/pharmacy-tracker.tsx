@@ -135,8 +135,8 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
       genericName: "Acetaminophen",
       strength: "500mg",
       form: "Tablet",
-      manufacturer: "Cipla",
-      price: "₹25",
+      manufacturer: "Jan Aushadhi",
+      price: 4,
       stocks: {
         1: { quantity: 150, status: "in_stock", lastUpdated: "2024-01-25 10:30" },
         2: { quantity: 25, status: "low_stock", lastUpdated: "2024-01-25 09:45" },
@@ -148,12 +148,12 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
     },
     {
       id: 2,
-      name: "Amoxicillin",
-      genericName: "Amoxicillin",
-      strength: "250mg",
-      form: "Capsule",
-      manufacturer: "Sun Pharma",
-      price: "₹45",
+      name: "Cetirizine",
+      genericName: "Cetirizine HCl",
+      strength: "10mg",
+      form: "Tablet",
+      manufacturer: "Jan Aushadhi",
+      price: 3,
       stocks: {
         1: { quantity: 80, status: "in_stock", lastUpdated: "2024-01-25 11:00" },
         2: { quantity: 5, status: "low_stock", lastUpdated: "2024-01-25 10:15" },
@@ -169,8 +169,8 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
       genericName: "Amlodipine Besylate",
       strength: "5mg",
       form: "Tablet",
-      manufacturer: "Ranbaxy",
-      price: "₹35",
+      manufacturer: "Jan Aushadhi",
+      price: 8,
       stocks: {
         1: { quantity: 200, status: "in_stock", lastUpdated: "2024-01-25 12:00" },
         2: { quantity: 60, status: "in_stock", lastUpdated: "2024-01-25 11:30" },
@@ -182,12 +182,12 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
     },
     {
       id: 4,
-      name: "Insulin Glargine",
-      genericName: "Insulin Glargine",
-      strength: "100IU/ml",
-      form: "Injection",
-      manufacturer: "Sanofi",
-      price: "₹1250",
+      name: "Amoxicillin",
+      genericName: "Amoxicillin",
+      strength: "500mg",
+      form: "Capsule",
+      manufacturer: "Jan Aushadhi",
+      price: 32,
       stocks: {
         1: { quantity: 12, status: "low_stock", lastUpdated: "2024-01-25 09:00" },
         2: { quantity: 0, status: "out_of_stock", lastUpdated: "2024-01-24 16:00" },
@@ -725,7 +725,7 @@ export function PharmacyTracker({ language }: PharmacyTrackerProps) {
                               </div>
                               
                               <div className="text-right">
-                                <p className="text-lg font-medium">{medicine.price}</p>
+                                <p className="text-lg font-medium">₹{medicine.price}</p>
                                 <Badge className={`gap-1 ${getStatusColor(stock?.status || 'out_of_stock')}`}>
                                   {getStatusIcon(stock?.status || 'out_of_stock')}
                                   {getStatusText(stock?.status || 'out_of_stock')}

@@ -22,7 +22,7 @@ export interface Medicine {
   strength: string;
   form: string;
   manufacturer: string;
-  price: string;
+  price: number;
   stocks: Record<number, MedicineStock>;
 }
 
@@ -89,6 +89,7 @@ export const pharmacies: PharmacyLocation[] = [
   },
 ];
 
+// Medicine prices based on Jan Aushadhi (Pradhan Mantri Bhartiya Jan Aushadhi Pariyojana)
 export const medicines: Medicine[] = [
   {
     id: 1,
@@ -96,32 +97,32 @@ export const medicines: Medicine[] = [
     genericName: 'Acetaminophen',
     strength: '500mg',
     form: 'Tablet',
-    manufacturer: 'Cipla',
-    price: '₹25',
+    manufacturer: 'Jan Aushadhi',
+    price: '₹4',
     stocks: {
-      1: { quantity: 150, status: 'in_stock', lastUpdated: '2024-01-25 10:30' },
-      2: { quantity: 25, status: 'low_stock', lastUpdated: '2024-01-25 09:45' },
-      3: { quantity: 0, status: 'out_of_stock', lastUpdated: '2024-01-24 18:00' },
-      4: { quantity: 80, status: 'in_stock', lastUpdated: '2024-01-25 11:15' },
-      5: { quantity: 40, status: 'in_stock', lastUpdated: '2024-01-25 10:45' },
-      6: { quantity: 15, status: 'low_stock', lastUpdated: '2024-01-25 09:30' },
+      1: { quantity: 500, status: 'in_stock', lastUpdated: '2026-08-18 10:30' },
+      2: { quantity: 300, status: 'in_stock', lastUpdated: '2026-08-18 09:45' },
+      3: { quantity: 0, status: 'out_of_stock', lastUpdated: '2026-08-17 18:00' },
+      4: { quantity: 200, status: 'in_stock', lastUpdated: '2026-08-18 11:15' },
+      5: { quantity: 80, status: 'in_stock', lastUpdated: '2026-08-18 10:45' },
+      6: { quantity: 30, status: 'low_stock', lastUpdated: '2026-08-18 09:30' },
     },
   },
   {
     id: 2,
-    name: 'Amoxicillin',
-    genericName: 'Amoxicillin',
-    strength: '250mg',
-    form: 'Capsule',
-    manufacturer: 'Sun Pharma',
-    price: '₹45',
+    name: 'Cetirizine',
+    genericName: 'Cetirizine HCl',
+    strength: '10mg',
+    form: 'Tablet',
+    manufacturer: 'Jan Aushadhi',
+    price: '₹3',
     stocks: {
-      1: { quantity: 80, status: 'in_stock', lastUpdated: '2024-01-25 11:00' },
-      2: { quantity: 5, status: 'low_stock', lastUpdated: '2024-01-25 10:15' },
-      3: { quantity: 20, status: 'in_stock', lastUpdated: '2024-01-25 08:30' },
-      4: { quantity: 60, status: 'in_stock', lastUpdated: '2024-01-25 12:00' },
-      5: { quantity: 10, status: 'low_stock', lastUpdated: '2024-01-25 11:30' },
-      6: { quantity: 35, status: 'in_stock', lastUpdated: '2024-01-25 10:00' },
+      1: { quantity: 400, status: 'in_stock', lastUpdated: '2026-08-18 11:00' },
+      2: { quantity: 150, status: 'in_stock', lastUpdated: '2026-08-18 10:15' },
+      3: { quantity: 60, status: 'in_stock', lastUpdated: '2026-08-18 08:30' },
+      4: { quantity: 250, status: 'in_stock', lastUpdated: '2026-08-18 12:00' },
+      5: { quantity: 40, status: 'low_stock', lastUpdated: '2026-08-18 11:30' },
+      6: { quantity: 100, status: 'in_stock', lastUpdated: '2026-08-18 10:00' },
     },
   },
   {
@@ -130,32 +131,32 @@ export const medicines: Medicine[] = [
     genericName: 'Amlodipine Besylate',
     strength: '5mg',
     form: 'Tablet',
-    manufacturer: 'Ranbaxy',
-    price: '₹35',
+    manufacturer: 'Jan Aushadhi',
+    price: '₹8',
     stocks: {
-      1: { quantity: 200, status: 'in_stock', lastUpdated: '2024-01-25 12:00' },
-      2: { quantity: 60, status: 'in_stock', lastUpdated: '2024-01-25 11:30' },
-      3: { quantity: 10, status: 'low_stock', lastUpdated: '2024-01-25 07:45' },
-      4: { quantity: 120, status: 'in_stock', lastUpdated: '2024-01-25 11:45' },
-      5: { quantity: 25, status: 'low_stock', lastUpdated: '2024-01-25 10:15' },
-      6: { quantity: 90, status: 'in_stock', lastUpdated: '2024-01-25 09:00' },
+      1: { quantity: 300, status: 'in_stock', lastUpdated: '2026-08-18 12:00' },
+      2: { quantity: 200, status: 'in_stock', lastUpdated: '2026-08-18 11:30' },
+      3: { quantity: 20, status: 'low_stock', lastUpdated: '2026-08-18 07:45' },
+      4: { quantity: 180, status: 'in_stock', lastUpdated: '2026-08-18 11:45' },
+      5: { quantity: 60, status: 'in_stock', lastUpdated: '2026-08-18 10:15' },
+      6: { quantity: 120, status: 'in_stock', lastUpdated: '2026-08-18 09:00' },
     },
   },
   {
     id: 4,
-    name: 'Insulin Glargine',
-    genericName: 'Insulin Glargine',
-    strength: '100IU/ml',
-    form: 'Injection',
-    manufacturer: 'Sanofi',
-    price: '₹1250',
+    name: 'Amoxicillin',
+    genericName: 'Amoxicillin',
+    strength: '500mg',
+    form: 'Capsule',
+    manufacturer: 'Jan Aushadhi',
+    price: '₹32',
     stocks: {
-      1: { quantity: 12, status: 'low_stock', lastUpdated: '2024-01-25 09:00' },
-      2: { quantity: 0, status: 'out_of_stock', lastUpdated: '2024-01-24 16:00' },
-      3: { quantity: 8, status: 'low_stock', lastUpdated: '2024-01-25 10:00' },
-      4: { quantity: 15, status: 'in_stock', lastUpdated: '2024-01-25 08:30' },
-      5: { quantity: 3, status: 'low_stock', lastUpdated: '2024-01-25 07:00' },
-      6: { quantity: 0, status: 'out_of_stock', lastUpdated: '2024-01-24 20:00' },
+      1: { quantity: 200, status: 'in_stock', lastUpdated: '2026-08-18 09:00' },
+      2: { quantity: 0, status: 'out_of_stock', lastUpdated: '2026-08-16 16:00' },
+      3: { quantity: 80, status: 'in_stock', lastUpdated: '2026-08-18 10:00' },
+      4: { quantity: 150, status: 'in_stock', lastUpdated: '2026-08-18 08:30' },
+      5: { quantity: 10, status: 'low_stock', lastUpdated: '2026-08-18 07:00' },
+      6: { quantity: 60, status: 'in_stock', lastUpdated: '2026-08-18 09:00' },
     },
   },
 ];

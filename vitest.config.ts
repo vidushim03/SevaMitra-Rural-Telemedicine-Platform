@@ -6,10 +6,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    pool: "threads",
-    poolOptions: {
-      threads: { singleThread: true },
-    },
+    pool: "forks",
     environmentOptions: {
       jsdom: { url: "http://localhost:3000" },
     },
