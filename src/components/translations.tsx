@@ -12,6 +12,8 @@ export const translations = {
     dashboard: "Dashboard",
     appointments: "Appointments",
     patients: "Patients",
+    doctors: "Doctors",
+    payments: "Payments",
     manageAppointments: "Manage your upcoming and past appointments.",
 
     // Authentication
@@ -714,6 +716,8 @@ export const translations = {
     dashboard: "डैशबोर्ड",
     appointments: "अपॉइंटमेंट",
     patients: "मरीज",
+    doctors: "डॉक्टर",
+    payments: "भुगतान",
     manageAppointments: "अपने आगामी और पिछले अपॉइंटमेंट प्रबंधित करें।",
     
     // Authentication
@@ -1413,6 +1417,8 @@ export const translations = {
     dashboard: "ਡੈਸ਼ਬੋਰਡ",
     appointments: "ਮੁਲਾਕਾਤਾਂ",
     patients: "ਮਰੀਜ਼",
+    doctors: "ਡਾਕਟਰ",
+    payments: "ਭੁਗਤਾਨ",
     manageAppointments: "ਆਪਣੀਆ ਆਗਾਮੀ ਅਤੇ ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ।",
     
     // Authentication
