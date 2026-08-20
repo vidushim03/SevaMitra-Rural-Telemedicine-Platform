@@ -36,7 +36,6 @@ export const translations = {
     // Home
     welcome: "Welcome to SevaMitra",
     subtitle: "Healthcare at your fingertips",
-    quickActions: "Quick Actions",
     
     // Consultation
     bookConsultation: "Book Consultation",
@@ -58,18 +57,15 @@ export const translations = {
     todaysDoses: "Today's Doses",
     myMedicines: "My Medicines",
     history: "History",
-    todaysSchedule: "Today's Schedule",
     taken: "Taken",
     markTaken: "Mark Taken",
     takenAt: "taken at",
     active: "Active",
-    completed: "Completed",
     compliance: "Compliance",
     missed: "Missed",
     nextDose: "Next dose at",
     addNewMedicine: "Add New Medicine",
     medicineName: "Medicine Name",
-    duration: "Duration",
     instructions: "Instructions",
     selectMedicine: "Select a Medicine",
     clickMedicine: "Click on a medicine to view its details",
@@ -123,7 +119,6 @@ export const translations = {
     punjabi: "Punjabi",
     
     // Experience
-    years: "years",
     
     // Symptom Checker
     quickSymptomSelection: "Quick Symptom Selection",
@@ -199,22 +194,16 @@ export const translations = {
     addRecord: "Add Record",
     offline: "Offline",
     recordDetails: "Record Details",
-    overview: "Overview",
     treatment: "Treatment",
     date: "Date",
     doctor: "Doctor",
     diagnosis: "Diagnosis",
-    symptoms: "Symptoms",
-    bloodPressure: "Blood Pressure",
     testResults: "Test Results",
     notes: "Notes",
     followUp: "Follow-up",
     noPrescriptionAvailable: "No prescription available",
     selectRecord: "Select a Record",
     clickRecordToView: "Click on a record to view its details",
-    dosage: "Dosage",
-    frequency: "Frequency",
-    duration: "Duration",
     
     // Medical Conditions & Diagnoses
     commonColdDiagnosis: "Common Cold",
@@ -341,7 +330,42 @@ export const translations = {
     noRecordsMessage: "No patient records match your current search criteria.",
     viewDetailedRecords: "View Detailed Patient Records",
     accessPatientRecords: "Access comprehensive patient records and consultation history",
-    openRecords: "Open Records"
+    openRecords: "Open Records",
+
+    // Billing & Payments
+    bills: "Bills",
+    myBills: "My Bills",
+    allBills: "All Bills & Payments",
+    createBill: "Create Bill",
+    billCreated: "Bill created successfully",
+    billDetails: "Bill Details",
+    consultationFee: "Consultation Fee",
+    medicineTotal: "Medicine Total",
+    billTotal: "Total",
+    pending: "Pending",
+    paid: "Paid",
+    failed: "Failed",
+    markPaid: "Mark Paid",
+    markPaidCash: "Mark Paid (Cash)",
+    payNow: "Pay Now (UPI)",
+    payAtCounter: "Pay at Counter",
+    noBillsFound: "No bills found",
+    addMedicineToBill: "Add Medicine",
+    removeMedicine: "Remove",
+    totalCollected: "Total collected",
+    totalPending: "Pending",
+    billId: "Bill ID",
+    selectMedicineForBill: "Select a Medicine",
+    billQuantity: "Qty",
+    unitPrice: "Price",
+    lineTotal: "Total",
+    billNotesLabel: "Notes",
+    billNotes: "Notes (optional)",
+    doctorCreateBill: "Doctor creates bill after consultation",
+    patientPaysBill: "Patient views and pays bills",
+    govtRate: "Govt Hospital Rate",
+    janAushadhiPrice: "Jan Aushadhi Price",
+    pricePerUnit: "per unit"
   },
   hi: {
     // Navigation
@@ -353,9 +377,6 @@ export const translations = {
     pharmacy: "फार्मेसी खोजें",
     notifications: "सूचनाएं",
     healthWorker: "स्वास्थ्य कार्यकर्ता मोड",
-    dashboard: "डैशबोर्ड",
-    appointments: "अपॉइंटमेंट",
-    patients: "मरीज",
     dashboard: "डैशबोर्ड",
     appointments: "अपॉइंटमेंट",
     patients: "मरीज",
@@ -375,7 +396,6 @@ export const translations = {
     save: "सहेजें",
     next: "आगे",
     back: "वापस",
-    emergency: "आपातकाल",
     search: "खोजें",
     quantity: "मात्रा",
     lastUpdated: "अंतिम बार अपडेट",
@@ -383,10 +403,8 @@ export const translations = {
     // Home
     welcome: "टेलीमेड में आपका स्वागत है",
     subtitle: "स्वास्थ्य सेवा, बस एक क्लिक दूर",
-    quickActions: "त्वरित कार्य",
     
     // Consultation
-    bookConsultation: "सलाह करें",
     startVideo: "वीडियो कॉल शुरू करें",
     useAudio: "केवल ऑडियो का उपयोग करें",
     doctorAvailable: "डॉक्टर उपलब्ध",
@@ -399,24 +417,19 @@ export const translations = {
     // Medicine
     takeMedicine: "दवा लें",
     medicineReminder: "दवा अनुस्मारक",
-    dosage: "खुराक",
-    frequency: "आवृत्ति",
     addMedicine: "दवा जोड़ें",
     todaysDoses: "आज की खुराक",
     myMedicines: "मेरी दवाएं",
     history: "इतिहास",
-    todaysSchedule: "आज का कार्यक्रम",
     taken: "लिया गया",
     markTaken: "लिया हुआ अंकित करें",
     takenAt: "पर लिया गया",
     active: "सक्रिय",
-    completed: "पूर्ण",
     compliance: "अनुपालन",
     missed: "छूट गया",
     nextDose: "अगली खुराक",
     addNewMedicine: "नई दवा जोड़ें",
     medicineName: "दवा का नाम",
-    duration: "अवधि",
     instructions: "निर्देश",
     selectMedicine: "दवा चुनें",
     clickMedicine: "विवरण देखने के लिए दवा पर क्लिक करें",
@@ -443,7 +456,6 @@ export const translations = {
     // Health Worker
     patientEntry: "रोगी प्रविष्टि",
     voiceNote: "ध्वनि नोट",
-    offlineMode: "ऑफलाइन मोड",
     
     // Doctor Consultation
     goodConnection: "अच्छा कनेक्शन",
@@ -470,7 +482,6 @@ export const translations = {
     punjabi: "पंजाबी",
     
     // Experience
-    years: "साल",
     
     // Symptom Checker
     quickSymptomSelection: "त्वरित लक्षण चयन",
@@ -546,13 +557,10 @@ export const translations = {
     addRecord: "रिकॉर्ड जोड़ें",
     offline: "ऑफलाइन",
     recordDetails: "रिकॉर्ड विवरण",
-    overview: "सिंहावलोकन",
     treatment: "उपचार",
     date: "तारीख",
     doctor: "डॉक्टर",
     diagnosis: "निदान",
-    symptoms: "लक्षण",
-    bloodPressure: "रक्तचाप",
     testResults: "टेस्ट परिणाम",
     notes: "नोट्स",
     followUp: "फॉलो-अप",
@@ -561,7 +569,6 @@ export const translations = {
     clickRecordToView: "विवरण देखने के लिए रिकॉर्ड पर क्लिक करें",
     dosage: "खुराक",
     frequency: "आवृत्ति",
-    duration: "अवधि",
     
     // Medical Conditions & Diagnoses
     commonColdDiagnosis: "सामान्य सर्दी",
@@ -688,7 +695,42 @@ export const translations = {
     noRecordsMessage: "कोई भी मरीज़ रिकॉर्ड आपके वर्तमान खोज मानदंडों से मेल नहीं खाता।",
     viewDetailedRecords: "विस्तृत मरीज़ रिकॉर्ड देखें",
     accessPatientRecords: "व्यापक मरीज़ रिकॉर्ड और परामर्श इतिहास तक पहुंच",
-    openRecords: "रिकॉर्ड खोलें"
+    openRecords: "रिकॉर्ड खोलें",
+
+    // Billing & Payments
+    bills: "बिल",
+    myBills: "मेरे बिल",
+    allBills: "सभी बिल और भुगतान",
+    createBill: "बिल बनाएं",
+    billCreated: "बिल सफलतापूर्वक बनाया गया",
+    billDetails: "बिल विवरण",
+    consultationFee: "परामर्श शुल्क",
+    medicineTotal: "दवा कुल",
+    billTotal: "कुल",
+    pending: "लंबित",
+    paid: "भुगतान किया",
+    failed: "विफल",
+    markPaid: "भुगतान चिन्हित करें",
+    markPaidCash: "नकद भुगतान चिन्हित करें",
+    payNow: "अभी भुगतान करें (UPI)",
+    payAtCounter: "काउंटर पर भुगतान करें",
+    noBillsFound: "कोई बिल नहीं मिला",
+    addMedicineToBill: "दवा जोड़ें",
+    removeMedicine: "हटाएं",
+    totalCollected: "कुल संग्रह",
+    totalPending: "लंबित",
+    billId: "बिल आईडी",
+    selectMedicineForBill: "दवा चुनें",
+    billQuantity: "मात्रा",
+    unitPrice: "मूल्य",
+    lineTotal: "कुल",
+    billNotesLabel: "नोट्स",
+    billNotes: "नोट्स (वैकल्पिक)",
+    doctorCreateBill: "डॉक्टर परामर्श के बाद बिल बनाता है",
+    patientPaysBill: "मरीज़ बिल देखता है और भुगतान करता है",
+    govtRate: "सरकारी अस्पताल दर",
+    janAushadhiPrice: "जन औषधि मूल्य",
+    pricePerUnit: "प्रति इकाई"
   },
   pa: {
     // Navigation
@@ -700,9 +742,6 @@ export const translations = {
     pharmacy: "ਫਾਰਮੇਸੀ ਖੋਜੋ",
     notifications: "ਸੂਚਨਾਵਾਂ",
     healthWorker: "ਸਿਹਤ ਕਰਮਚਾਰੀ ਮੋਡ",
-    dashboard: "ਡੈਸ਼ਬੋਰਡ",
-    appointments: "ਮੁਲਾਕਾਤਾਂ",
-    patients: "ਮਰੀਜ਼",
     dashboard: "ਡੈਸ਼ਬੋਰਡ",
     appointments: "ਮੁਲਾਕਾਤਾਂ",
     patients: "ਮਰੀਜ਼",
@@ -722,7 +761,6 @@ export const translations = {
     save: "ਸੇਵ ਕਰੋ",
     next: "ਅੱਗੇ",
     back: "ਵਾਪਸ",
-    emergency: "ਐਮਰਜੈਂਸੀ",
     search: "ਖੋਜੋ",
     quantity: "ਮਾਤਰਾ",
     lastUpdated: "ਆਖਰੀ ਅਪਡੇਟ",
@@ -730,10 +768,8 @@ export const translations = {
     // Home
     welcome: "ਟੇਲੀਮੈਡ ਵਿਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ",
     subtitle: "ਤੁਹਾਡੀ ਹਥੇਲੀ ਵਿਚ ਸਿਹਤ ਸੇਵਾ",
-    quickActions: "ਤੇਜ਼ ਕਾਰਵਾਈਆਂ",
     
     // Consultation
-    bookConsultation: "ਸਲਾਹ ਬੁੱਕ ਕਰੋ",
     startVideo: "ਵੀਡੀਓ ਕਾਲ ਸ਼ਰੂ ਕਰੋ",
     useAudio: "ਸਿਰਫ਼ ਆਡੀਓ ਵਰਤੋ",
     doctorAvailable: "ਡਾਕਟਰ ਉਪਲਬਧ",
@@ -746,24 +782,19 @@ export const translations = {
     // Medicine
     takeMedicine: "ਦਵਾਈ ਲਓ",
     medicineReminder: "ਦਵਾਈ ਯਾਦਦਾਸ਼ਤ",
-    dosage: "ਖੁਰਾਕ",
-    frequency: "ਬਾਰੰਬਾਰਤਾ",
     addMedicine: "ਦਵਾਈ ਜੋੜੋ",
     todaysDoses: "ਅੱਜ ਦੀਆਂ ਖੁਰਾਕਾਂ",
     myMedicines: "ਮੇਰੀਆਂ ਦਵਾਈਆਂ",
     history: "ਇਤਿਹਾਸ",
-    todaysSchedule: "ਅੱਜ ਦਾ ਸਮਾਂ ਸਾਰਣੀ",
     taken: "ਲਿਆ ਗਿਆ",
     markTaken: "ਲਿਆ ਹੋਇਆ ਮਾਰਕ ਕਰੋ",
     takenAt: "ਤੇ ਲਿਆ ਗਿਆ",
     active: "ਸਰਗਰਮ",
-    completed: "ਪੂਰਾ",
     compliance: "ਪਾਲਣਾ",
     missed: "ਛੁਟਿਆ",
     nextDose: "ਅਗਲੀ ਖੁਰਾਕ",
     addNewMedicine: "ਨਵੀਂ ਦਵਾਈ ਜੋੜੋ",
     medicineName: "ਦਵਾਈ ਦਾ ਨਾਮ",
-    duration: "ਮਿਆਦ",
     instructions: "ਹਦਾਇਤਾਂ",
     selectMedicine: "ਦਵਾਈ ਚੁਣੋ",
     clickMedicine: "ਵੇਰਵੇ ਵੇਖਣ ਲਈ ਦਵਾਈ ਤੇ ਕਲਿਕ ਕਰੋ",
@@ -790,7 +821,6 @@ export const translations = {
     // Health Worker
     patientEntry: "ਮਰੀਜ਼ ਦਰਜ",
     voiceNote: "ਅਵਾਜ਼ ਨੋਟ",
-    offlineMode: "ਔਫਲਾਈਨ ਮੋਡ",
     
     // Doctor Consultation
     goodConnection: "ਚੰਗਾ ਕਨੈਕਸ਼ਨ",
@@ -816,8 +846,6 @@ export const translations = {
     english: "ਅੰਗਰੇਜ਼ੀ",
     punjabi: "ਪੰਜਾਬੀ",
     
-    // Experience
-    years: "ਸਾਲ",
     
     // Symptom Checker
     quickSymptomSelection: "ਤੇਜ਼ ਲੱਛਣ ਚੁਣੋ",
@@ -893,13 +921,10 @@ export const translations = {
     addRecord: "ਰਿਕਾਰਡ ਜੋੜੋ",
     offline: "ਔਫਲਾਈਨ",
     recordDetails: "ਰਿਕਾਰਡ ਵੇਰਵਾ",
-    overview: "ਸਾਰ",
     treatment: "ਇਲਾਜ",
     date: "ਤਾਰੀਖ",
     doctor: "ਡਾਕਟਰ",
     diagnosis: "ਨਿਦਾਨ",
-    symptoms: "ਲੱਛਣ",
-    bloodPressure: "ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ",
     testResults: "ਟੈਸਟ ਨਤੀਜੇ",
     notes: "ਨੋਟਸ",
     followUp: "ਫਾਲੋ-ਅੱਪ",
@@ -908,7 +933,6 @@ export const translations = {
     clickRecordToView: "ਵੇਰਵਾ ਵੇਖਣ ਲਈ ਰਿਕਾਰਡ 'ਤੇ ਕਲਿੱਕ ਕਰੋ",
     dosage: "ਖੁਰਾਕ",
     frequency: "ਬਾਰੰਬਾਰਤਾ",
-    duration: "ਮਿਆਦ",
     
     // Medical Conditions & Diagnoses
     commonColdDiagnosis: "ਆਮ ਜ਼ੁਕਾਮ",
@@ -1035,7 +1059,42 @@ export const translations = {
     noRecordsMessage: "ਕੋਈ ਵੀ ਮਰੀਜ਼ ਰਿਕਾਰਡ ਤੁਹਾਡੇ ਮੌਜੂਦਾ ਖੋਜ ਮਾਪਦੰਡਾਂ ਨਾਲ ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ।",
     viewDetailedRecords: "ਵਿਸਤ੍ਰਿਤ ਮਰੀਜ਼ ਰਿਕਾਰਡ ਵੇਖੋ",
     accessPatientRecords: "ਵਿਆਪਕ ਮਰੀਜ਼ ਰਿਕਾਰਡ ਅਤੇ ਸਲਾਹ ਇਤਿਹਾਸ ਤੱਕ ਪਹੁੰਚ",
-    openRecords: "ਰਿਕਾਰਡ ਖੋਲ੍ਹੋ"
+    openRecords: "ਰਿਕਾਰਡ ਖੋਲ੍ਹੋ",
+
+    // Billing & Payments
+    bills: "ਬਿੱਲ",
+    myBills: "ਮੇਰੇ ਬਿੱਲ",
+    allBills: "ਸਾਰੇ ਬਿੱਲ ਅਤੇ ਭੁਗਤਾਨ",
+    createBill: "ਬਿੱਲ ਬਣਾਓ",
+    billCreated: "ਬਿੱਲ ਸਫਲਤਾਪੂਰਵਕ ਬਣਾਇਆ ਗਿਆ",
+    billDetails: "ਬਿੱਲ ਵੇਰਵਾ",
+    consultationFee: "ਸਲਾਹ ਫੀਸ",
+    medicineTotal: "ਦਵਾ ਕੁੱਲ",
+    billTotal: "ਕੁੱਲ",
+    pending: "ਲੰਬਿਤ",
+    paid: "ਭੁਗਤਾਨ ਕੀਤਾ",
+    failed: "ਅਸਫਲ",
+    markPaid: "ਭੁਗਤਾਨ ਚਿੰਨ੍ਹਿਤ ਕਰੋ",
+    markPaidCash: "ਨਕਦ ਭੁਗਤਾਨ ਚਿੰਨ੍ਹਿਤ ਕਰੋ",
+    payNow: "ਹੁਣੇ ਭੁਗਤਾਨ ਕਰੋ (UPI)",
+    payAtCounter: "ਕਾਊਂਟਰ 'ਤੇ ਭੁਗਤਾਨ ਕਰੋ",
+    noBillsFound: "ਕੋਈ ਬਿੱਲ ਨਹੀਂ ਮਿਲਿਆ",
+    addMedicineToBill: "ਦਵਾ ਸ਼ਾਮਲ ਕਰੋ",
+    removeMedicine: "ਹਟਾਓ",
+    totalCollected: "ਕੁੱਲ ਇਕੱਠਾ",
+    totalPending: "ਲੰਬਿਤ",
+    billId: "ਬਿੱਲ ਆਈਡੀ",
+    selectMedicineForBill: "ਦਵਾ ਚੁਣੋ",
+    billQuantity: "ਮਾਤਰਾ",
+    unitPrice: "ਮੁੱਲ",
+    lineTotal: "ਕੁੱਲ",
+    billNotesLabel: "ਨੋਟਸ",
+    billNotes: "ਨੋਟਸ (ਵਿਕਲਪਕ)",
+    doctorCreateBill: "ਡਾਕਟਰ ਸਲਾਹ ਤੋਂ ਬਾਅਦ ਬਿੱਲ ਬਣਾਉਂਦਾ ਹੈ",
+    patientPaysBill: "ਮਰੀਜ਼ ਬਿੱਲ ਵੇਖਦਾ ਹੈ ਅਤੇ ਭੁਗਤਾਨ ਕਰਦਾ ਹੈ",
+    govtRate: "ਸਰਕਾਰੀ ਹਸਪਤਾਲ ਦਰ",
+    janAushadhiPrice: "ਜਨ ਔਸ਼ਧੀ ਮੁੱਲ",
+    pricePerUnit: "ਪ੍ਰਤੀ ਇਕਾਈ"
   }
 };
 

@@ -746,6 +746,11 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                     <div className="animate-in delay-200">
                       <PrescriptionBuilder
                         patientName={selectedPatient.name}
+                        patientId={selectedPatient.id}
+                        doctorId={user.id}
+                        doctorName={user.name}
+                        specialty={(user as any).specialty ?? 'General Physician'}
+                        appointmentId={data.appointments.find(a => a.patientId === selectedPatient.id && a.doctorId === user.id)?.id}
                         language={language}
                       />
                     </div>

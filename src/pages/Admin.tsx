@@ -4,9 +4,9 @@ import { useAppData } from '../contexts/AppDataContext';
 import { AdminAnalytics } from '../components/admin-analytics';
 import { OperationsAnalytics } from '../components/operations-analytics';
 import { SessionUser, UserRole } from '../types/app';
-import { Users, Stethoscope, UserCheck, BarChart3, Calendar, FileText, Trash2, Plus, X } from 'lucide-react';
+import { Users, Stethoscope, UserCheck, BarChart3, Calendar, FileText, Trash2, Plus, X, CreditCard, IndianRupee, CheckCircle, Clock } from 'lucide-react';
 
-type Tab = 'analytics' | 'doctors' | 'patients' | 'appointments' | 'records';
+type Tab = 'analytics' | 'doctors' | 'patients' | 'appointments' | 'records' | 'payments';
 
 const SPECIALTIES = [
   'General Physician',
@@ -23,7 +23,7 @@ const SPECIALTIES = [
 
 export function AdminPage() {
   const { user } = useAuth();
-  const { data, doctors, patients, addUser, removeUser, updateAppointmentStatus } = useAppData();
+  const { data, doctors, patients, addUser, removeUser, updateAppointmentStatus, markPayment } = useAppData();
   const [tab, setTab] = useState<Tab>('analytics');
 
   // Add Doctor form state
@@ -76,6 +76,7 @@ export function AdminPage() {
     { id: 'patients', label: `Patients (${patients.length})`, icon: UserCheck },
     { id: 'appointments', label: `Appointments (${data.appointments.length})`, icon: Calendar },
     { id: 'records', label: `Records (${data.records.length})`, icon: FileText },
+    { id: 'payments', label: `Payments (${data.payments.length})`, icon: CreditCard },
   ];
 
   return (
@@ -334,6 +335,76 @@ export function AdminPage() {
                       <td className="p-3 text-muted-foreground">{new Date(r.date).toLocaleDateString()}</td>
                       <td className="p-3 font-medium">{r.diagnosis}</td>
                       <td className="p-3 text-muted-foreground max-w-xs truncate">{r.notes}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Payments Tab */}
+      {tab === 'payments' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold">All Bills & Payments</h3>
+            <div className="flex gap-3">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <IndianRupee size={14} />
+                Total collected: ₹{data.payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0)}
+              </span>
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Clock size={14} />
+                Pending: ₹{data.payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0)}
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr>
+                  <th className="p-3 text-left">Bill ID</th>
+                  <th className="p-3 text-left">Patient</th>
+                  <th className="p-3 text-left">Doctor</th>
+                  <th className="p-3 text-left">Consultation</th>
+                  <th className="p-3 text-left">Medicines</th>
+                  <th className="p-3 text-left">Total</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.payments.length === 0 && (
+                  <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No bills yet.</td></tr>
+                )}
+                {data.payments.map(p => {
+                  const patName = data.users.find(u => u.id === p.patientId)?.name || p.patientId;
+                  const drName = data.users.find(u => u.id === p.doctorId)?.name || p.doctorId;
+                  return (
+                    <tr key={p.id} className="border-t">
+                      <td className="p-3 font-mono text-xs">{p.id}</td>
+                      <td className="p-3 font-medium">{patName}</td>
+                      <td className="p-3">{drName}</td>
+                      <td className="p-3">₹{p.consultationFee}</td>
+                      <td className="p-3">₹{p.medicineTotal}</td>
+                      <td className="p-3 font-bold">₹{p.amount}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${
+                          p.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                          p.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                          p.status === 'failed' ? 'bg-rose-100 text-rose-700' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>{p.status}</span>
+                      </td>
+                      <td className="p-3 flex gap-1">
+                        {p.status === 'pending' && (
+                          <>
+                            <button onClick={() => markPayment(p.id, 'paid')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">Mark Paid</button>
+                            <button onClick={() => markPayment(p.id, 'failed')} className="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-xs">Fail</button>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}

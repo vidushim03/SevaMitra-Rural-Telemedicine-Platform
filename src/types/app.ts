@@ -5,6 +5,8 @@ export interface SessionUser {
   name: string;
   role: UserRole;
   email: string;
+  specialty?: string;
+  consultationFee?: number;
 }
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'in-progress';
@@ -61,14 +63,26 @@ export interface Prescription {
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
+export interface BillLineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 export interface Payment {
   id: string;
   appointmentId: string;
   patientId: string;
+  doctorId: string;
+  consultationFee: number;
+  medicineTotal: number;
   amount: number;
+  lineItems: BillLineItem[];
   status: PaymentStatus;
   method: 'upi' | 'card' | 'cash' | 'wallet';
   date: string;
+  notes?: string;
 }
 
 export interface ChatMessage {
