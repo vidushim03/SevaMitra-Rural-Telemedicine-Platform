@@ -1,28 +1,40 @@
-﻿import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAppData } from '../contexts/AppDataContext';
 import { UserRole } from '../types/app';
 import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../components/translations';
 
-const DEMO_USERS: { role: UserRole; name: string; email: string }[] = [
-  { role: 'patient', name: 'Rohan Verma', email: 'rohan@demo.com' },
-  { role: 'doctor', name: 'Dr. Priya Sharma', email: 'priya@demo.com' },
-  { role: 'admin', name: 'System Admin', email: 'admin@demo.com' },
-];
-
 export function LoginPage() {
   const { login } = useAuth();
+  const { data } = useAppData();
   const { language } = useLanguage();
   const t = translations[language];
-  const [name, setName] = useState('Rohan Verma');
-  const [email, setEmail] = useState('rohan@demo.com');
-  const [role, setRole] = useState<UserRole>('patient');
 
-  const submit = (n: string, e: string, r: UserRole) => login({ name: n, email: e, role: r });
+  const [role, setRole] = useState<UserRole>('doctor');
+  
+  // Get all users for the currently selected role
+  const roleUsers = data.users.filter(u => u.role === role);
+  
+  // Default to the first user in that role if available
+  const [selectedUserId, setSelectedUserId] = useState(roleUsers.length > 0 ? roleUsers[0].id : '');
+
+  useEffect(() => {
+    // When role changes, update the selected user to the first one in the new role
+    const newRoleUsers = data.users.filter(u => u.role === role);
+    if (newRoleUsers.length > 0) {
+      setSelectedUserId(newRoleUsers[0].id);
+    } else {
+      setSelectedUserId('');
+    }
+  }, [role, data.users]);
 
   const onSubmit = (ev: FormEvent) => {
     ev.preventDefault();
-    submit(name, email, role);
+    const user = data.users.find(u => u.id === selectedUserId);
+    if (user) {
+      login({ name: user.name, email: user.email || `${user.id}@demo.com`, role: user.role });
+    }
   };
 
   return (
@@ -33,16 +45,6 @@ export function LoginPage() {
           <p className="text-white/70 text-sm">{t.signInDescription}</p>
 
           <div className="space-y-2">
-            <label className="text-sm">{t.name}</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl bg-white/10 border border-white/25 px-4 py-3 outline-none" required />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm">{t.email}</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl bg-white/10 border border-white/25 px-4 py-3 outline-none" required />
-          </div>
-
-          <div className="space-y-2">
             <label className="text-sm">{t.role}</label>
             <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} className="w-full rounded-xl bg-slate-900 border border-white/25 px-4 py-3 outline-none">
               <option value="patient">{t.patient}</option>
@@ -51,26 +53,27 @@ export function LoginPage() {
             </select>
           </div>
 
-          <button type="submit" className="w-full rounded-xl bg-blue-500 hover:bg-blue-400 transition py-3 font-semibold">
+          <div className="space-y-2">
+            <label className="text-sm">Select User</label>
+            <select 
+              value={selectedUserId} 
+              onChange={(e) => setSelectedUserId(e.target.value)} 
+              className="w-full rounded-xl bg-slate-900 border border-white/25 px-4 py-3 outline-none"
+              required
+            >
+              {roleUsers.length === 0 && <option value="" disabled>No {role}s available</option>}
+              {roleUsers.map(u => (
+                <option key={u.id} value={u.id}>
+                  {u.name} ({u.email || `${u.id}@demo.com`})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button type="submit" className="w-full rounded-xl bg-blue-500 hover:bg-blue-400 transition py-3 font-semibold" disabled={!selectedUserId}>
             {t.continueBtn}
           </button>
         </form>
-
-        <div className="rounded-3xl border border-white/15 bg-white/5 backdrop-blur-xl p-5 space-y-3">
-          <p className="text-white/70 text-sm font-medium">{t.quickDemoAccess}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {DEMO_USERS.map((d) => (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => submit(d.name, d.email, d.role)}
-                className="rounded-xl border border-white/20 bg-white/10 hover:bg-blue-500/30 transition py-2.5 text-sm font-semibold capitalize"
-              >
-                {t[d.role]}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
