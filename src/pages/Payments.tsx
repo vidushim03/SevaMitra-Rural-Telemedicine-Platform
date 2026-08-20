@@ -5,13 +5,17 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { CreditCard, CheckCircle, Clock, FileText, IndianRupee } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, FileText, IndianRupee, Copy, Smartphone, Users, Truck } from 'lucide-react';
+
+const HOSPITAL_UPI_ID = 'sevamitra@upi';
 
 export function PaymentsPage() {
   const { data, markPayment } = useAppData();
   const { user } = useAuth();
   const { language } = useLanguage();
   const [filter, setFilter] = useState<'all' | 'pending' | 'paid'>('all');
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [expandedPayId, setExpandedPayId] = useState<string | null>(null);
 
   const payments = useMemo(() => {
     if (!user) return [];
@@ -114,9 +118,66 @@ export function PaymentsPage() {
                     {new Date(p.date).toLocaleDateString()} • {p.method.toUpperCase()}
                   </span>
                   {p.status === 'pending' && user.role === 'patient' && (
-                    <span className="text-sm text-muted-foreground italic">
-                      Pay at hospital counter during your visit
-                    </span>
+                    <div className="flex flex-col gap-2 items-end">
+                      {expandedPayId === p.id ? (
+                        <div className="w-72 space-y-2 rounded-xl border p-3 bg-white dark:bg-zinc-950">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">Choose how to pay ₹{p.amount}:</p>
+
+                          {/* UPI Option */}
+                          <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg px-3 py-2">
+                            <Smartphone size={14} className="text-emerald-600 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium">Pay via UPI</p>
+                              <p className="text-xs font-mono text-muted-foreground truncate">{HOSPITAL_UPI_ID}</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(HOSPITAL_UPI_ID);
+                                setCopiedUpi(true);
+                                setTimeout(() => setCopiedUpi(false), 2000);
+                              }}
+                              className="p-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-800 transition-colors shrink-0"
+                            >
+                              <Copy size={12} className="text-emerald-600" />
+                            </button>
+                          </div>
+                          {copiedUpi && <p className="text-xs text-emerald-600">UPI ID copied!</p>}
+
+                          {/* ASHA Worker Option */}
+                          <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
+                            <Users size={14} className="text-blue-600 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium">Pay via ASHA Worker</p>
+                              <p className="text-xs text-muted-foreground">Ask your local ASHA worker to collect</p>
+                            </div>
+                          </div>
+
+                          {/* Medicine Delivery Option */}
+                          <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg px-3 py-2">
+                            <Truck size={14} className="text-orange-600 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium">Pay on Medicine Delivery</p>
+                              <p className="text-xs text-muted-foreground">Pay cash when medicines arrive</p>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setExpandedPayId(null)}
+                            className="text-xs text-muted-foreground hover:text-foreground text-center w-full pt-1"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                          onClick={() => setExpandedPayId(p.id)}
+                        >
+                          Pay ₹{p.amount}
+                        </Button>
+                      )}
+                    </div>
                   )}
                   {p.status === 'pending' && (user.role === 'admin' || user.role === 'doctor') && (
                     <div className="flex gap-2">
