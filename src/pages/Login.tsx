@@ -13,6 +13,10 @@ export function LoginPage() {
 
   const [role, setRole] = useState<UserRole>('patient');
   
+  // For Patient
+  const [patientName, setPatientName] = useState('');
+  const [patientEmail, setPatientEmail] = useState('');
+
   // For Doctor
   const doctorUsers = data.users.filter(u => u.role === 'doctor');
   const [selectedDoctorId, setSelectedDoctorId] = useState(doctorUsers.length > 0 ? doctorUsers[0].id : '');
@@ -24,10 +28,10 @@ export function LoginPage() {
       if (doc) {
         login({ name: doc.name, email: doc.email || `${doc.id}@demo.com`, role: 'doctor' });
       }
+    } else if (role === 'patient') {
+      login({ name: patientName, email: patientEmail, role: 'patient' });
     } else if (role === 'admin') {
       login({ name: 'System Admin', email: 'admin@demo.com', role: 'admin' });
-    } else {
-      login({ name: 'Rohan Verma', email: 'rohan@demo.com', role: 'patient' });
     }
   };
 
@@ -48,9 +52,17 @@ export function LoginPage() {
           </div>
 
           {role === 'patient' && (
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white/80">
-              You will be signed in securely as Rohan Verma (rohan@demo.com).
-            </div>
+            <>
+              <div className="space-y-2">
+                <label className="text-sm">{t.name}</label>
+                <input value={patientName} onChange={(e) => setPatientName(e.target.value)} className="w-full rounded-xl bg-white/10 border border-white/25 px-4 py-3 outline-none" required />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm">{t.email}</label>
+                <input type="email" value={patientEmail} onChange={(e) => setPatientEmail(e.target.value)} className="w-full rounded-xl bg-white/10 border border-white/25 px-4 py-3 outline-none" required />
+              </div>
+            </>
           )}
 
           {role === 'doctor' && (
