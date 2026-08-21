@@ -111,8 +111,12 @@ function AdminView({ data, doctorMap, patientMap, t }: { data: ReturnType<typeof
   const statusDistribution = useMemo(() => {
     const m = new Map<string, number>();
     data.payments.forEach((p) => m.set(p.status, (m.get(p.status) || 0) + 1));
-    return Array.from(m.entries()).map(([name, value]) => ({ name, value }));
-  }, [data.payments]);
+    return Array.from(m.entries()).map(([name, value]) => ({ 
+      name: t[`${name}Status`] || name, 
+      originalName: name,
+      value 
+    }));
+  }, [data.payments, t]);
 
   const monthlyRevenue = useMemo(() => {
     const m = new Map<string, number>();
@@ -185,7 +189,7 @@ function AdminView({ data, doctorMap, patientMap, t }: { data: ReturnType<typeof
             <PieChart>
               <Pie data={statusDistribution} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
                 {statusDistribution.map((entry) => (
-                  <Cell key={entry.name} fill={STATUS_COLORS[entry.name] || "#94a3b8"} />
+                  <Cell key={entry.originalName} fill={STATUS_COLORS[entry.originalName] || "#94a3b8"} />
                 ))}
               </Pie>
               <Tooltip />
