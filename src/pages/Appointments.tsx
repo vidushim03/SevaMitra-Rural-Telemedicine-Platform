@@ -24,7 +24,8 @@ export const Appointments = () => {
 
   if (!user) return null;
 
-  const isDoctor = user.role === 'doctor' || user.role === 'admin';
+  const isDoctor = user.role === 'doctor';
+  const isAdmin = user.role === 'admin';
 
   const getPatientName = (id: string) => {
     const p = patients.find((p) => p.id === id);
@@ -96,8 +97,8 @@ export const Appointments = () => {
         <table className="w-full text-sm">
           <thead className="bg-muted/40">
             <tr>
-              {isDoctor && <th className="p-3 text-left">{t.patient}</th>}
-              {!isDoctor && <th className="p-3 text-left">{t.doctor}</th>}
+              {(isDoctor || isAdmin) && <th className="p-3 text-left">{t.patient}</th>}
+              {(!isDoctor || isAdmin) && <th className="p-3 text-left">{t.doctor}</th>}
               <th className="p-3 text-left">{t.when}</th>
               <th className="p-3 text-left">{t.reason}</th>
               <th className="p-3 text-left">{t.fee}</th>
@@ -113,8 +114,8 @@ export const Appointments = () => {
             )}
             {appointments.map((a) => (
               <tr key={a.id} className="border-t">
-                {isDoctor && <td className="p-3 font-medium">{getPatientName(a.patientId)}</td>}
-                {!isDoctor && <td className="p-3">{getDoctorName(a.doctorId)}</td>}
+                {(isDoctor || isAdmin) && <td className="p-3 font-medium">{getPatientName(a.patientId)}</td>}
+                {(!isDoctor || isAdmin) && <td className="p-3">{getDoctorName(a.doctorId)}</td>}
                 <td className="p-3">{a.date} {a.time}</td>
                 <td className="p-3">{a.reason}</td>
                 <td className="p-3">₹{a.fee}</td>
