@@ -28,6 +28,28 @@ export function AdminPage() {
   const { data, doctors, patients, addUser, removeUser, updateAppointmentStatus, markPayment } = useAppData();
   const { language } = useLanguage();
   const t = translations[language];
+
+    const translateStatus = (s: string) => {
+      if (s === 'completed') return t.completed;
+      if (s === 'in-progress') return t.inProgress;
+      if (s === 'cancelled') return (t as any).cancelled || 'Cancelled';
+      if (s === 'paid') return t.paid;
+      if (s === 'pending') return t.pending;
+      if (s === 'failed') return t.failed;
+      return s;
+    };
+
+    const translateSpecialty = (s: string) => {
+      const map: Record<string, string> = {
+        'General Physician': (t as any).generalPhysician,
+        'Cardiologist': (t as any).cardiologist,
+        'Dermatologist': (t as any).dermatologist,
+        'Pediatrician': (t as any).pediatrician,
+        'Gynecologist': (t as any).gynecologist,
+      };
+      return map[s] || s;
+    };
+
   const [tab, setTab] = useState<Tab>('analytics');
 
   // Add Doctor form state
@@ -143,7 +165,7 @@ export function AdminPage() {
                 <input value={docName} onChange={e => setDocName(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={`${t.name} *`} required />
                 <input value={docEmail} onChange={e => setDocEmail(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" placeholder={t.email} type="email" />
                 <select value={docSpecialty} onChange={e => setDocSpecialty(e.target.value)} className="border rounded-lg px-3 py-2 text-sm">
-                  {SPECIALTIES.map(s => <option key={s}>{s}</option>)}
+                  {SPECIALTIES.map(s => <option key={s} value={s}>{translateSpecialty(s)}</option>)}
                 </select>
               </div>
               <button className="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">{t.addDoctor}</button>
@@ -295,7 +317,7 @@ export function AdminPage() {
                           a.status === 'in-progress' ? 'bg-amber-100 text-amber-700' :
                           a.status === 'cancelled' ? 'bg-rose-100 text-rose-700' :
                           'bg-blue-100 text-blue-700'
-                        }`}>{a.status}</span>
+                        }`}>{translateStatus(a.status)}</span>
                       </td>
                       <td className="p-3 flex gap-1">
                         <button onClick={() => updateAppointmentStatus(a.id, 'completed')} className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-xs">{t.completeBtn}</button>
@@ -399,7 +421,7 @@ export function AdminPage() {
                           p.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                           p.status === 'failed' ? 'bg-rose-100 text-rose-700' :
                           'bg-slate-100 text-slate-700'
-                        }`}>{p.status}</span>
+                        }`}>{translateStatus(p.status)}</span>
                       </td>
                       <td className="p-3 flex gap-1">
                         {p.status === 'pending' && (
