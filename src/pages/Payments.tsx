@@ -15,6 +15,14 @@ export function PaymentsPage() {
   const { user } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
+
+  const translateStatus = (s: string) => {
+    if (s === 'paid') return t.paid;
+    if (s === 'pending') return t.pending;
+    if (s === 'failed') return t.failed;
+    return s;
+  };
+
   const [filter, setFilter] = useState<'all' | 'pending' | 'paid'>('all');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [expandedPayId, setExpandedPayId] = useState<string | null>(null);
@@ -199,7 +207,7 @@ export function PaymentsPage() {
                     </div>
                   </div>
                   <Badge variant={p.status === 'paid' ? 'default' : 'secondary'} className={p.status === 'paid' ? 'bg-green-600' : 'bg-amber-500'}>
-                    {p.status}
+                    {translateStatus(p.status)}
                   </Badge>
                   <Button
                     size="sm"

@@ -10,6 +10,14 @@ export const Appointments = () => {
   const { language } = useLanguage();
   const t = translations[language];
 
+  const translateStatus = (s: string) => {
+    if (s === 'completed') return t.completed;
+    if (s === 'in-progress') return t.inProgress;
+    if (s === 'cancelled') return (t as any).cancelled || 'Cancelled';
+    return s;
+  };
+
+
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? 'doctor_1');
   const [patientId, setPatientId] = useState('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -119,7 +127,7 @@ export const Appointments = () => {
                 <td className="p-3">{a.date} {a.time}</td>
                 <td className="p-3">{a.reason}</td>
                 <td className="p-3">₹{a.fee}</td>
-                <td className="p-3 capitalize">{a.status}</td>
+                <td className="p-3 capitalize">{translateStatus(a.status)}</td>
                 <td className="p-3 flex gap-2">
                   {(user.role === 'doctor' || user.role === 'admin') && (
                     <>
