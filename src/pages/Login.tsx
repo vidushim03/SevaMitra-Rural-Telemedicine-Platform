@@ -67,14 +67,14 @@ export function LoginPage() {
 
           {role === 'doctor' && (
             <div className="space-y-2">
-              <label className="text-sm">Select Doctor</label>
+              <label className="text-sm">{t.selectDoctor}</label>
               <select 
                 value={selectedDoctorId} 
                 onChange={(e) => setSelectedDoctorId(e.target.value)} 
                 className="w-full rounded-xl bg-slate-900 border border-white/25 px-4 py-3 outline-none"
                 required
               >
-                {doctorUsers.length === 0 && <option value="" disabled>No doctors available</option>}
+                {doctorUsers.length === 0 && <option value="" disabled>{t.noDoctorsAvailable}</option>}
                 {doctorUsers.map(u => (
                   <option key={u.id} value={u.id}>
                     {u.name} ({u.email || `${u.id}@demo.com`})
@@ -86,7 +86,7 @@ export function LoginPage() {
 
           {role === 'admin' && (
             <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white/80">
-              You will be signed in securely as System Administrator (admin@demo.com).
+              {t.adminSignInMessage} (admin@demo.com).
             </div>
           )}
 

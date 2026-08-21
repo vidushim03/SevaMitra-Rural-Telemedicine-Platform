@@ -22,6 +22,10 @@ export const translations = {
     register: "Register",
     phone: "Phone Number",
     password: "Password",
+    logout: "Logout",
+    selectDoctor: "Select Doctor",
+    noDoctorsAvailable: "No doctors available",
+    adminSignInMessage: "You will be signed in securely as System Administrator",
     confirmPassword: "Confirm Password",
     name: "Full Name",
     
@@ -739,6 +743,10 @@ export const translations = {
     register: "पंजीकरण",
     phone: "फोन नंबर",
     password: "पासवर्ड",
+    logout: "लॉगआउट",
+    selectDoctor: "डॉक्टर चुनें",
+    noDoctorsAvailable: "कोई डॉक्टर उपलब्ध नहीं",
+    adminSignInMessage: "आप सुरक्षित रूप से सिस्टम प्रशासक के रूप में साइन इन होंगे",
     confirmPassword: "पासवर्ड की पुष्टि करें",
     name: "पूरा नाम",
     
@@ -1447,6 +1455,10 @@ export const translations = {
     register: "ਰਜਿਸਟਰ",
     phone: "ਫੋਨ ਨੰਬਰ",
     password: "ਪਾਸਵਰਡ",
+    logout: "ਲਾਗਆਉਟ",
+    selectDoctor: "ਡਾਕਟਰ ਚੁਣੋ",
+    noDoctorsAvailable: "ਕੋਈ ਡਾਕਟਰ ਉਪਲਬਧ ਨਹੀਂ",
+    adminSignInMessage: "ਤੁਸੀਂ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਸਿਸਟਮ ਪ੍ਰਸ਼ਾਸਕ ਵਜੋਂ ਸਾਈਨ ਇਨ ਹੋਵੋਗੇ",
     confirmPassword: "ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
     name: "ਪੂਰਾ ਨਾਂ",
     

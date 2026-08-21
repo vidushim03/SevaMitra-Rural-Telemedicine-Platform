@@ -149,7 +149,7 @@ function ProtectedApp() {
         <div className="p-4 border-t border-border/50 flex items-center justify-between">
           <ThemeToggle />
           <LanguageToggle />
-          <button onClick={logout} className="px-3 py-1 text-sm rounded-full border hover:bg-muted">Logout</button>
+          <button onClick={logout} className="px-3 py-1 text-sm rounded-full border hover:bg-muted">{t.logout}</button>
         </div>
       </aside>
 
