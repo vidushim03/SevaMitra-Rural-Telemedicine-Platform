@@ -24,7 +24,8 @@ export function PrescriptionsPage() {
 
   if (!user) return null;
 
-  const isDoctor = user.role === 'doctor' || user.role === 'admin';
+  const isDoctor = user.role === 'doctor';
+  const isAdmin = user.role === 'admin';
 
   const getPatientName = (id: string) => {
     const p = patients.find((p) => p.id === id);
@@ -87,12 +88,12 @@ export function PrescriptionsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-semibold">{t.prescription} #{p.id}</p>
-                {isDoctor && (
+                {(isDoctor || isAdmin) && (
                   <p className="text-xs text-blue-600 mt-0.5">{t.patientLabel} {getPatientName(p.patientId)}</p>
                 )}
                 <p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleString()}</p>
               </div>
-              {isDoctor && (
+              {(isDoctor || isAdmin) && (
                 <button
                   onClick={() => deletePrescription(p.id)}
                   className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
