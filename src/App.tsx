@@ -73,14 +73,9 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
   ],
   admin: [
     { to: '/', label: 'Dashboard', icon: Activity },
-    { to: '/symptoms', label: 'Symptom Checker', icon: Stethoscope },
-    { to: '/consultations', label: 'Consultations', icon: Video },
     { to: '/appointments', label: 'Appointments', icon: Calendar },
     { to: '/records', label: 'Records', icon: FileText },
-    { to: '/prescriptions', label: 'Prescriptions', icon: Stethoscope },
-    { to: '/medicines', label: 'Medicines', icon: Pill },
     { to: '/pharmacy', label: 'Pharmacy', icon: MapPin },
-    { to: '/vitals', label: 'Vitals', icon: HeartPulse },
     { to: '/payments', label: 'Payments', icon: CreditCard },
     { to: '/payment-analytics', label: 'Analytics', icon: Activity },
     { to: '/admin', label: 'Admin', icon: Shield },
@@ -90,7 +85,7 @@ const ROLE_LINKS: Record<string, { to: string; label: string; icon: typeof Activ
 const ROLE_ACCESS: Record<string, string[]> = {
   patient: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments'],
   doctor: ['/', '/consultations', '/appointments', '/records', '/prescriptions', '/payments', '/payment-analytics', '/pharmacy'],
-  admin: ['/', '/symptoms', '/consultations', '/appointments', '/records', '/prescriptions', '/medicines', '/pharmacy', '/vitals', '/payments', '/payment-analytics', '/admin'],
+  admin: ['/', '/appointments', '/records', '/pharmacy', '/payments', '/payment-analytics', '/admin'],
 };
 
 function AccessGuard({ path, children }: { path: string; children: React.ReactNode }) {
