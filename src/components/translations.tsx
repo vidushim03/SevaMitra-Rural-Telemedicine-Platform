@@ -15,6 +15,7 @@ export const translations = {
     doctors: "Doctors",
     payments: "Payments",
     manageAppointments: "Manage your upcoming and past appointments.",
+    analytics: "Analytics",
 
     // Authentication
     login: "Login",
@@ -719,6 +720,7 @@ export const translations = {
     doctors: "डॉक्टर",
     payments: "भुगतान",
     manageAppointments: "अपने आगामी और पिछले अपॉइंटमेंट प्रबंधित करें।",
+    analytics: "एनालिटिक्स",
     
     // Authentication
     login: "लॉग इन",
@@ -1420,6 +1422,7 @@ export const translations = {
     doctors: "ਡਾਕਟਰ",
     payments: "ਭੁਗਤਾਨ",
     manageAppointments: "ਆਪਣੀਆ ਆਗਾਮੀ ਅਤੇ ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ।",
+    analytics: "ਵਿਸ਼ਲੇਸ਼ਣ",
     
     // Authentication
     login: "ਲੌਗ ਇਨ",
