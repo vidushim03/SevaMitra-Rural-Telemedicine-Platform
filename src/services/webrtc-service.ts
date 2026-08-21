@@ -17,7 +17,7 @@ export class WebRTCService {
     console.log('Initializing WebRTC service with signaling URL:', serverUrl);
 
     this.socket = io(serverUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       timeout: 10000,
       reconnection: true,
       reconnectionAttempts: 10,
