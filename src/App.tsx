@@ -125,7 +125,7 @@ function ProtectedApp() {
       <aside className="w-72 border-r border-border glass flex flex-col z-10 m-4 rounded-3xl overflow-hidden">
         <div className="p-6 border-b border-border/50">
           <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">SevaMitra</h1>
-          <p className="text-xs text-muted-foreground mt-2">{user.name} ({user.role})</p>
+          <p className="text-xs text-muted-foreground mt-2">{user.name} ({(t as any)[user.role] || user.role})</p>
         </div>
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
           {links.map(({ to, label, icon: Icon }) => {
