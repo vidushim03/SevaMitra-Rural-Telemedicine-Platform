@@ -27,6 +27,10 @@ export const translations = {
     selectDoctor: "Select Doctor",
     noDoctorsAvailable: "No doctors available",
     adminSignInMessage: "You will be signed in securely as System Administrator",
+    portal: "PORTAL",
+    joined: "Joined:",
+    ongoing: "Ongoing",
+    waiting: "Waiting",
     confirmPassword: "Confirm Password",
     name: "Full Name",
     
@@ -749,6 +753,10 @@ export const translations = {
     selectDoctor: "डॉक्टर चुनें",
     noDoctorsAvailable: "कोई डॉक्टर उपलब्ध नहीं",
     adminSignInMessage: "आप सुरक्षित रूप से सिस्टम प्रशासक के रूप में साइन इन होंगे",
+    portal: "पोर्टल",
+    joined: "शामिल हुए:",
+    ongoing: "जारी है",
+    waiting: "प्रतीक्षा में",
     confirmPassword: "पासवर्ड की पुष्टि करें",
     name: "पूरा नाम",
     
@@ -1462,6 +1470,10 @@ export const translations = {
     selectDoctor: "ਡਾਕਟਰ ਚੁਣੋ",
     noDoctorsAvailable: "ਕੋਈ ਡਾਕਟਰ ਉਪਲਬਧ ਨਹੀਂ",
     adminSignInMessage: "ਤੁਸੀਂ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਸਿਸਟਮ ਪ੍ਰਸ਼ਾਸਕ ਵਜੋਂ ਸਾਈਨ ਇਨ ਹੋਵੋਗੇ",
+    portal: "ਪੋਰਟਲ",
+    joined: "ਸ਼ਾਮਲ ਹੋਏ:",
+    ongoing: "ਜਾਰੀ ਹੈ",
+    waiting: "ਉਡੀਕ ਕਰ ਰਿਹਾ ਹੈ",
     confirmPassword: "ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
     name: "ਪੂਰਾ ਨਾਂ",
     

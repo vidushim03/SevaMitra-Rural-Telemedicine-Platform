@@ -56,7 +56,7 @@ export const Dashboard = () => {
   return (
     <div className="space-y-8">
       <div className="rounded-3xl p-6 text-white bg-[linear-gradient(120deg,#0c4a6e_0%,#1e40af_45%,#3b0764_100%)] shadow-2xl">
-        <p className="text-white/80 text-sm">{user.role.toUpperCase()} PORTAL</p>
+        <p className="text-white/80 text-sm uppercase">{(t as any)[user.role] || user.role} {(t as any).portal || 'PORTAL'}</p>
         <h2 className="text-3xl font-bold mt-1">{t.welcomeBack.replace('{name}', user.name)}</h2>
         <p className="text-white/80 mt-2">{t.dashboardSubtitle}</p>
       </div>
@@ -79,9 +79,9 @@ export const Dashboard = () => {
               <div key={q.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
                   <p className="font-medium">{q.appointmentId}</p>
-                  <p className="text-xs text-muted-foreground">Joined: {new Date(q.joinedAt).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">{(t as any).joined || 'Joined:'} {new Date(q.joinedAt).toLocaleString()}</p>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-zinc-800">{q.status}</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 capitalize">{(t as any)[q.status] || q.status}</span>
               </div>
             ))}
           </div>
