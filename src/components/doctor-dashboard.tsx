@@ -180,17 +180,9 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
     };
 
     // Test connection after 2 seconds
-    setTimeout(() => {
-      if (!socket.connected) {
-        setError(t.connectionTimeout);
-      }
-    }, 3000);
+    const timer = setTimeout(() => { if (!socket.connected) { setError(t.connectionTimeout); } }, 3000);
 
-    return () => {
-      if (webrtcService) {
-        webrtcService.disconnect();
-      }
-    };
+    return () => { clearTimeout(timer); if (webrtcService) { webrtcService.disconnect(); } };
   }, [webrtcService]);
 
   // Video call functions
