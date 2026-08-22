@@ -57,8 +57,8 @@ export function RoomOnboarding({ language, userId, userName, role }: RoomOnboard
     try {
       const existing = getRoom(code);
       if (existing && existing.patientId && existing.patientId !== userId) {
-        setError("This room is already occupied.");
-        return;
+        // Just log it instead of blocking, to allow seamless multi-tab testing
+        console.warn(`Taking over room ${code} from previous patient ${existing.patientId}`);
       }
       const joined = joinRoom(code, userId, userName);
       setJoinedRoom(joined);

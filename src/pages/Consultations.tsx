@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../components/translations';
 import { DoctorConsultation } from '../components/doctor-consultation';
@@ -47,7 +47,7 @@ export const Consultations = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-5">
-        <div>{isDoctor ? <DoctorDashboard language={language} user={user} /> : <DoctorConsultation language={language} user={user} />}</div>
+        <div className="min-w-0">{isDoctor ? <DoctorDashboard language={language} user={user} /> : <DoctorConsultation language={language} user={user} />}</div>
 
         <div className="space-y-4">
           <RoomOnboarding

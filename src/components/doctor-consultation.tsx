@@ -17,14 +17,14 @@ interface DoctorConsultationProps {
 export function DoctorConsultation({ language, user }: DoctorConsultationProps) {
   const [isInCall, setIsInCall] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [connectionQuality, setConnectionQuality] = useState<'good' | 'poor'>('good');
   const [currentCallId, setCurrentCallId] = useState<string | null>(null);
   const [callStatus, setCallStatus] = useState<'idle' | 'calling' | 'ringing' | 'connected'>('idle');
   const [incomingCall, setIncomingCall] = useState<any>(null);
 
-  // WebRTC service and video refs
-  const [webrtcService] = useState(() => new WebRTCService());
+  const [webrtcService, setWebrtcService] = useState<WebRTCService | null>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   // True when this patient is answering a doctor-initiated call (doctor creates the offer)
@@ -74,15 +74,18 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
   ];
 
   useEffect(() => {
+    const service = new WebRTCService();
+    setWebrtcService(service);
+
     // Register the real patient so the doctor's signaling server sees them
-    webrtcService.register(currentPatient.id, 'patient', {
+    service.register(currentPatient.id, 'patient', {
       name: currentPatient.name,
       age: currentPatient.age,
       condition: currentPatient.condition
     });
 
     // Setup event listeners
-    const socket = webrtcService.getSocket();
+    const socket = service.getSocket();
 
     socket.on('call-initiated', ({ callId }) => {
       setCurrentCallId(callId);
@@ -99,13 +102,13 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
 
       try {
         // Start local stream and initiate WebRTC
-        const localStream = await webrtcService.startLocalStream(isVideoEnabled, isAudioEnabled);
+        const localStream = await service.startLocalStream(isVideoEnabled, isAudioEnabled);
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream;
         }
 
         // Initiate WebRTC call
-        await webrtcService.initiateCall(callId);
+        await service.initiateCall(callId);
       } catch (error) {
         alert(t.cameraAccessFailed);
       }
@@ -129,24 +132,24 @@ export function DoctorConsultation({ language, user }: DoctorConsultationProps) 
     });
 
     // Handle remote stream
-    webrtcService.onRemoteStream = (stream) => {
+    service.onRemoteStream = (stream) => {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
       }
     };
 
     // Handle call ended
-    webrtcService.onCallEnded = () => {
+    service.onCallEnded = () => {
       endCall();
     };
 
     // Handle connection state changes
-    webrtcService.onConnectionStateChange = (state) => {
+    service.onConnectionStateChange = (state) => {
       setConnectionQuality(state === 'connected' ? 'good' : 'poor');
     };
 
     return () => {
-      webrtcService.disconnect();
+      service.disconnect();
     };
   }, []);
 
