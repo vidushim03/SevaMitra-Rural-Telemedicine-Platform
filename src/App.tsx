@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
-import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video } from 'lucide-react';
+import { Activity, Calendar, CreditCard, FileText, Globe, HeartPulse, MapPin, Moon, Pill, Shield, Stethoscope, Sun, Video, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { translations } from './components/translations';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -106,6 +106,8 @@ function ProtectedApp() {
   const { language } = useLanguage();
   const t = translations[language as keyof typeof translations];
 
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -122,10 +124,25 @@ function ProtectedApp() {
       <div className="absolute top-[-100px] left-[-100px] w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] right-[-100px] w-96 h-96 bg-destructive/10 rounded-full blur-3xl pointer-events-none" />
 
-      <aside className="w-72 border-r border-border glass flex flex-col z-10 m-4 rounded-3xl overflow-hidden">
-        <div className="p-6 border-b border-border/50">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">SevaMitra</h1>
-          <p className="text-xs text-muted-foreground mt-2">{user.name} ({(t as any)[user.role] || user.role})</p>
+      <aside className={`${isCollapsed ? 'w-24' : 'w-72'} transition-all duration-300 border-r border-border glass flex flex-col z-10 m-4 rounded-3xl overflow-hidden relative group/sidebar`}>
+        <div className="p-6 border-b border-border/50 flex items-center justify-between min-h-[90px]">
+          {!isCollapsed && (
+            <div className="overflow-hidden whitespace-nowrap">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">SevaMitra</h1>
+              <p className="text-xs text-muted-foreground mt-2">{user.name} ({(t as any)[user.role] || user.role})</p>
+            </div>
+          )}
+          {isCollapsed && (
+            <div className="mx-auto font-bold text-xl text-primary flex items-center justify-center">SM</div>
+          )}
+          
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="absolute right-3 top-6 p-1.5 rounded-full bg-background/80 hover:bg-muted border shadow-sm text-muted-foreground opacity-0 group-hover/sidebar:opacity-100 transition-opacity"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          </button>
         </div>
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
           {links.map(({ to, label, icon: Icon }) => {
@@ -134,26 +151,33 @@ function ProtectedApp() {
               <Link 
                 key={to} 
                 to={to} 
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all group ${
+                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-2xl transition-all group ${
                   isActive 
                     ? 'bg-primary/10 text-primary font-bold shadow-sm' 
                     : 'hover:bg-primary/5 text-muted-foreground hover:text-foreground font-medium'
                 }`}
+                title={isCollapsed ? label : undefined}
               >
-                <Icon className={`${isActive ? 'text-primary' : 'text-primary/70'} group-hover:scale-110 transition-transform`} size={18} />
-                {label}
+                <Icon className={`${isActive ? 'text-primary' : 'text-primary/70'} group-hover:scale-110 transition-transform`} size={isCollapsed ? 22 : 18} />
+                {!isCollapsed && <span className="whitespace-nowrap">{label}</span>}
               </Link>
             );
           })}
         </nav>
-        <div className="p-4 border-t border-border/50 flex items-center justify-between">
+        <div className={`p-4 border-t border-border/50 flex ${isCollapsed ? 'flex-col gap-4 items-center justify-center' : 'items-center justify-between'}`}>
           <ThemeToggle />
-          <LanguageToggle />
-          <button onClick={logout} className="px-3 py-1 text-sm rounded-full border hover:bg-muted">{t.logout}</button>
+          {!isCollapsed && <LanguageToggle />}
+          <button 
+            onClick={logout} 
+            className={`px-3 py-1 text-sm rounded-full border hover:bg-muted ${isCollapsed ? 'w-10 h-10 flex items-center justify-center p-0' : ''}`}
+            title={isCollapsed ? t.logout : undefined}
+          >
+            {isCollapsed ? "➜" : t.logout}
+          </button>
         </div>
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto z-10">
+      <main className="flex-1 p-8 overflow-y-auto overflow-x-hidden z-10 min-w-0">
         <div className="animate-in">
           <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="text-muted-foreground text-lg">Loading...</div></div>}>
             <Routes>

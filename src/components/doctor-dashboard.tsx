@@ -43,14 +43,7 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
   const [error, setError] = useState<string | null>(null);
 
   // WebRTC service and video refs
-  const [webrtcService] = useState(() => {
-    try {
-      return new WebRTCService();
-    } catch (err) {
-      setError(t.videoServiceInitFailed);
-      return null;
-    }
-  });
+  const [webrtcService, setWebrtcService] = useState<WebRTCService | null>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const doctorInitiatedCallRef = useRef(false);
@@ -106,19 +99,23 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
 
   // Video call setup
   useEffect(() => {
-    if (!webrtcService) {
-      setError(t.videoServiceUnavailable);
+    let service: WebRTCService;
+    try {
+      service = new WebRTCService();
+      setWebrtcService(service);
+    } catch (err) {
+      setError(t.videoServiceInitFailed);
       return;
     }
 
     // Register the real logged-in doctor so incoming calls route to them
-    webrtcService.register(currentDoctor.id, 'doctor', {
+    service.register(currentDoctor.id, 'doctor', {
       name: currentDoctor.name,
       specialty: currentDoctor.specialty
     });
 
     // Setup event listeners
-    const socket = webrtcService.getSocket();
+    const socket = service.getSocket();
 
     socket.on('connect', () => {
       setConnectionStatus('connected');
@@ -153,11 +150,9 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
 
     socket.on('call-accepted', async ({ callId }) => {
       // The patient accepted a doctor-initiated call: kick off WebRTC offer.
-      // Only the initiating side (doctor) creates the offer; if the doctor is
-      // merely accepting a patient-initiated call, this handler does nothing.
       try {
-        if (webrtcService && doctorInitiatedCallRef.current) {
-          await webrtcService.initiateCall(callId);
+        if (service && doctorInitiatedCallRef.current) {
+          await service.initiateCall(callId);
           doctorInitiatedCallRef.current = false;
         }
       } catch (err) {
@@ -165,25 +160,28 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
       }
     });
 
-    webrtcService.onRemoteStream = (stream) => {
+    service.onRemoteStream = (stream) => {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
       }
     };
 
-    webrtcService.onCallEnded = () => {
+    service.onCallEnded = () => {
       endVideoCall();
     };
 
-    webrtcService.onConnectionStateChange = (state) => {
+    service.onConnectionStateChange = (state) => {
       setConnectionQuality(state === 'connected' ? 'good' : 'poor');
     };
 
-    // Test connection after 2 seconds
-    const timer = setTimeout(() => { if (!socket.connected) { setError(t.connectionTimeout); } }, 3000);
+    // Test connection after 10 seconds to avoid premature timeout errors on slow starts
+    const timer = setTimeout(() => { if (!socket.connected) { setError(t.connectionTimeout); } }, 10000);
 
-    return () => { clearTimeout(timer); if (webrtcService) { webrtcService.disconnect(); } };
-  }, [webrtcService]);
+    return () => { 
+      clearTimeout(timer); 
+      service.disconnect(); 
+    };
+  }, []);
 
   // Video call functions
   const acceptCall = async () => {
