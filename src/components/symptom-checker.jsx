@@ -829,49 +829,6 @@ export function SymptomChecker({ language, onPageChange }) {
                 </div>
               </div>
 
-              {/* Image Upload - Enhanced */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-gray-800">
-                  📸 {t.visualSymptoms || "Visual Symptoms"} (
-                  {t.optional || "Optional"})
-                </h4>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                  />
-
-                  <label htmlFor="image-upload" className="cursor-pointer">
-                    <div className="space-y-3">
-                      <Upload className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
-                      <div>
-                        <p className="text-gray-600 font-medium">
-                          {t.uploadPhotoSymptoms ||
-                            "Upload photo of visible symptoms"}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {t.imageUploadHint ||
-                            "PNG, JPG up to 5MB • Helps with rashes, swelling, wounds"}
-                        </p>
-                      </div>
-                    </div>
-                  </label>
-                  {uploadedImage && (
-                    <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <div className="flex items-center justify-center space-x-2 text-green-700 dark:text-green-300">
-                        <CheckCircle className="h-5 w-5" />
-                        <span className="text-sm font-medium">
-                          ✓ {t.imageUploaded || "Image uploaded"}:{" "}
-                          {uploadedImage.name}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
               {/* Helper Text */}
               <div className="text-center">
