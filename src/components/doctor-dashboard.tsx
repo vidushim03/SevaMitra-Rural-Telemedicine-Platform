@@ -603,8 +603,8 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
               <CardContent>
                 <div className="space-y-4">
                   {todaysPatients.map((patient) => (
-                    <div key={patient.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="flex items-center space-x-4">
+                    <div key={patient.id} className="flex flex-wrap items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 gap-4">
+                      <div className="flex items-center space-x-4 min-w-[200px] flex-1">
                         <Avatar>
                           <AvatarFallback>
                             {patient.name.split(' ').map(n => n[0]).join('')}
@@ -618,24 +618,24 @@ export function DoctorDashboard({ language, user }: DoctorDashboardProps) {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="min-w-[120px] flex-1">
                         <p className="font-medium">{patient.condition}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{patient.appointmentTime}</p>
                         {patient.waitTime > 0 && (
-                          <Badge variant="outline" className="text-yellow-600">
+                          <Badge variant="outline" className="text-yellow-600 mt-1">
                             {t.waiting || 'Waiting'}: {patient.waitTime}m
                           </Badge>
                         )}
                       </div>
-                      <div className="text-right max-w-xs">
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{patient.symptoms}</p>
+                      <div className="min-w-[150px] flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{patient.symptoms}</p>
                         {patient.lastVisit && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {t.lastVisit || 'Last Visit'}: {patient.lastVisit}
                           </p>
                         )}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 w-full lg:w-auto justify-end mt-2 lg:mt-0">
                         <Button size="sm" variant="outline" onClick={() => setSelectedTab('records')}>
                           <FileText className="h-4 w-4 mr-2" />
                           {t.records}
