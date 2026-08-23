@@ -99,7 +99,7 @@ Symptom check / complaint → Room code or QR onboarding → Video consultation
    device-local data that survives disconnects
 ```
 
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Socket.IO client, WebRTC, shadcn/ui.
+- **Frontend:** React 18, JavaScript, Vite, Tailwind CSS, Socket.IO client, WebRTC, shadcn/ui.
 - **Backend:** Python, FastAPI, Socket.IO, Gemini API.
 - **Persistence:** localStorage-backed offline queue (`src/services/sync-queue.ts`) with automatic
   flush on the `online` event.

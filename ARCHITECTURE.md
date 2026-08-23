@@ -8,7 +8,7 @@ decisions are auditable.
 
 ```
 ┌────────────────────────────────┐         ┌─────────────────────────────────────┐
-│  React SPA (Vite + TypeScript) │         │  telemed-backend (Python + FastAPI)  │
+│  React SPA (Vite + JavaScript) │         │  telemed-backend (Python + FastAPI)  │
 │  ────────────────────────────  │  HTTP   │  ──────────────────────────────────  │
 │  App shell (routing, auth,     │  + WS   │  Socket.IO signaling server           │
 │    language, app-data context) │────────▶│   · register / call lifecycle        │
